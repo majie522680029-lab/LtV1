@@ -1,0 +1,17 @@
+{
+  "dialog_index": 114,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，请问有什么可以帮您 \nSERVICE:您现在什么问题 \nCUSTOMER:* 取消次月生效产品 \nSERVICE:现在取消次月权限没有了 \nSERVICE:前台取消有什么报错 \nCUSTOMER:系统限制    服务名称 [ trades_mobilemodify_transform ] txid [79e5c7e9^**] 规则编码 [4330] 规则内容: 规则限制：该副卡对应的主卡号码已经取消主卡，下月生效，不允许将该号码回退为副卡！  \nCUSTOMER:或者 能不能 更改次月生效的套餐 我换个资费 \nSERVICE:您好，此问题需要后台专家协助核查，已经为你转接中，请稍等，转接成功后将由后台专家为您服务感谢配合 \nSERVICE:@* 专家会话太多了您提供联系方式派单核实下 \nSERVICE:你好在吗 \nSERVICE:转接说明：请核实 \nSERVICE:您好，我是*，很高兴为您服务！ \nSERVICE:后台无法直接为用户办理取消次月产品 \nSERVICE:根据报错请恢复主卡业务后再办理副卡取消次月产品 \nSERVICE:还有问题不",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，请问有什么可以帮您 \nSERVICE:您现在什么问题 \nCUSTOMER:* 取消次月生效产品 \nSERVICE:现在取消次月权限没有了 \nSERVICE:前台取消有什么报错 \nCUSTOMER:系统限制    服务名称 [ trades_mobilemodify_transform ] txid [79e5c7e9^**] 规...",
+  "extracted_qa_pairs": [
+    {
+      "question": "取消次月生效产品时系统提示“该副卡对应的主卡号码已经取消主卡，下月生效，不允许将该号码回退为副卡”，应如何处理？",
+      "answer": "根据报错，请恢复主卡业务后再办理副卡取消次月产品。"
+    },
+    {
+      "question": "能否更改次月生效的套餐，更换资费？",
+      "answer": "后台无法直接为用户办理取消次月产品。"
+    }
+  ],
+  "extraction_count": 2,
+  "success": true
+}

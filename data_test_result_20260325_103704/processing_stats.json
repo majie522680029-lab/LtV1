@@ -1,0 +1,18 @@
+{
+  "start_time": "2026-03-25 10:38:51",
+  "processing_time_seconds": 107.47,
+  "total_dialogs_processed": 30,
+  "dialogs_with_valid_qa": 14,
+  "total_raw_qa_pairs": 26,
+  "total_clusters": 9,
+  "noise_cluster_size": 0,
+  "final_representative_qa_count": 10,
+  "success_rate": "46.7%",
+  "qa_extraction_rate": "0.87 QA/对话",
+  "representative_qa_rate": "38.5%",
+  "qa_extract_model_source": "线上模型",
+  "qa_extract_model_name": "qwen3-max",
+  "qa_extract_base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+  "representative_model_name": "qwen3-max",
+  "representative_model_base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+}

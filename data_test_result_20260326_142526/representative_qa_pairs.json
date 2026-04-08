@@ -1,0 +1,62 @@
+[
+  {
+    "representative_question": "固网解约时出现报错提示如何处理？",
+    "representative_answer": "固网解约时可能出现报错提示，如：pretrades服务处理失败：调用getTradeFee异常:获取费用异常合约算费异常活动已经进行过转兑，不允许返销！OUTER_TRADE_ID*活动已经进行过转兑，不允许返销！OUTER_TRADE_ID*"
+  },
+  {
+    "representative_question": "如何核实号码是否有转分月的发票？",
+    "representative_answer": "可通过系统查询是否存在未转分月的预存款订单，并通过【CBSS-发票账务打印设置】功能点将订单转分月，以增加用户的可打金额。"
+  },
+  {
+    "representative_question": "如何查询号码的开户部门和开户员工信息？",
+    "representative_answer": "可查询号码的开户部门和开户员工信息。"
+  },
+  {
+    "representative_question": "开户员工： 周伟，他这个工号呢",
+    "representative_answer": "周伟 zhouwei69 北京市分公司社会渠道中心.资源管理中心"
+  },
+  {
+    "representative_question": "如何确定不同服务的使用优先级？",
+    "representative_answer": "升级包优先使用，随后是月末27日流量。副卡的优先级需进一步查询。"
+  },
+  {
+    "representative_question": "如何查询宽带号码？",
+    "representative_answer": "无法查询到宽带号码。"
+  },
+  {
+    "representative_question": "能否提供宽带号码？",
+    "representative_answer": "可以提供宽带号码。"
+  },
+  {
+    "representative_question": "APP为何持续向用户发送查询详单短信，而用户从未使用过该功能？",
+    "representative_answer": "建议通过沃工单提交核实。"
+  },
+  {
+    "representative_question": "营业发票显示专票正在申请，推送完成后是否通过政企平台邮箱发送给客户？",
+    "representative_answer": "推送完成后会通过政企平台邮箱发送给客户。"
+  },
+  {
+    "representative_question": "如何将基础产品包（必选）设置为长期生效？",
+    "representative_answer": "已处理，请查看。"
+  },
+  {
+    "representative_question": "这个问题其他人提的其他系统的问题",
+    "representative_answer": "今天要求必须关单吗"
+  },
+  {
+    "representative_question": "如何开具开户费用的增值税专用发票？",
+    "representative_answer": "若需开具增值税专用发票，需在【营业发票退票】页面操作退票，退完后进行账务发票打印设置，再重新打印。"
+  },
+  {
+    "representative_question": "如何查询斯瓦尔巴群岛的漫游资费？",
+    "representative_answer": "无法提供斯瓦尔巴群岛的漫游资费信息。"
+  },
+  {
+    "representative_question": "产品上架需要联系哪个部门？",
+    "representative_answer": "产品上架需要联系相关部门协助处理。"
+  },
+  {
+    "representative_question": "非直充方式的一卡通缴费是否会影响可打金额？",
+    "representative_answer": "非直充方式的一卡通缴费不会增加可打金额。"
+  }
+]

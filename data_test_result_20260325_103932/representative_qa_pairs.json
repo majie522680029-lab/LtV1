@@ -1,0 +1,74 @@
+[
+  {
+    "representative_question": "用户办理融合拆机后，次月生效的套餐无法取消导致重复计费怎么办？",
+    "representative_answer": "请等待次月套餐生效后，重新为用户办理原套餐，并对因次月重复计费产生的费用进行人工调账处理。"
+  },
+  {
+    "representative_question": "用户开具月结发票时提示可打金额不足，如何将预存款转为分月可打金额？",
+    "representative_answer": "需通过【CBSS-发票账务打印设置】功能将未转分月的预存款订单转为分月，以增加可打金额；如操作失败，请联系后台专家协助处理。"
+  },
+  {
+    "representative_question": "如何查询开户时的客户姓名和开户员工信息？",
+    "representative_answer": "BSS系统已下架，无法查询开户时的客户姓名；开户员工信息如姓名和工号（例如：周伟，zhouwei69）可由内部系统提供，具体以当时记录为准。"
+  },
+  {
+    "representative_question": "流量使用优先级是如何排序的？",
+    "representative_answer": "优先使用升级包中的流量，之后使用月末27日发放的流量。"
+  },
+  {
+    "representative_question": "发票打印方式有哪些？",
+    "representative_answer": "发票打印方式包括现金和月结两种，均占用可打额。可通过【CBSS-账务管理-票据管理-账务票据辅助-账务票据打印日志查询】核实打印情况。"
+  },
+  {
+    "representative_question": "账户余额无法抵扣费用，能否处理？",
+    "representative_answer": "该问题无法处理。"
+  },
+  {
+    "representative_question": "合约7月底到期，现在只有9元了",
+    "representative_answer": "要不您单独数一下"
+  },
+  {
+    "representative_question": "为什么APP会发送查询详单短信，即使用户从未使用过该功能？",
+    "representative_answer": "APP可能因系统自动触发或账户安全验证机制发送查询详单短信。若用户确认未操作且频繁收到此类信息，建议联系客服核查账户状态或调整通知设置。"
+  },
+  {
+    "representative_question": "如何邀请集团加入？",
+    "representative_answer": "请稍等，系统正在处理您的邀请请求。"
+  },
+  {
+    "representative_question": "如何查询我的宽带账号？",
+    "representative_answer": "您可以通过登录运营商官方App、拨打客服热线或前往营业厅查询您的宽带账号信息。"
+  },
+  {
+    "representative_question": "如何提交沃工单？",
+    "representative_answer": "您可以通过相关渠道提交沃工单，以便我们及时为您处理问题。"
+  },
+  {
+    "representative_question": "北京沃派校园套餐48元档的合约是否会自动续约？",
+    "representative_answer": "北京沃派校园套餐48元档预存250元享11个月套餐折扣，合约到期后不会自动续约。"
+  },
+  {
+    "representative_question": "增值税专用发票申请完成后，是否会通过政企平台预留的邮箱发送给客户？",
+    "representative_answer": "增值税专用发票申请完成后，系统会通过政企平台中客户预留的邮箱自动推送电子发票。"
+  },
+  {
+    "representative_question": "开户费用中包含300元，如何开具增值税专用发票？",
+    "representative_answer": "开户流程中若已开具普通发票，需先在【营业发票退票】页面操作退票；如涉及税务系统已开具的专票（如30000元），也需完成税务退票。退票完成后，在账务系统中重新设置发票打印类型，即可重新开具增值税专用发票。"
+  },
+  {
+    "representative_question": "我的票出现了异常，该怎么办？",
+    "representative_answer": "已提交至集团协助核实，请关注相关工单的处理意见。"
+  },
+  {
+    "representative_question": "K405账务打印设置失败，提示acts/invprinttag异常，如何处理？",
+    "representative_answer": "请联系后台支持人员协助添加相关配置以解决K405账务打印设置失败的问题。"
+  },
+  {
+    "representative_question": "有2个可以了",
+    "representative_answer": "后台已经协助增加了，正在集团审批中，请明日再看吧"
+  },
+  {
+    "representative_question": "一卡通的缴费明细包含哪些信息？",
+    "representative_answer": "一卡通的缴费明细包括每次缴费的具体时间与金额，用于记录用户的充值历史。"
+  }
+]

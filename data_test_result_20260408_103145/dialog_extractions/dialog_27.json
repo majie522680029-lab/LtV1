@@ -1,0 +1,17 @@
+{
+  "dialog_index": 27,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，有什么可以帮您 \nCUSTOMER:*号码在本月产生短信费计费正常吗 \nSERVICE:请稍等 \nSERVICE:您好，此问题需要后台专家协助核查，已为您转接中，请稍等，转接成功后将由后台专家为您服务，感谢配合 \nSERVICE:转接说明：请协助核实 \nSERVICE:您好，我是*，很高兴为您服务！ \nSERVICE:稍等 \nSERVICE:话单真实存在，计费正常 \nSERVICE:还有问题不",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，有什么可以帮您 \nCUSTOMER:*号码在本月产生短信费计费正常吗 \nSERVICE:请稍等 \nSERVICE:您好，此问题需要后台专家协助核查，已为您转接中，请稍等，转接成功后将由后台专家为您服务，感谢配合 \nSERVICE:转接说明：请协助核实 \nSERVICE:您好，我是*，很高兴为您服务！ \nSERVICE:稍等 \nS...",
+  "extracted_qa_pairs": [
+    {
+      "question": "号码本月短信费计费是否正常",
+      "answer": "话单真实存在，计费正常"
+    },
+    {
+      "question": "号码本月产生的短信费计费是否正常？",
+      "answer": "话单真实存在，计费正常"
+    }
+  ],
+  "extraction_count": 2,
+  "success": true
+}

@@ -1,0 +1,13 @@
+{
+  "dialog_index": 17,
+  "full_dialog_text": "SRVICE:您好，请问有什么可以帮您 \nCUSTOMER:客户想要了解斯瓦尔巴群岛的漫游资费 \nSERVICE:师傅您好，咱们这只能处理CB受理业务时遇到的数据问题",
+  "dialog_preview": "SRVICE:您好，请问有什么可以帮您 \nCUSTOMER:客户想要了解斯瓦尔巴群岛的漫游资费 \nSERVICE:师傅您好，咱们这只能处理CB受理业务时遇到的数据问题",
+  "extracted_qa_pairs": [
+    {
+      "question": "斯瓦尔巴群岛的漫游资费是多少？",
+      "answer": "无法处理漫游资费相关咨询，仅能处理CB受理业务时遇到的数据问题。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

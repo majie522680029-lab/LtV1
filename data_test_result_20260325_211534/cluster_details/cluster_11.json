@@ -1,0 +1,10 @@
+{
+  "cluster_id": 11,
+  "size": 1,
+  "qa_pairs": [
+    {
+      "question": "我 ROBOT:{processInitiatorAccount:caom61，processId*，createTime:2025-06-30 18:29:40，processName:B域问题咨询，processKey:OH*，tip:【您的问题已被转为问题工单，请关注！】，title:短信，userName:赵娜}",
+      "answer": "关注下这个单子"
+    }
+  ]
+}

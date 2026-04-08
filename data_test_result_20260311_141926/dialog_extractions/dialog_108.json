@@ -1,0 +1,13 @@
+{
+  "dialog_index": 108,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，有什么可以帮您 \nCUSTOMER:*，需要恢复 5G升级包9元2GB（次月生效）  \nSERVICE:请稍等 \nSERVICE:是恢复68元套餐对吗 \nCUSTOMER:是的 \nSERVICE:请稍等 \nSERVICE:已恢复，请查看 \nCUSTOMER:好的",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，有什么可以帮您 \nCUSTOMER:*，需要恢复 5G升级包9元2GB（次月生效）  \nSERVICE:请稍等 \nSERVICE:是恢复68元套餐对吗 \nCUSTOMER:是的 \nSERVICE:请稍等 \nSERVICE:已恢复，请查看 \nCUSTOMER:好的",
+  "extracted_qa_pairs": [
+    {
+      "question": "如何恢复5G升级包9元2GB（次月生效）？",
+      "answer": "已恢复5G升级包9元2GB（次月生效）。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

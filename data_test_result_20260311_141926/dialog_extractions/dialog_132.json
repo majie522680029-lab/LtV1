@@ -1,0 +1,21 @@
+{
+  "dialog_index": 132,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，请问有什么可以帮您？ \nCUSTOMER:营业专票是在CBSS系统推送，还是通过政企运营平台？ \nSERVICE:您好，此问题需要后台专家协助核查，已为您转接中，请稍等，转接成功后将转由后台专家为您服务，感谢配合。 \nSERVICE:转接说明：请协助核实 谢谢 \nSERVICE:您好，我是*，很高兴为您服务！ \nSERVICE:营业发票打印可以打印专票 \nSERVICE:试试有报错提供一下 \nCUSTOMER:我打印完了，显示打印中，CBSS系统推送的是打纸的？ \nSERVICE:电子发票吧 \nSERVICE:没有填写邮箱信息啥的 \nCUSTOMER:我给你截个图，看一下 \nCUSTOMER:这是在CB系统显示的状态 \nSERVICE:你刚才打印的时候录入邮箱信息了吗 \nCUSTOMER:我打印的时候没有写邮箱的地方 \nSERVICE:要不打印一下纸质发票或者退票后我这边看看 \nCUSTOMER:专票从哪能退 \nSERVICE:营业发票退票 \nCUSTOMER:只有普票退票，没有专票的 \nCUSTOMER:你这个图显示的有笔4000多的普票，我不退这个 \nSERVICE:这个不是你刚打的发票吗 \nSERVICE:不能退吗 \nCUSTOMER:这个退了是普票 \nCUSTOMER:我要把已申请的专票退了，然后我再政企运营平台重新推送一下 \nSERVICE:你刚才打印的专票不是通过CB 系统打印的吗 \nCUSTOMER:但是CB没有退专票的地 \nCUSTOMER:你截图的那个是普票！！！！ \nCUSTOMER:政企平台的复议专票栏目里也没有看到这个纳税人识别号下的发票信息 ROBOT:{processInitiatorAccount:bjp-st-liup，processId*，createTime:2025-06-30 18:45:52，processName:B域问题咨询，processKey:OB*，tip:【您的问题已被转为问题工单，请关注！】，title:打印专票问题，userName:李纯清} \nSERVICE:让集团帮看看吧 \nSERVICE:关注一下集团工单处理进度 \nCUSTOMER:好的， \nCUSTOMER:那先这样 \nSERVICE:这个点邀请不到他们了 \nSERVICE:只能提个单子了 \nSERVICE:关注一下吧 \nCUSTOMER:好的，那我看沃工单吧 \nSERVICE:好的",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，请问有什么可以帮您？ \nCUSTOMER:营业专票是在CBSS系统推送，还是通过政企运营平台？ \nSERVICE:您好，此问题需要后台专家协助核查，已为您转接中，请稍等，转接成功后将转由后台专家为您服务，感谢配合。 \nSERVICE:转接说明：请协助核实 谢谢 \nSERVICE:您好，我是*，很高兴为您服务！ \nSERVICE:...",
+  "extracted_qa_pairs": [
+    {
+      "question": "营业专票是在CBSS系统推送，还是通过政企运营平台？",
+      "answer": "营业发票打印可以打印专票。"
+    },
+    {
+      "question": "CBSS系统推送的专票是打印纸质的吗？",
+      "answer": "电子发票，需要填写邮箱信息。"
+    },
+    {
+      "question": "专票从哪里可以退？",
+      "answer": "通过营业发票退票功能处理。"
+    }
+  ],
+  "extraction_count": 3,
+  "success": true
+}

@@ -1,0 +1,13 @@
+{
+  "dialog_index": 28,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，有什么可以帮您 \nCUSTOMER:业务号码:*，用户开具月结发票提示可打金额不足，要求把之前的预存款全部转分月增加可打金额，但订单号****，设置转分月时提示：K405账务打印设置失败 acts/invprinttag 异常 \nSERVICE:请稍等 \nSERVICE:现在试试 \nCUSTOMER:还是一样，请贵部自己处理增加可打金额就可以了 \nSERVICE:您好，此问题需要后台专家协助核查，已为您转接中，请稍等，转接成功后将由后台专家为您服务，感谢配合 \nSERVICE:转接说明：请协助核实 \nSERVICE:您好，目前咨询人数较多，请您稍等，稍后为您解答问题 \nSERVICE:搬迁了，重新操作转分月吧 \nCUSTOMER:稍等 \nCUSTOMER:还是提示：K405账务打印设置失败 acts/invprinttag 异常 \nSERVICE:稍等，后台帮增加一下 \nCUSTOMER**就还是提示：K405账务打印设置失败 acts/invprinttag 异常了 \nCUSTOMER:有2个可以了 \nSERVICE:后台已经协助增加了，正在集团审批中，请明日再看吧",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，有什么可以帮您 \nCUSTOMER:业务号码:*，用户开具月结发票提示可打金额不足，要求把之前的预存款全部转分月增加可打金额，但订单号****，设置转分月时提示：K405账务打印设置失败 acts/invprinttag 异常 \nSERVICE:请稍等 \nSERVICE:现在试试 \nCUSTOMER:还是一样，请贵部自己处理增加...",
+  "extracted_qa_pairs": [
+    {
+      "question": "设置转分月时提示K405账务打印设置失败如何处理？",
+      "answer": "后台已经协助增加了，正在集团审批中，请明日再看吧"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

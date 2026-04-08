@@ -1,0 +1,18 @@
+{
+  "cluster_id": 2,
+  "size": 3,
+  "qa_pairs": [
+    {
+      "question": "*号码欠费销前是否有提醒通知？",
+      "answer": "没有"
+    },
+    {
+      "question": "*号码欠费是否有提醒？",
+      "answer": "没有"
+    },
+    {
+      "question": "固话销户前是否有语音提醒？",
+      "answer": "这是催缴的。"
+    }
+  ]
+}

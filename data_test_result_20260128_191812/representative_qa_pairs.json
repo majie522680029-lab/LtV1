@@ -1,0 +1,42 @@
+[
+  {
+    "representative_question": "号码欠费是否有提醒通知？",
+    "representative_answer": "没有"
+  },
+  {
+    "representative_question": "流量或短信计费是否正常？",
+    "representative_answer": "核实用户话单真实存在，计费正常。"
+  },
+  {
+    "representative_question": "主卡有未生效套餐时，能否办理家庭卡（副卡）相关业务？",
+    "representative_answer": "主卡有未生效套餐时，不允许新开家庭卡成员或选择副卡月功能费立即生效。建议先取消主卡未生效的套餐，办理家庭卡业务后，再重新受理主卡套餐变更。"
+  },
+  {
+    "representative_question": "郊区专属FTTR两年期赠费包（600元两年）到期后是否会自动顺延？",
+    "representative_answer": "该赠费包到期后自动顺延，延续后费用可正常使用，用户不会产生额外费用或损失。"
+  },
+  {
+    "representative_question": "如何办理已下架的郊区专属FTTR两年期赠费包（600元两年）的续约？",
+    "representative_answer": "需联系市场部协助申请产品重新上架，上架后可正常订购续约。"
+  },
+  {
+    "representative_question": "如何查询号码的开户部门和开户员工信息？",
+    "representative_answer": "号码的开户部门和开户员工信息可通过系统查询，开户部门通常为所属分公司的具体业务中心，开户员工信息包括姓名及工号。"
+  },
+  {
+    "representative_question": "号码是否有未转分月的发票？",
+    "representative_answer": "若存在预存款订单未转分月，需通过【CBSS-发票账务打印设置】功能将订单转分月，以增加可打金额。"
+  },
+  {
+    "representative_question": "北京沃派校园套餐48元档预存250元11个月折扣合约是否会自动续约？",
+    "representative_answer": "该合约不会自动续约。"
+  },
+  {
+    "representative_question": "营业发票推送完成后是否会通过政企平台的邮箱发送给客户？",
+    "representative_answer": "营业发票推送完成后会按照政企平台登记的邮箱地址发送给客户。"
+  },
+  {
+    "representative_question": "斯瓦尔巴群岛的漫游资费是多少？",
+    "representative_answer": "斯瓦尔巴群岛属于挪威，国际漫游资费请参考您所使用运营商针对挪威的漫游资费标准。建议出行前联系您的运营商确认具体资费及是否需开通国际漫游服务。"
+  }
+]

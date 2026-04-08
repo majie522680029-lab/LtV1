@@ -1,0 +1,17 @@
+{
+  "dialog_index": 110,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:查沃工单回执：OB* 。谢谢 \nCUSTOMER:业务号码:*，   回执没太懂。 用户还有250元冻结预存款啥时候能到账？、 \nSERVICE:您好，此问题需要后台专家协助核查，已为您转接中，请稍等，转接成功后将转由后台专家为您服务，感谢配合。 \nSERVICE:转接说明：请处理。 \nSERVICE:您好，目前咨询人数较多，请您稍等，稍后为您解答问题 \nSERVICE: 直接把用户预存余额可退的钱250元全部转应收了 \nSERVICE:250元是违约金直接转应收了 \nSERVICE:现在数据没问题  \nCUSTOMER:是前期取消合约时候没有减免违约金么？   意思现在用户账户没有冻结的预存款了？  \nCUSTOMER:我看这里还有未返的金额 \nSERVICE:稍等 \nSERVICE:是的 \nSERVICE:我看了，正常解约的话，未作的返费应该要失效的 \nSERVICE:我再把单子回退集团吧 \nCUSTOMER:好的，辛苦 \nSERVICE:重新提了沃工单  OB* \nCUSTOMER:好滴，谢谢",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:查沃工单回执：OB* 。谢谢 \nCUSTOMER:业务号码:*，   回执没太懂。 用户还有250元冻结预存款啥时候能到账？、 \nSERVICE:您好，此问题需要后台专家协助核查，已为您转接中，请稍等，转接成功后将转由后台专家为您服务，感谢配合。 \nSERVICE:转接说明：请处理。 \nSERVICE:您好，目前咨询人数较多，请您稍...",
+  "extracted_qa_pairs": [
+    {
+      "question": "用户还有250元冻结预存款啥时候能到账？",
+      "answer": "250元是违约金，已直接转应收，用户账户没有冻结的预存款了。"
+    },
+    {
+      "question": "前期取消合约时没有减免违约金吗？现在用户账户没有冻结的预存款了吗？",
+      "answer": "正常解约的话，未返还的费用应失效，250元违约金已转应收，账户无冻结预存款。"
+    }
+  ],
+  "extraction_count": 2,
+  "success": true
+}

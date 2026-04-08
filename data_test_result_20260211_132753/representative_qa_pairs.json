@@ -1,0 +1,54 @@
+[
+  {
+    "representative_question": "主卡有未生效或次月生效的套餐时，能否办理家庭卡（副卡）？",
+    "representative_answer": "主卡有未生效或次月生效的套餐时，不允许直接办理家庭卡（副卡）。建议先取消主卡的未生效套餐，办理家庭卡后再重新申请套餐变更。"
+  },
+  {
+    "representative_question": "家庭卡（副卡）办理后能否修改生效时间？",
+    "representative_answer": "家庭卡（副卡）办理后如为次月生效，可联系客服申请修改为立即生效。"
+  },
+  {
+    "representative_question": "流量或短信计费是否正常？",
+    "representative_answer": "经核实，话单真实存在，计费正常。"
+  },
+  {
+    "representative_question": "郊区专属FTTR两年期赠费包（600元两年）到期后能否自动顺延？",
+    "representative_answer": "该赠费包到期后自动顺延，延续后费用可正常使用，用户不会有损失。"
+  },
+  {
+    "representative_question": "如何查询号码的开户部门？",
+    "representative_answer": "可通过系统查询号码的开户部门，例如：北京市分公司社会渠道中心.资源管理中心。"
+  },
+  {
+    "representative_question": "联通云智电脑豪华版-Z移网75元/月产品与云智电脑通用版-Z移网（24年活动版）的优惠如何计算？",
+    "representative_answer": "优惠金额不叠加，按最大值生效，因此75元/月产品优惠45元后实际收费为30元/月。"
+  },
+  {
+    "representative_question": "号码欠费销户前是否会收到提醒通知？",
+    "representative_answer": "不会收到提醒通知。"
+  },
+  {
+    "representative_question": "当月办理过融合拆机后，能否取消套餐变更？",
+    "representative_answer": "当月受理过融合拆机的用户，无法在“移网变更_2.0体验版”菜单办理业务返销。若原套餐未下架，需等待次月生效后重新办理原套餐，并通过人工调账处理因此产生的额外费用。"
+  },
+  {
+    "representative_question": "为什么联通APP会发送查询详单短信？",
+    "representative_answer": "如您收到联通APP发送的查询详单短信，建议通过中国联通官方渠道提交工单进行核实处理。"
+  },
+  {
+    "representative_question": "号码是否存在未转分月的发票？",
+    "representative_answer": "若号码存在预存款订单未转分月，可通过【CBSS-发票账务打印设置】功能将订单转分月，以增加可开具发票的金额。"
+  },
+  {
+    "representative_question": "沃派校园套餐的预存折扣合约是否会自动续约？",
+    "representative_answer": "沃派校园套餐的预存折扣合约不会自动续约。"
+  },
+  {
+    "representative_question": "营业发票推送完成后是否会通过政企平台的邮箱发送给客户？",
+    "representative_answer": "营业发票推送完成后会按照政企平台登记的邮箱地址发送给客户。"
+  },
+  {
+    "representative_question": "斯瓦尔巴群岛的漫游资费是多少？",
+    "representative_answer": "斯瓦尔巴群岛属于挪威，通常适用国际漫游资费标准。具体资费请以运营商最新公布的国际及港澳台漫游资费表为准，建议出行前通过官方渠道查询或开通相应漫游服务。"
+  }
+]

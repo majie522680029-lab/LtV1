@@ -1,0 +1,25 @@
+{
+  "dialog_index": 19,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:根据提示就是正常业务规则限制 产品停售 无法办理 还是具体什么问题 请详细说明 \nSERVICE:请详细说明您的意思 \nCUSTOMER:综合资料产品里边 是自动延续的 \nCUSTOMER:郊区专属FTTR两年期赠费包（600元两年）郊区专属FTTR两年期赠费包（600元两年），次月生效，合约期为24个自然月，可抵扣套餐费用。该赠费包到期后自动顺延。 \nCUSTOMER:现在续约报错 \nCUSTOMER:也没有 顺延  \nCUSTOMER:用户不同意变更套餐 只要之前的套餐  \nSERVICE:要查询什么时候续约是么 \nCUSTOMER:0元合约24个月 续不上 \nSERVICE:自动续约 没说手动办理 \nCUSTOMER:但是现在没续约 \nSERVICE:所以是要查询什么时候续约是么 \nSERVICE:还是说就要手动办理 \nCUSTOMER:现在没顺延 我想手动续上 \nCUSTOMER:要不次月会产生50元费用 \nSERVICE:您好，此问题需要后台专家协助核查，已为您转接中，请稍等，转接成功后将转由后台专家为您服务，感谢配合。 \nSERVICE:转接说明：请协助核实 谢谢 \nSERVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:师傅您能看见之前的记录吧 还用描述一下吗？ \nSERVICE:稍等 \nSERVICE:您好，我是*，很高兴为您服务！ \nSERVICE:请集团帮核实自动续约失败原因 \nSERVICE:您好，问题已收到，由于当前咨询较多，正在逐一处理中，请稍候 \nCUSTOMER:月末最后一天了  \nSERVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，问题已收到，请稍候 \nSERVICE:select * from d_users.ti_b_time_fixeduser_06 where serial_number in('*');请看下为何未落顺眼*郊区专属FTTR两年期赠费包（600元两年） \nSERVICE:@* 着急办理的话请省份临时上架让提单人先办理上select * from i_prods.td_b_product where product_id in *); select * from i_prods.td_b_product_release where product_id in *);  \nSERVICE:产品上架需要联系市场部核实 \nSERVICE:@*  \nSERVICE:@* 请集团帮核实原因 \nSERVICE:谢谢 \nSERVICE:这个应该当时没有扫到 \nSERVICE:可以下个月五号操作逾期续约 \nSERVICE:限制菜单权限收回了不能操作用户续约批量导入了 \nSERVICE:@* 请见批量同事恢复 \nCUSTOMER:我什么时候操作 \nSERVICE:@* 我看您的意思是7.5日前台可以操作逾期续约就能续约上了是吗 \nSERVICE:是的 \nSERVICE:正常产品未失效操作用户续约批量导入即可，但是月底收回权限了 \nCUSTOMER:这个我23号的时候就试过了不行 \nSERVICE:23号操作的什么 \nSERVICE:逾期还是正常2续约 \nCUSTOMER:续0元 赠费 \nSERVICE:哪个菜单操作的，发下批次号 \nCUSTOMER:我不知道您说的批次号是什么 \nSERVICE:这是哪个菜单 \nSERVICE:给您提供的途径是用户续约批量导入菜单2 \nCUSTOMER:融合业务新 不变更 0元赠600 续约 \nCUSTOMER:我想知道7月5号能延续吗？ \nSERVICE:可以 \nCUSTOMER:延续之后 费用能正常使用吧 \nCUSTOMER:就是用户不会有损失吧 \nCUSTOMER:或者能不能临时上架我这边受理啊  \nSERVICE:产品上架需要联系市场部协助处理 \nSERVICE:@*  \nCUSTOMER:因为我同事也是这种FTTR赠费，刚刚也是无法续约，然后就又可以了 \nSERVICE:提供一下号码 \nSERVICE:让集团师傅帮看看 \nCUSTOMER:* \nSERVICE:@* 集团师傅再帮看看 \nSERVICE:@* 融合业务新操作报错 \nSERVICE:@* 请看下 \nSERVICE:@*  \nCUSTOMER:预存0元;赠款总额1080元;1080元分24月返还; \nSERVICE:select * from i_prods.td_b_product where product_id in *); select * from i_prods.td_b_product_release where product_id in *);  \nCUSTOMER* 这个是不是您所说的批次号？ \nSERVICE:@* 批次号非我侧业务，请核实指导 \nSERVICE:@* 这是产品id，什么批次号 \nSERVICE:融合业务新有批次号吗 \nSERVICE:说的批次号是操作用户续约批量导入 \nSERVICE:提单人操作的融合业务新，请继续指导@*  \nSERVICE:他就是问的你说的那个批次号啊 \nSERVICE:@* 融合业务新工单中的号码无法办理是因为产品已下架，需申请上架后再办理，提供的可以办理的号码已查明是上架的所以能办理， \nSERVICE:提单人反馈有续约成功的，所以我问下批次号，但是提单人操作的是融合业务新，也就不存在批次号了 \nCUSTOMER:我的意思就是 能续上 用户没损失就可以 、 \nCUSTOMER:别到时候用户这边多扣钱  \nCUSTOMER:咱们招投诉 \nSERVICE:@* 原来的产品6月底到期，你申请上架后正常订购产品 \nSERVICE:您好，由于我明天不在，如果还需我侧【固网及融合】协助处理问题，麻烦再邀请我侧相关处理人员核实处理，谢谢。 \nSERVICE:@* 还有其他问题不 \nCUSTOMER:我下个月还得申请？ \nSERVICE:看集团意见需要5号再做 \nSERVICE:还有其他问题不",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:根据提示就是正常业务规则限制 产品停售 无法办理 还是具体什么问题 请详细说明 \nSERVICE:请详细说明您的意思 \nCUSTOMER:综合资料产品里边 是自动延续的 \nCUSTOMER:郊区专属FTTR两年期赠费包（600元两年）郊区专属FTTR两年期赠费包（600元两年），次月生效，合约期为24个自然月，可抵扣套餐费用。该赠费包...",
+  "extracted_qa_pairs": [
+    {
+      "question": "郊区专属FTTR两年期赠费包（600元两年）到期后是否会自动顺延？",
+      "answer": "该赠费包到期后自动顺延。"
+    },
+    {
+      "question": "郊区专属FTTR两年期赠费包（600元两年）在7月5日能否操作逾期续约？",
+      "answer": "可以。"
+    },
+    {
+      "question": "郊区专属FTTR两年期赠费包（600元两年）续约后用户是否会产生额外费用或损失？",
+      "answer": "延续之后费用能正常使用，用户不会有损失。"
+    },
+    {
+      "question": "如何办理已下架的郊区专属FTTR两年期赠费包（600元两年）的续约？",
+      "answer": "产品上架需要联系市场部协助处理。"
+    }
+  ],
+  "extraction_count": 4,
+  "success": true
+}

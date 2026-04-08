@@ -1,0 +1,13 @@
+{
+  "dialog_index": 3,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，请问有什么可以帮您 \nCUSTOMER:您好 解约 提示已经转兑 \nSERVICE:业务号提供下 \nCUSTOMER:* \nSERVICE:您反映的问题需派单核查处理，请您预留联系电话和归属部门 \nCUSTOMER:* \nCUSTOMER:双井营业厅 \nSERVICE:已经派单 \nSERVICE:请问您还有其他问题么 \nCUSTOMER:没有了 \nCUSTOMER:我这个账本钱不能抵扣您这边能弄么 \nSERVICE:咱们处理不了 \nSERVICE:等后台处理 \nCUSTOMER:好 \nSERVICE:有问题欢迎您再次咨询，感谢您的来访，再见",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，请问有什么可以帮您 \nCUSTOMER:您好 解约 提示已经转兑 \nSERVICE:业务号提供下 \nCUSTOMER:* \nSERVICE:您反映的问题需派单核查处理，请您预留联系电话和归属部门 \nCUSTOMER:* \nCUSTOMER:双井营业厅 \nSERVICE:已经派单 \nSERVICE:请问您还有其他问题么 \nCUST...",
+  "extracted_qa_pairs": [
+    {
+      "question": "账本钱不能抵扣怎么办？",
+      "answer": "咱们处理不了。等后台处理。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

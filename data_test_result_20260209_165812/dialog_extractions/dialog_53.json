@@ -1,0 +1,13 @@
+{
+  "dialog_index": 53,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:您好 \nSERVICE:您好，有什么可以帮您 \nCUSTOMER:联通公众撤单，公众上显示如图 \nSERVICE:找联通公众客服核实原因 \nCUSTOMER:但是后来发短信提示，如图 \nSERVICE:我这边查不了联通公众的信息 \nCUSTOMER:找不到啊，，，，4000后台让我问线上，您这又让我问公众客服，，，，， \nCUSTOMER:公众客服有联系方式么？ \nSERVICE:联通公众只有在线客服 \nSERVICE:走的不是我这边 \nSERVICE:你有联通公众APP吗 \nCUSTOMER:app有 \nSERVICE:里面找掌沃通或者联通公众客服 \nCUSTOMER:这个？？？ \nSERVICE:你试试 \nCUSTOMER:点不开啊，点开就如图 \nSERVICE:联通公众APP服务支撑队列网址：http://*:8090/onlineService/marketing/index.html；  \nSERVICE:你试试这个网址能不能进去 \nCUSTOMER:用手机开？？还是电脑？ \nCUSTOMER:电脑打不开 \nSERVICE:用外网的吗 \nCUSTOMER:对，我们代理商，没有内网 \nSERVICE:您好，此问题需要后台专家协助核查，已为您转接中，请稍等，转接成功后将由后台专家为您服务，感谢配合 \nSERVICE:转接说明：请协助核实 \nSERVICE:您好，目前咨询人数较多，请您稍等，稍后为您解答问题 \nSERVICE:联通公众的，需要走上面热线发的那个链接 \nSERVICE:我侧是CB侧无法查询联通公众的 \nSERVICE:如果没有其他问题，请及时关闭会话，以免会话堆积 影响后续会话接入，谢谢‘",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:您好 \nSERVICE:您好，有什么可以帮您 \nCUSTOMER:联通公众撤单，公众上显示如图 \nSERVICE:找联通公众客服核实原因 \nCUSTOMER:但是后来发短信提示，如图 \nSERVICE:我这边查不了联通公众的信息 \nCUSTOMER:找不到啊，，，，4000后台让我问线上，您这又让我问公众客服，，，，， \nCUSTO...",
+  "extracted_qa_pairs": [
+    {
+      "question": "联通公众客服有联系方式吗？",
+      "answer": "联通公众只有在线客服，可以通过联通公众APP里的掌沃通或联通公众客服联系。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

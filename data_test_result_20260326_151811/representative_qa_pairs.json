@@ -1,0 +1,74 @@
+[
+  {
+    "representative_question": "APP一直发送查询详单短信但用户从未使用过怎么办？",
+    "representative_answer": "APP专家已经下班了，帮你提交沃工单核实。"
+  },
+  {
+    "representative_question": "如何处理发票账务打印设置失败导致无法转分月的情况？",
+    "representative_answer": "发票医生诊断结果显示用户存在预存款订单未转分月，需通过【CBSS-发票账务打印设置】功能点将订单转分月，增加用户的可打金额。"
+  },
+  {
+    "representative_question": "营业发票打印失败如何处理？",
+    "representative_answer": "如果营业发票打印失败，需在【营业发票退票】页面操作退票，退完后做账务发票打印设置，然后重新打印。"
+  },
+  {
+    "representative_question": "主卡未生效的情况下能否办理副卡？",
+    "representative_answer": "主卡未生效的情况下不允许选择副卡月功能费立即生效，需主卡取消未生效套餐办理家庭卡，然后主卡再办理套餐变更。"
+  },
+  {
+    "representative_question": "主卡未生效办理副卡后如何避免双重费用？",
+    "representative_answer": "建议取消次月先受理副卡再办理更改套餐。"
+  },
+  {
+    "representative_question": "郊区专属FTTR两年期赠费包（600元两年）到期后是否自动顺延？",
+    "representative_answer": "该赠费包到期后自动顺延。"
+  },
+  {
+    "representative_question": "郊区专属FTTR两年期赠费包（600元两年）续约失败怎么办？",
+    "representative_answer": "需要联系市场部核实产品上架情况，若产品已下架需申请上架后再办理。"
+  },
+  {
+    "representative_question": "为什么同一业务不同号码的费用不同？",
+    "representative_answer": "优惠金额不是叠加生效，是取最大值，所以75元优惠45后，剩30元。"
+  },
+  {
+    "representative_question": "号码在本月产生短信费计费是否正常？",
+    "representative_answer": "话单真实存在，计费正常。"
+  },
+  {
+    "representative_question": "如何查询号码的开户部门和是否有过户记录？",
+    "representative_answer": "可查询号码的开户部门和是否存在过户记录。"
+  },
+  {
+    "representative_question": "如何查询开户员工的工号？",
+    "representative_answer": "开户员工的工号可通过系统查询，例如周伟的工号为 zhouwei69。"
+  },
+  {
+    "representative_question": "固网解约报错提示'活动已经进行过转兑，不允许返销'如何处理？",
+    "representative_answer": "您反映的问题需派单核查处理，请您预留联系电话和归属部门。"
+  },
+  {
+    "representative_question": "办理的新全家福106档套餐对应5G升级包9元专享合约少了一个9元费用怎么办？",
+    "representative_answer": "账本收支里看都转兑了。"
+  },
+  {
+    "representative_question": "预存60元得副卡专属6元20GB通用流量包6个月和2元1GB月末27日生效流量加油包（京）的流量优先级如何？",
+    "representative_answer": "升级包先用，然后是月末27日流量。副卡那个优先级没查到，得专家看下"
+  },
+  {
+    "representative_question": "宽带号码能提供吗？",
+    "representative_answer": "宽带号码能给提供下吗"
+  },
+  {
+    "representative_question": "北京沃派校园套餐48元档预存250元11个月套餐折扣合约是否会自动续约？",
+    "representative_answer": "北京沃派校园套餐48元档预存250元11个月套餐折扣合约合约计划 2024-08-01 00:00:00 2025-06-30 23:59:59"
+  },
+  {
+    "representative_question": "如何将基础产品包（必选）改为长期生效？",
+    "representative_answer": "已处理，请查看。"
+  },
+  {
+    "representative_question": "非直充方式的一卡通缴费是否会影响可打金额？",
+    "representative_answer": "该用户存在非直充方式的一卡通缴费，该方式不增加可打金额。缴费明细如下：2024-08-05 17:24:46.0缴费50.00元；2024-07-06 11:07:14.0缴费100.00元；2021-01-22 20:01:31.0缴费20.00元；2020-06-11 13:59:33.0缴费10.00元；2020-06-04 12:04:01.0缴费20.00元；2020-07-09 08:04:14.0缴费100.00元；2020-08-07 16:02:11.0缴费20.00元；2019-12-29 23:37:37.0缴费5.00元；若用户不认可需要联系电商核实具体缴费渠道。"
+  }
+]

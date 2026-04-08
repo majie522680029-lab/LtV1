@@ -1,0 +1,142 @@
+import hashlib
+import re, json
+from openai import OpenAI
+
+
+def build_deepseek_client(api_key, base_url="https://api.deepseek.com"):
+    """构建 DeepSeek OpenAI 兼容客户端"""
+    return OpenAI(api_key=api_key, base_url=base_url)
+
+
+def _parse_llm_judge_result(raw_text: str):
+    default_result = {"is_similar": False, "confidence": 0.0, "reason": "parse failure"}
+
+    try:
+        text = (raw_text or "").strip()
+
+        # 1) 去掉 ```json ... ``` 代码块包装
+        text = re.sub(r"^\s*```(?:json)?\s*", "", text, flags=re.IGNORECASE)
+        text = re.sub(r"\s*```\s*$", "", text)
+
+        # 2) 截取第一个 { 到最后一个 }（处理前后夹带解释文字）
+        l, r = text.find("{"), text.rfind("}")
+        if l == -1 or r == -1 or r <= l:
+            return default_result
+        text = text[l:r+1]
+
+        data = json.loads(text)
+        if not isinstance(data, dict):
+            return default_result
+
+        # 3) 必要字段检查
+        for k in ("is_similar", "confidence", "reason"):
+            if k not in data:
+                return default_result
+
+        # 4) 类型纠正：允许 "true"/"false"、"0.83"
+        is_sim = data["is_similar"]
+        if isinstance(is_sim, str):
+            if is_sim.lower() in ("true", "yes", "1"):
+                is_sim = True
+            elif is_sim.lower() in ("false", "no", "0"):
+                is_sim = False
+            else:
+                return default_result
+        if not isinstance(is_sim, bool):
+            return default_result
+
+        conf = data["confidence"]
+        if isinstance(conf, str):
+            conf = conf.strip()
+            conf = float(conf)  # 允许 "0.83"
+        if not isinstance(conf, (int, float)):
+            return default_result
+        conf = float(conf)
+        if not (0.0 <= conf <= 1.0):
+            return default_result
+
+        reason = data["reason"]
+        if not isinstance(reason, str):
+            reason = str(reason)
+
+        # 你原来限制 30 个词：中文会不分词，这里保留你的逻辑
+        reason_words = reason.split()
+        if len(reason_words) > 30:
+            reason = " ".join(reason_words[:30])
+
+        return {"is_similar": is_sim, "confidence": conf, "reason": reason}
+
+    except Exception:
+        return default_result
+
+
+def llm_judge_is_similar(client, rep_question, rep_answer, cand_question, cand_answer, model):
+    """调用 LLM Judge 判断是否相似"""
+    system_prompt = (
+        "你是客服知识库去重的严格裁判。"
+        "请保守判断：不确定时判定为不相似。"
+        "你必须只输出一行严格JSON，禁止任何解释、前后缀、Markdown代码块。"
+        "输出格式必须完全等于："
+        "{\"is_similar\": false, \"confidence\": 0.0, \"reason\": \"...\"}"
+    )
+    user_prompt = (
+        "[PAIR A - 新的代表性问答]\n"
+        f"Q: {rep_question}\n"
+        f"A: {rep_answer}\n\n"
+        "[PAIR B - 知识库已有候选问答]\n"
+        f"Q: {cand_question}\n"
+        f"A: {cand_answer}\n\n"
+        "只返回 JSON，包含以下键：\n"
+        "is_similar (bool),\n"
+        "confidence (0-1 数值),\n"
+        "reason (不超过 30 个词)\n\n"
+        "规则：\n"
+        "- 仅当两者表达同一用户意图，且多数场景可复用同一知识库条目时，is_similar 才为 true。\n"
+        "- 如果只是相关但非同一意图，is_similar=false。\n"
+        "- 不确定时，is_similar=false 且 confidence<=0.6。"
+    )
+
+    default_result = {"is_similar": False, "confidence": 0.0, "reason": "parse failure"}
+    try:
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            temperature=0
+        )
+        content = response.choices[0].message.content.strip()
+        return _parse_llm_judge_result(content)
+    except Exception:
+        return default_result
+
+
+def judge_with_cache(st_session_state, rep_question, rep_answer, cand_question, cand_answer, model, api_key, client=None):
+    """使用缓存的 LLM Judge 判断，避免重复调用"""
+    if not api_key:
+        return {"is_similar": False, "confidence": 0.0, "reason": "missing api key"}
+
+    if "judge_cache" not in st_session_state:
+        st_session_state["judge_cache"] = {}
+
+    cache_key_payload = {
+        "rep_question": rep_question,
+        "rep_answer": rep_answer,
+        "cand_question": cand_question,
+        "cand_answer": cand_answer,
+        "model": model
+    }
+    cache_key = hashlib.sha256(
+        json.dumps(cache_key_payload, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    ).hexdigest()
+
+    if cache_key in st_session_state["judge_cache"]:
+        return st_session_state["judge_cache"][cache_key]
+
+    if client is None:
+        client = build_deepseek_client(api_key)
+
+    result = llm_judge_is_similar(client, rep_question, rep_answer, cand_question, cand_answer, model)
+    st_session_state["judge_cache"][cache_key] = result
+    return result

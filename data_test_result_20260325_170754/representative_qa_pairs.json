@@ -1,0 +1,42 @@
+[
+  {
+    "representative_question": "流量包（如5G升级包、月末生效加油包、副卡专属流量包）与套内国内流量的使用优先级是怎样的？",
+    "representative_answer": "5G升级包优先使用，其次是月末27日生效的流量加油包；副卡专属流量包的优先级需后台专家核查。"
+  },
+  {
+    "representative_question": "联通云智电脑套餐优惠为何按30元/月收费？",
+    "representative_answer": "优惠金额不叠加，取最大值生效。例如75元/月套餐优惠45元后，实收30元/月。"
+  },
+  {
+    "representative_question": "主卡有未生效套餐时能否办理家庭卡（副卡）相关业务？",
+    "representative_answer": "主卡有未生效套餐时不允许新开家庭卡成员或办理副卡立即生效。建议先取消主卡未生效的套餐，完成家庭卡办理后，再重新申请套餐变更；副卡生效方式可联系客服调整。"
+  },
+  {
+    "representative_question": "郊区专属FTTR两年期赠费包（600元两年）到期后能否自动顺延？",
+    "representative_answer": "该赠费包到期后自动顺延，延续后费用可正常使用，用户不会有损失。"
+  },
+  {
+    "representative_question": "如何查询号码的开户部门？",
+    "representative_answer": "可通过系统查询号码的开户部门，例如：北京市分公司社会渠道中心.资源管理中心。"
+  },
+  {
+    "representative_question": "号码欠费销户前是否会收到提醒通知？",
+    "representative_answer": "不会收到提醒通知。"
+  },
+  {
+    "representative_question": "如何处理预存款未转分月导致无法打印营业发票的问题？",
+    "representative_answer": "请通过【CBSS-发票账务打印设置】功能将预存款订单转为分月，以增加用户的可打发票金额。"
+  },
+  {
+    "representative_question": "沃派校园套餐的合约到期后会自动续约吗？",
+    "representative_answer": "沃派校园套餐的合约到期后不会自动续约。"
+  },
+  {
+    "representative_question": "专票申请推送完成后，是否会通过政企平台的邮箱发送给客户？",
+    "representative_answer": "专票申请推送完成后，会通过政企平台的邮箱发送给客户。"
+  },
+  {
+    "representative_question": "斯瓦尔巴群岛的漫游资费是多少？",
+    "representative_answer": "斯瓦尔巴群岛属于挪威，国际漫游资费请参考您所使用运营商针对挪威的漫游资费标准。建议出行前联系您的运营商确认具体资费及是否需开通国际漫游服务。"
+  }
+]

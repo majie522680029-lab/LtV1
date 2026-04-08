@@ -1,0 +1,25 @@
+{
+  "cluster_count": 2,
+  "noise_cluster_count": 0,
+  "total_qa_pairs": 2,
+  "clusters": {
+    "0": {
+      "size": 1,
+      "qa_pairs": [
+        {
+          "question": "发票重发异常如何处理？",
+          "answer": "需要联系税务系统核实，已转为问题工单，请关注工单意见。"
+        }
+      ]
+    },
+    "1": {
+      "size": 1,
+      "qa_pairs": [
+        {
+          "question": "短信费计费是否正常",
+          "answer": "话单真实存在，计费正常"
+        }
+      ]
+    }
+  }
+}

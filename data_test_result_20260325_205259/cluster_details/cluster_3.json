@@ -1,0 +1,14 @@
+{
+  "cluster_id": 3,
+  "size": 2,
+  "qa_pairs": [
+    {
+      "question": "那个优先使用",
+      "answer": "好的，请您稍等"
+    },
+    {
+      "question": "优先级小的先使用",
+      "answer": "优先级小的先使用"
+    }
+  ]
+}

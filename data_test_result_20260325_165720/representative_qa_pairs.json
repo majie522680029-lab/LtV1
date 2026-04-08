@@ -1,0 +1,78 @@
+[
+  {
+    "representative_question": "主卡有未生效套餐时，如何办理家庭卡成员加入？",
+    "representative_answer": "需先取消主卡的未生效套餐，再办理家庭卡成员加入，之后主卡可重新受理套餐变更。因家庭卡立即生效且速率需与主卡当月一致，为避免速率不一致问题，必须按此顺序操作。"
+  },
+  {
+    "representative_question": "用户流量计费是否正常？为何产生套外费用？",
+    "representative_answer": "经核实话单真实存在，计费正常。套外费用通常由以下原因导致：套餐内资源已用尽；流量包订购晚于使用时间；副卡未共享非共享资源；群组资料异常导致计费侧未同步；或用户使用习惯（如后台应用、双卡切换、高清视频等）引发额外流量消耗。日租宝等套外资费按实际使用按日计费。"
+  },
+  {
+    "representative_question": "请核实我的流量使用和计费是否正常？",
+    "representative_answer": "经核实，您的流量话单真实存在，计费正常。流量使用情况包括通用互联网流量及各类应用（如腾讯应用、快手专属等）消耗，具体业务类型由网络侧根据访问IP地址判定，不代表终端实际使用的APP。若产生套外费用，可能原因包括：套餐内资源已用尽、流量包订购晚于使用时间、副卡未共享主卡非共享资源、群组数据同步异常、话单跨天计费，或用户使用习惯（如后台应用自启、Wi-Fi与移动数据切换、多应用并行使用等）。此外，国内1元800MB日租宝为常见套外资费标准。"
+  },
+  {
+    "representative_question": "如何查询号码的开户部门和开户员工信息？",
+    "representative_answer": "开户部门和开户员工信息可通过系统查询，但部分历史数据因BSS系统已下架可能无法获取。"
+  },
+  {
+    "representative_question": "流量使用优先级是如何排序的？",
+    "representative_answer": "系统优先使用升级包中的流量，之后再使用月末27日发放的流量。"
+  },
+  {
+    "representative_question": "发票打印方式有哪些？",
+    "representative_answer": "发票打印方式包括现金发票和月结发票两种，均占用可打额。可通过【CBSS-账务管理-票据管理-账务票据辅助-账务票据打印日志查询】核实打印情况。"
+  },
+  {
+    "representative_question": "账户余额无法抵扣费用，能否处理？",
+    "representative_answer": "该问题无法处理。"
+  },
+  {
+    "representative_question": "合约7月底到期，现在只有9元了",
+    "representative_answer": "要不您单独数一下"
+  },
+  {
+    "representative_question": "为什么APP会发送查询详单短信，即使用户从未使用过该功能？",
+    "representative_answer": "APP可能因系统自动触发或账户安全验证机制发送查询详单短信。若用户确认未操作且频繁收到此类短信，建议联系客服核查账户状态或调整通知设置。"
+  },
+  {
+    "representative_question": "需要邀请集团",
+    "representative_answer": "请稍等"
+  },
+  {
+    "representative_question": "如何查询我的宽带账号？",
+    "representative_answer": "您可通过登录运营商官方App、拨打客服热线或前往营业厅查询您的宽带账号信息。"
+  },
+  {
+    "representative_question": "如何提交沃工单？",
+    "representative_answer": "您可以通过相关渠道提交沃工单，以便我们及时为您处理问题。"
+  },
+  {
+    "representative_question": "北京沃派校园套餐48元档的合约是否会自动续约？",
+    "representative_answer": "北京沃派校园套餐48元档预存250元享11个月套餐折扣，合约到期后不会自动续约。"
+  },
+  {
+    "representative_question": "专票申请完成后是否会通过政企平台的邮箱发送给客户？",
+    "representative_answer": "专票申请完成后，系统会通过政企平台预留的客户邮箱自动推送电子专票。"
+  },
+  {
+    "representative_question": "开户费用中包含300元，如何开具增值税专用发票？",
+    "representative_answer": "开户流程中相关费用默认开具普通发票，如需开具增值税专用发票，请先在【营业发票退票】页面申请退票（若已在税务系统开具专票，需同步完成税务系统退票），退票完成后重新设置账务发票打印选项并重新开具。"
+  },
+  {
+    "representative_question": "我的票出现了异常，该怎么办？",
+    "representative_answer": "已提交至集团协助核实，请关注相关工单的处理意见。"
+  },
+  {
+    "representative_question": "K405账务打印设置失败，提示acts/invprinttag异常，如何解决？",
+    "representative_answer": "请联系后台支持人员协助处理该异常。"
+  },
+  {
+    "representative_question": "有2个可以了",
+    "representative_answer": "后台已经协助增加了，正在集团审批中，请明日再看吧"
+  },
+  {
+    "representative_question": "一卡通的缴费明细包含哪些信息？",
+    "representative_answer": "一卡通的缴费明细包括每次缴费的具体时间与金额。"
+  }
+]

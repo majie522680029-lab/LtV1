@@ -1,0 +1,8 @@
+{
+  "dialog_index": 23,
+  "full_dialog_text": "SRVICE:您好，很高兴为您服务！ \nSERVICE:您好，请问您在线吗？ \nSERVICE:很抱歉，未联系到您，有问题欢迎您再次咨询，感谢您的来访，再见。 \nSERVICE:很抱歉，未联系到您，有问题欢迎您再次咨询，感谢您的来访，再见。",
+  "dialog_preview": "SRVICE:您好，很高兴为您服务！ \nSERVICE:您好，请问您在线吗？ \nSERVICE:很抱歉，未联系到您，有问题欢迎您再次咨询，感谢您的来访，再见。 \nSERVICE:很抱歉，未联系到您，有问题欢迎您再次咨询，感谢您的来访，再见。",
+  "extracted_qa_pairs": [],
+  "extraction_count": 0,
+  "success": false
+}

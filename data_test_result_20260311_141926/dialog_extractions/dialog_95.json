@@ -1,0 +1,13 @@
+{
+  "dialog_index": 95,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:业务号码:*    腾讯视频10G流量加月会员合约包（优惠）** 2025-06-28 23:30:57 2029-12-31 23:59:59 腾讯视频10G流量加月会员合约包（优惠）   \nCUSTOMER:这个在哪里退订？ \nSERVICE:移网变更做下退订 \nCUSTOMER:没有 \nCUSTOMER:找到了，号码弄错了 \nSERVICE:好的 \nSERVICE:请问还有问题吗？ \nSERVICE:很抱歉，未联系到您，有问题欢迎您再次咨询，感谢您的来访，再见。",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:业务号码:*    腾讯视频10G流量加月会员合约包（优惠）** 2025-06-28 23:30:57 2029-12-31 23:59:59 腾讯视频10G流量加月会员合约包（优惠）   \nCUSTOMER:这个在哪里退订？ \nSERVICE:移网变更做下退订 \nCUSTOMER:没有 \nCUSTOMER:找到了，号码弄错了 \n...",
+  "extracted_qa_pairs": [
+    {
+      "question": "腾讯视频10G流量加月会员合约包（优惠）在哪里退订？",
+      "answer": "通过移网变更进行退订。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

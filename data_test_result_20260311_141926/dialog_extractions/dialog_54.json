@@ -1,0 +1,21 @@
+{
+  "dialog_index": 54,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:* 月结额度不足 \nSERVICE:师傅，是打印哪个月的月结发票 \nCUSTOMER:近一年的 \nSERVICE:请稍等 \nSERVICE:查询账户可打金额 934.99，近一年月结发票只*、07、08、09及12月没开发票，每月38元，应该够开发票额度 \nCUSTOMER:我看用户月结为何是38呀 \nCUSTOMER:不是实际账单 \nCUSTOMER:”用户要求开5月的月结发票，通过app开票显示只有49元， \nCUSTOMER:这个问题师傅 \nCUSTOMER:下面这个 \nSERVICE:*的月结发票吗 \nCUSTOMER:对 \nSERVICE:5月普通现金销账49 \nSERVICE:调账账本销账40 \nSERVICE:调账账本销账，不能打印发票 \nCUSTOMER:4月份的账本抵扣的是5月 \nSERVICE:账后调帐现金账本，可退预存款1，这个账本不分哪个月，随机抵扣 \nCUSTOMER:好滴 \nSERVICE:师傅，请问还有其他问题吗 \nSERVICE:有问题欢迎您再次咨询，感谢您的来访，再见！",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:* 月结额度不足 \nSERVICE:师傅，是打印哪个月的月结发票 \nCUSTOMER:近一年的 \nSERVICE:请稍等 \nSERVICE:查询账户可打金额 934.99，近一年月结发票只*、07、08、09及12月没开发票，每月38元，应该够开发票额度 \nCUSTOMER:我看用户月结为何是38呀 \nCUSTOMER:不是实际账单...",
+  "extracted_qa_pairs": [
+    {
+      "question": "用户月结为何是38元？",
+      "answer": "近一年月结发票中，部分月份未开发票，每月38元。"
+    },
+    {
+      "question": "5月的月结发票通过app开票显示只有49元，是什么原因？",
+      "answer": "5月普通现金销账49元，调账账本销账40元；其中调账账本销账不能打印发票。"
+    },
+    {
+      "question": "4月份的账本抵扣的是5月吗？",
+      "answer": "账后调账现金账本可退预存款1，这个账本不分哪个月，随机抵扣。"
+    }
+  ],
+  "extraction_count": 3,
+  "success": true
+}

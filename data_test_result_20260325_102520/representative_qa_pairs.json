@@ -1,0 +1,30 @@
+[
+  {
+    "representative_question": "我的通信费用（如流量、短信）计费是否正常？",
+    "representative_answer": "经核实，您的通信话单真实存在，计费正常。"
+  },
+  {
+    "representative_question": "当月办理融合拆机后，如何取消次月生效的新套餐？",
+    "representative_answer": "若原套餐未下架，需等待次月新套餐生效后，重新为客户办理原套餐，并对因次月套餐产生的额外费用进行人工调账处理。"
+  },
+  {
+    "representative_question": "主卡有未生效套餐时，为什么无法新开家庭卡成员？",
+    "representative_answer": "因为家庭卡立即生效，其速率需与主卡当月保持一致。若主卡存在未生效套餐，会导致家庭卡速率无法与主卡变更后套餐的速率一致。需先取消主卡的未生效套餐，办理家庭卡加入后，再重新为主卡办理套餐变更。"
+  },
+  {
+    "representative_question": "为什么两个号码办理同一业务的费用不同？",
+    "representative_answer": "因为优惠金额不叠加生效，而是取其中的最大值。"
+  },
+  {
+    "representative_question": "北京沃派校园套餐48元档是否会自动续约？",
+    "representative_answer": "北京沃派校园套餐48元档包含11个月合约期（2024年8月1日至2025年6月30日），预存250元享受套餐折扣，合约到期后不会自动续约。"
+  },
+  {
+    "representative_question": "服务或权益可以延续吗？",
+    "representative_answer": "可以延续。"
+  },
+  {
+    "representative_question": "无法通过APP办理副卡怎么办？",
+    "representative_answer": "建议联系客服或前往营业厅咨询办理副卡相关事宜。"
+  }
+]

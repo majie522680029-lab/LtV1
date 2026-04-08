@@ -1,0 +1,62 @@
+[
+  {
+    "representative_question": "流量计费是否正常？",
+    "representative_answer": "核实用户话单真实存在，计费正常。产生套外流量费用的情况均按照‘国内1元800MB日租宝’计费。可能影响计费的情况包括：话单跨天、计费话单产生在群组生效前、订购资源为非共享资源、群组资料异常导致数据不同步、收费发生在流量包订购前、用户使用习惯（如后台应用自启、Wi-Fi与数据切换等）、以及业务类型由网络侧按IP地址判定等。"
+  },
+  {
+    "representative_question": "主卡有未生效套餐时能否办理家庭卡（副卡）？",
+    "representative_answer": "主卡有未生效套餐时不允许新开家庭卡（副卡），需先取消主卡的未生效套餐，办理家庭卡后再重新申请套餐变更。"
+  },
+  {
+    "representative_question": "郊区专属FTTR两年期赠费包（600元两年）到期后是否会自动顺延？",
+    "representative_answer": "该赠费包到期后自动顺延，延续后费用可正常使用，用户不会产生额外费用或损失。"
+  },
+  {
+    "representative_question": "号码欠费或销户前是否有提醒通知？",
+    "representative_answer": "没有提醒通知，相关语音提示属于催缴性质。"
+  },
+  {
+    "representative_question": "如何查询号码的开户部门和开户员工信息？",
+    "representative_answer": "您可联系客服查询号码的开户部门及开户员工信息。开户部门通常为所属分公司的社会渠道中心或资源管理中心，开户员工信息包括姓名及工号。"
+  },
+  {
+    "representative_question": "为什么局方停机没有显示原因？",
+    "representative_answer": "停机原因是在受理时录入的，若未填写则不会显示。"
+  },
+  {
+    "representative_question": "办理融合拆机后，能否取消已提交的套餐变更？",
+    "representative_answer": "不能取消。若原套餐未下架，请等待次月生效后重新办理原套餐，并对次月因变更产生的额外费用申请人工调账处理。"
+  },
+  {
+    "representative_question": "福多多龙卡套餐已下架，如何恢复办理？",
+    "representative_answer": "若福多多龙卡套餐已下架，需先申请临时上架后方可重新受理。如工号有该产品受理权限，可发起部门协作至数字化部/公众开发中心、市场部/产品规划与统筹组，注明需恢复的产品及恢复时间；如无权限，需由市场部产品经理发起OOP工单，明确需上架的产品及赋权角色组。"
+  },
+  {
+    "representative_question": "如何查询证件号码是否在黑名单中？",
+    "representative_answer": "目前未查询到该证件号码在多省市特殊黑名单中。"
+  },
+  {
+    "representative_question": "靓号销户是否需要审批，审批后如何办理销户？",
+    "representative_answer": "靓号销户需提交“在网靓号用户特殊事项审批单”进行审批。审批完成后，数字化部将通过CB系统“在网靓号协议调整”功能取消靓号协议并预约销户，营业厅无需再办理注销业务。"
+  },
+  {
+    "representative_question": "联通公众客服的联系方式是什么？",
+    "representative_answer": "联通公众提供在线客服，您可以通过联通公众APP中的掌沃通或联通公众客服入口进行咨询。"
+  },
+  {
+    "representative_question": "为什么流量使用情况在不同查询方式中显示不一致？",
+    "representative_answer": "不同查询方式可能展示的范围不同，例如部分流量属于共享套餐中的其他号码，或包含多种业务类型（如腾讯应用、通用互联网流量等）的使用记录。实际总用量以详细账单为准。"
+  },
+  {
+    "representative_question": "订购了流量包但很快用完，可能是什么原因？",
+    "representative_answer": "流量消耗与使用习惯密切相关，例如后台应用运行、高清视频播放、APP下载等行为均可能导致大量流量使用。建议通过官方渠道查询详细流量使用明细。"
+  },
+  {
+    "representative_question": "北京创新远大科技有限公司宽带门店（电商）归属哪个部门或地区？",
+    "representative_answer": "很抱歉，未联系到您，有问题欢迎您再次咨询。"
+  },
+  {
+    "representative_question": "【联通智家-臻宽带】已下架的合约产品（如预存0元送396元的光宽带U5-166元/月）还能续订或重新办理吗？",
+    "representative_answer": "若产品已下架，无法自动续订或由后台直接办理；需咨询所在省份产品侧是否可临时上架，并通过前台重新订购。"
+  }
+]

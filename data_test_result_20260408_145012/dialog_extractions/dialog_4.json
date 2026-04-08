@@ -1,0 +1,13 @@
+{
+  "dialog_index": 4,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，请问有什么可以帮您 \nCUSTOMER:* 用户来电有此黑名单号码但我方为核实到有黑名单记录，只核实到有实时余额有未结清 \nSERVICE:证件号提供下 \nCUSTOMER:姓名：敬毅力，身份证号码未提供 \nSERVICE:有欠费没有交费 \nCUSTOMER:好的 \nSERVICE:有问题欢迎您再次咨询，感谢您的来访，再见",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，请问有什么可以帮您 \nCUSTOMER:* 用户来电有此黑名单号码但我方为核实到有黑名单记录，只核实到有实时余额有未结清 \nSERVICE:证件号提供下 \nCUSTOMER:姓名：敬毅力，身份证号码未提供 \nSERVICE:有欠费没有交费 \nCUSTOMER:好的 \nSERVICE:有问题欢迎您再次咨询，感谢您的来访，再见",
+  "extracted_qa_pairs": [
+    {
+      "question": "如何核实黑名单号码记录？",
+      "answer": "需提供证件号进行核实，但仅能核实到实时余额有未结清的情况，无法确认黑名单记录。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

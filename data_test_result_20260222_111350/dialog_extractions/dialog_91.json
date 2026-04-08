@@ -1,0 +1,17 @@
+{
+  "dialog_index": 91,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:* 合约到期了 续不上 \nSERVICE:完整提示请提供下 \nCUSTOMER:就是该合约已下线 \nCUSTOMER:无法办理已下线合约 \nCUSTOMER:原续原 \nCUSTOMER:0元 396 \nSERVICE:您好，此问题需要后台专家协助核查，已为您转接中，请稍等，转接成功后将转由后台专家为您服务，感谢配合。 \nCUSTOMER:抓紧 \nCUSTOMER:我的天 \nCUSTOMER:还有几位 \nSERVICE:- 非常抱歉，当前咨询高峰，专家忙碌中，在您前面还有 6 位客户在排队... - \nCUSTOMER:... \nCUSTOMER:... \nSERVICE:转接说明：请协助核实 谢谢 \nSERVICE:您好，目前咨询人数较多，请您稍等，稍后为您解答问题 \nCUSTOMER:快快快 \nCUSTOMER:    很遗憾，出错了！    订单预提交失败！错误编码: 5001，错误提示: [用户号码:*，业务限制:[您好，该产品【【联通智家-臻宽带】预存0元送396元（12个月）合约智享-光宽带U5-166元/月】已停止销售，请选择其他产品!$$$34056$$$]]， 子系统编码: 5001，子系统提示: [用户号码:*，业务限制:[您好，该产品【【联通智家-臻宽带】预存0元送396元（12个月）合约智享-光宽带U5-166元/月】已停止销售，请选择其他产品!$$$34056$$$]]  \nCUSTOMER:* \nSERVICE:这个在自动续约的范围内，月底最后一天会执行 \nCUSTOMER:我刚解约的 \nCUSTOMER:还会自动续上么 \nSERVICE:解约了，就不会自动续了 \nCUSTOMER:所以续不上了 您看帮忙搞下 \nSERVICE:请集团看下这种情况后台还能自动续约吗 \nCUSTOMER:我去  各种排队啊 \nSERVICE:月未最后一天，会话比较多 \nCUSTOMER:.. \nSERVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，问题已收到，请稍候 \nCUSTOMER:麻烦帮忙处理 \nSERVICE:稍等下，正在看 \nSERVICE:已解约，正常需要前台重新订购了，如果已下架，需要咨询省份产品侧看下能否临时上架，前台订购，谢谢 \nCUSTOMER:没法协助重新做上么 \nSERVICE:后台没法直接添加 \nSERVICE:这种涉及续约表数据，需要前台操作订购，这样后续到期能自动续约 \nSERVICE:所以您可以咨询省份侧能否临时上架，然后您再进行订购 \nSERVICE:您好，请看下是否还有其他问题 \nSERVICE:您好，问题已处理完毕，如无其他问题，关闭会话请选【已解决】，如针对该问题仍有疑问可继续咨询~",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:* 合约到期了 续不上 \nSERVICE:完整提示请提供下 \nCUSTOMER:就是该合约已下线 \nCUSTOMER:无法办理已下线合约 \nCUSTOMER:原续原 \nCUSTOMER:0元 396 \nSERVICE:您好，此问题需要后台专家协助核查，已为您转接中，请稍等，转接成功后将转由后台专家为您服务，感谢配合。 \nCUSTOM...",
+  "extracted_qa_pairs": [
+    {
+      "question": "【联通智家-臻宽带】预存0元送396元（12个月）合约智享-光宽带U5-166元/月产品已停止销售，还能续订吗？",
+      "answer": "已解约且产品已下架，正常需要前台重新订购；如果已下架，需咨询省份产品侧看能否临时上架后前台订购。"
+    },
+    {
+      "question": "已解约的【联通智家-臻宽带】预存0元送396元（12个月）合约还会自动续上吗？",
+      "answer": "解约了，就不会自动续了。"
+    }
+  ],
+  "extraction_count": 2,
+  "success": true
+}

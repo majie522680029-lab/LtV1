@@ -1,0 +1,30 @@
+[
+  {
+    "representative_question": "为什么同一业务在不同号码上的费用不同？",
+    "representative_answer": "同一业务在不同号码上的费用不同，是因为优惠金额不叠加生效，而是取最大值。"
+  },
+  {
+    "representative_question": "如何确认某项通信费用（如流量、短信）计费是否正常？",
+    "representative_answer": "若话单真实存在，则相关通信费用（如流量、短信）计费正常。"
+  },
+  {
+    "representative_question": "主卡有未生效套餐时，为什么无法新开家庭卡成员？如何解决？",
+    "representative_answer": "因为家庭卡立即生效，其速率需与主卡当月保持一致，若主卡存在未生效套餐，将无法保证速率一致性。解决方法是：先取消主卡的未生效套餐，办理家庭卡加入，之后主卡可重新申请套餐变更。"
+  },
+  {
+    "representative_question": "北京沃派校园套餐48元档是否会自动续约？",
+    "representative_answer": "北京沃派校园套餐48元档包含11个月合约期（2024年8月1日至2025年6月30日），预存250元享受套餐折扣，合约到期后不会自动续约。"
+  },
+  {
+    "representative_question": "专票申请完成后是否会通过政企平台预留的邮箱发送给客户？",
+    "representative_answer": "是的，专票申请完成后会通过政企平台预留的邮箱发送给客户。"
+  },
+  {
+    "representative_question": "服务或权益可以延续吗？",
+    "representative_answer": "可以延续。"
+  },
+  {
+    "representative_question": "无法通过APP办理副卡怎么办？",
+    "representative_answer": "建议联系客服或前往营业厅咨询办理副卡相关事宜。"
+  }
+]

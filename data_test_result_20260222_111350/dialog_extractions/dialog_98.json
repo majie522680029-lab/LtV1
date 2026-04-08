@@ -1,0 +1,13 @@
+{
+  "dialog_index": 98,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:ZF 主副卡群组 * * 副卡  2025-06-09 12:58:07 2025-06-30 23:59:59 ZF 主副卡群组 * 主卡  2025-06-09 12:57:21 2050-12-31 23:59:59  \nSERVICE:副卡次月失效 主卡销户后副卡按标资收费 用户知道同意 \nCUSTOMER:用多少收多少费用？ \nSERVICE:标资 具体标准知识库有详细说明 \nCUSTOMER:用户同意后你这边可以办理销户是吗？ \nSERVICE:这边不受理业务 可以把主副卡关系月底改立即失效 \nCUSTOMER:好的 \nSERVICE:请问还有其他问题么 \nCUSTOMER:立即失效 \nCUSTOMER:办理 \nCUSTOMER:已联系用户认可。 \nSERVICE:ZF 主副卡群组 * * 副卡  2025-06-09 12:58:07 2025-06-30 23:59:59  \nSERVICE:立即失效是吧 稍等 \nCUSTOMER:是的 \nSERVICE:请重试 \nCUSTOMER:好的 \nSERVICE:请问还有其他问题么 \nCUSTOMER:没有了谢谢 \nSERVICE:有问题欢迎您再次咨询，感谢您的来访，再见。",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:ZF 主副卡群组 * * 副卡  2025-06-09 12:58:07 2025-06-30 23:59:59 ZF 主副卡群组 * 主卡  2025-06-09 12:57:21 2050-12-31 23:59:59  \nSERVICE:副卡次月失效 主卡销户后副卡按标资收费 用户知道同意 \nCUSTOMER:用多少收多少费用？...",
+  "extracted_qa_pairs": [
+    {
+      "question": "主卡销户后副卡的费用如何计算？",
+      "answer": "主卡销户后副卡按标资收费，具体标准知识库有详细说明。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

@@ -1,0 +1,13 @@
+{
+  "dialog_index": 88,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:*   请协助0元10G定向流量包  回复订购 \nCUSTOMER:*   请协助0元10G定向流量包 恢复订购 \nSERVICE:好的，请您稍等 \nSERVICE:已处理恢复，请查看 \nCUSTOMER:谢谢",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:*   请协助0元10G定向流量包  回复订购 \nCUSTOMER:*   请协助0元10G定向流量包 恢复订购 \nSERVICE:好的，请您稍等 \nSERVICE:已处理恢复，请查看 \nCUSTOMER:谢谢",
+  "extracted_qa_pairs": [
+    {
+      "question": "如何恢复订购0元10G定向流量包？",
+      "answer": "已处理恢复，请查看。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

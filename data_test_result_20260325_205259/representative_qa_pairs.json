@@ -1,0 +1,78 @@
+[
+  {
+    "representative_question": "这月办理过融合拆机怎么办？",
+    "representative_answer": "请等待用户次月产生效后，再联系用户重新办理原套餐，同时请站在客户服务的角度对次月办理导致的多出费用问题进行人工调账处理"
+  },
+  {
+    "representative_question": "用户撤机，系统自动续费下月生效的东西解不了怎么办？",
+    "representative_answer": "这个只能后台给你改失效"
+  },
+  {
+    "representative_question": "无法办理副卡怎么办？",
+    "representative_answer": "APP号卡办理报错，建议咨询公客销核实。"
+  },
+  {
+    "representative_question": "主卡标识可否帮忙立即生效",
+    "representative_answer": "根据报错，把主卡次月产品取消后先办理主卡业务改副卡，主卡再重新受理变更。"
+  },
+  {
+    "representative_question": "合约7月底到期，现在只有9元了",
+    "representative_answer": "要不您单独数一下"
+  },
+  {
+    "representative_question": "优先级小的先使用",
+    "representative_answer": "优先级小的先使用"
+  },
+  {
+    "representative_question": "号码在本月产生短信费计费正常吗",
+    "representative_answer": "话单真实存在，计费正常"
+  },
+  {
+    "representative_question": "这个号码开户部门是哪里，当时开户是谁的名字，期间有没有过户记录",
+    "representative_answer": "开户员工： 周伟 开户部门： 北京市分公司社会渠道中心.资源管理中心. 暂未查询到过户记录"
+  },
+  {
+    "representative_question": "账本钱不能抵扣怎么办？",
+    "representative_answer": "咱们处理不了。等后台处理。"
+  },
+  {
+    "representative_question": "查询为什么APP一直给用户发送查询详单短信，用户一次都没有使用过",
+    "representative_answer": "稍等\n有排队会话 请稍等\n转接说明：请核实\n您好，目前咨询人数较多，请您稍等，稍后为您解答问题\nAPP专家已经下班了，帮你提交沃工单核实"
+  },
+  {
+    "representative_question": "宽带号码能给提供下吗",
+    "representative_answer": "查不到 我这边查的话，两个号码没有上述短信 是的 我也没查到 我问问通知中心 确定是这两个号码 但是有个宽带的失效联系电话是其中一个号码"
+  },
+  {
+    "representative_question": "这个问题其他人提的其他系统的问题",
+    "representative_answer": "我用其他人的工号提个沃工单吧 没事 我提下就行 我 ROBOT:{processInitiatorAccount:caom61，processId*，createTime:2025-06-30 18:29:40，processName:B域问题咨询，processKey:OH*，tip:【您的问题已被转为问题工单，请关注！】，title:短信，userName:赵娜} 关注下这个单子 好的，谢谢"
+  },
+  {
+    "representative_question": "下月会收双重费用吗",
+    "representative_answer": "建议取消次月先受理副卡再办理更改套餐。"
+  },
+  {
+    "representative_question": "我看产品信息都有账户优惠都30的费用啊？",
+    "representative_answer": "好的，请您稍等，您的意思从产品看，应该是0元./月，实际是按30元/月收的？"
+  },
+  {
+    "representative_question": "号码还有没有转分月的发票吗",
+    "representative_answer": "发票医生诊断结果：1、该用户存在预存款订单，详情如下：2023-06-21 11:45:22.0，您业务流水号为*】算费流水号为*】的预存款未转分月，请通过【CBSS-发票账务打印设置】功能点将订单转分月，增加用户的可打金额；2024-06-05 18:21:45.0，您业务流水号为*】算费流水号为*】的预存款未转分月，请通过【CBSS-发票账务打印设置】功能点将订单转分月，增加用户的可打金额；2023-01-09 16:58:46.0，您业务流水号为*】算费流水号为*】的预存款已转分月，并增加可打额；"
+  },
+  {
+    "representative_question": "他这个合约会自动续约吗",
+    "representative_answer": "北京沃派校园套餐48元档预存250元11个月套餐折扣合约，合约计划为2024-08-01 00:00:00 至 2025-06-30 23:59:59。"
+  },
+  {
+    "representative_question": "我看见营业发票中显示的专票正在申请，这个推送完之后是否按照政企平台的邮箱发送给客户？",
+    "representative_answer": "您好，我是*，很高兴为您服务！您好，您的问题已收到，请稍等， 谢谢"
+  },
+  {
+    "representative_question": "或者能不能临时上架我这边受理啊",
+    "representative_answer": "产品上架需要联系市场部协助处理"
+  },
+  {
+    "representative_question": "业务号码:*，用户开具月结发票提示可打金额不足，要求把之前的预存款全部转分月增加可打金额，但设置转分月时提示：K405账务打印设置失败 acts/invprinttag 异常",
+    "representative_answer": "后台已经协助增加了，正在集团审批中，请明日再看吧"
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "representative_question": "为什么两个号码的增值业务费用不同？",
+    "representative_answer": "优惠金额不是叠加生效，是取最大值，所以75元优惠45后，剩30元。"
+  },
+  {
+    "representative_question": "无法办理副卡",
+    "representative_answer": "APP号卡办理报错，建议咨询公客销核实。"
+  },
+  {
+    "representative_question": "用户撤机后系统自动续费的下月生效服务如何取消？",
+    "representative_answer": "需要后台修改失效，不需要退订。"
+  },
+  {
+    "representative_question": "我这个账本钱不能抵扣您这边能弄么？",
+    "representative_answer": "咱们处理不了。"
+  },
+  {
+    "representative_question": "如何处理预存款未转分月的情况？",
+    "representative_answer": "通过【CBSS-发票账务打印设置】功能点将订单转分月，增加用户的可打金额。"
+  },
+  {
+    "representative_question": "北京沃派校园套餐48元档合约到期后会自动续约吗？",
+    "representative_answer": "北京沃派校园套餐48元档合约到期后不会自动续约。"
+  },
+  {
+    "representative_question": "客户想要了解斯瓦尔巴群岛的漫游资费",
+    "representative_answer": "师傅您好，咱们这只能处理CB受理业务时遇到的数据问题"
+  },
+  {
+    "representative_question": "发票重发异常如何处理？",
+    "representative_answer": "需要联系税务系统核实，我提集团协助核实了，关注一下工单意见。"
+  },
+  {
+    "representative_question": "将基础产品包（必选）改为长期生效",
+    "representative_answer": "已处理，请查看"
+  }
+]

@@ -1,0 +1,46 @@
+[
+  {
+    "representative_question": "流量计费是否正常？",
+    "representative_answer": "核实用户话单真实存在，计费正常。"
+  },
+  {
+    "representative_question": "号码欠费销户前是否有提醒通知？",
+    "representative_answer": "没有"
+  },
+  {
+    "representative_question": "郊区专属FTTR两年期赠费包（600元两年）到期后能否自动顺延？",
+    "representative_answer": "该赠费包到期后自动顺延。"
+  },
+  {
+    "representative_question": "如何查询号码的开户部门？",
+    "representative_answer": "可通过系统查询号码的开户部门，例如：北京市分公司社会渠道中心资源管理中心。"
+  },
+  {
+    "representative_question": "办理融合拆机后，当月能否更换为其他套餐？",
+    "representative_answer": "若原套餐未下架，需等待次月生效后方可重新办理；因次月办理产生的额外费用可申请人工调账处理。"
+  },
+  {
+    "representative_question": "联通云智电脑豪华版-Z移网75元/月产品为何实际收费30元/月？",
+    "representative_answer": "该产品的优惠金额不叠加，而是取最大值，75元优惠45元后，实际收费为30元/月。"
+  },
+  {
+    "representative_question": "如何处理未转分月的预存款发票？",
+    "representative_answer": "可通过【CBSS-发票账务打印设置】功能将未转分月的预存款订单转为分月，以增加可开具发票的金额。"
+  },
+  {
+    "representative_question": "沃派校园套餐的折扣合约到期后会自动续约吗？",
+    "representative_answer": "沃派校园套餐的折扣合约是否自动续约，需以办理时协议约定及系统实际设置为准，建议通过官方渠道查询具体合约条款。"
+  },
+  {
+    "representative_question": "营业发票推送完成后是否会通过政企平台的邮箱发送给客户？",
+    "representative_answer": "营业发票推送完成后会按照政企平台的邮箱发送给客户。"
+  },
+  {
+    "representative_question": "斯瓦尔巴群岛的漫游资费是多少？",
+    "representative_answer": "无法提供斯瓦尔巴群岛的漫游资费信息，该问题不属于CB受理业务范围。"
+  },
+  {
+    "representative_question": "通过APP无法办理副卡怎么办？",
+    "representative_answer": "若在APP中办理副卡时出现报错，请联系公客销进行核实处理。"
+  }
+]

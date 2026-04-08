@@ -1,0 +1,54 @@
+[
+  {
+    "representative_question": "主卡存在次月生效的套餐变更时，能否办理副卡或融合拆机相关业务？",
+    "representative_answer": "主卡存在次月生效的套餐变更时，不允许新开家庭卡成员或在“移网变更_2.0体验版”菜单办理融合拆机返销。需先取消未生效的套餐变更，完成副卡或拆机操作后，再重新办理所需套餐。若已产生费用差异，可申请人工调账处理。"
+  },
+  {
+    "representative_question": "副卡办理后能否将次月生效的生效时间改为立即生效？",
+    "representative_answer": "可以，副卡办理完成后可联系客服协助将次月生效的副卡修改为立即生效。"
+  },
+  {
+    "representative_question": "郊区专属FTTR两年期赠费包（600元两年）到期后如何续约？",
+    "representative_answer": "若产品未失效，可通过用户续约批量导入菜单操作；如产品已下架，需联系市场部申请临时上架后方可办理续约。逾期续约可于次月5号操作。"
+  },
+  {
+    "representative_question": "流量包的使用优先级是如何确定的？",
+    "representative_answer": "优先级较低的流量包会先被使用。例如，5G升级包（如9元2GB）通常优先于月末生效的流量加油包（如2元1GB，27日生效）使用。"
+  },
+  {
+    "representative_question": "如何处理未转分月的预存款订单以增加可打金额？",
+    "representative_answer": "请通过【CBSS-发票账务打印设置】功能将预存款订单转分月，以增加可打金额。"
+  },
+  {
+    "representative_question": "用户号码的流量或短信计费是否正常？",
+    "representative_answer": "经核实，话单真实存在，计费正常。"
+  },
+  {
+    "representative_question": "发票打印时现金和月结混打为什么会占用可打金额？",
+    "representative_answer": "当发票打印方式同时包含现金和月结时，两种方式均会占用可打金额。"
+  },
+  {
+    "representative_question": "联通云智电脑豪华版-Z移网75元/月套餐为何实际收费30元/月？",
+    "representative_answer": "该套餐的优惠金额不叠加，按最大值生效，75元优惠45元后，实际收费为30元/月。"
+  },
+  {
+    "representative_question": "北京沃派校园套餐48元档预存250元享11个月折扣的合约是否会自动续约？",
+    "representative_answer": "北京沃派校园套餐48元档预存250元享11个月折扣的合约到期后不会自动续约，合约期满将恢复原套餐资费或按用户选择处理。"
+  },
+  {
+    "representative_question": "专票申请完成后是否会通过政企平台邮箱发送给客户？",
+    "representative_answer": "专票申请完成后是否通过政企平台邮箱发送，需以实际系统通知或客户所在地区的具体流程为准。"
+  },
+  {
+    "representative_question": "开户流程中产生的费用如何开具增值税专用发票？",
+    "representative_answer": "若已开具普通发票，需在【营业发票退票】页面操作退票；若已开具增值税专用发票且可开票金额已用完，需先在税务系统完成退票，再进行账务发票打印设置后重新开具。"
+  },
+  {
+    "representative_question": "为什么通过非直充方式为一卡通缴费不会增加可打金额？",
+    "representative_answer": "通过非直充方式为一卡通缴费不会增加可打金额。如需进一步确认缴费渠道，请联系电商客服核实。"
+  },
+  {
+    "representative_question": "如何查询发票打印记录？",
+    "representative_answer": "可通过【CBSS-账务管理-票据管理-账务票据辅助-账务票据打印日志查询】功能查询发票打印记录。"
+  }
+]

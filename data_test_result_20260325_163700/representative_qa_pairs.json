@@ -1,0 +1,46 @@
+[
+  {
+    "representative_question": "主卡有未生效套餐时能否办理家庭卡（副卡）？",
+    "representative_answer": "主卡有未生效套餐时不允许新开家庭卡（副卡）。建议先取消主卡的未生效套餐，办理家庭卡后再重新申请套餐变更。"
+  },
+  {
+    "representative_question": "流量或短信计费是否正常？",
+    "representative_answer": "经核实，话单真实存在，计费正常。套外流量费用按照国内1元800MB日租宝标准计费。"
+  },
+  {
+    "representative_question": "郊区专属FTTR两年期赠费包（600元两年）到期后是否会自动顺延？",
+    "representative_answer": "该赠费包到期后自动顺延；如未自动顺延，可联系客服办理逾期续约，续约后费用可正常使用，用户无损失。"
+  },
+  {
+    "representative_question": "号码欠费销户前是否会收到提醒通知？",
+    "representative_answer": "不会收到提醒通知。"
+  },
+  {
+    "representative_question": "当月办理过融合拆机后，能否取消套餐变更？",
+    "representative_answer": "当月受理过融合拆机，不允许在“移网变更_2.0体验版”菜单办理业务返销。若原套餐未下架，需等待次月生效后重新办理原套餐，并对次月因重新办理产生的额外费用进行人工调账处理。"
+  },
+  {
+    "representative_question": "预存60元获赠的多个流量包（包括副卡专属6元20GB通用流量包、2元1GB月末27日生效流量加油包、9元5G升级包）与套内国内流量的使用优先级如何排序？",
+    "representative_answer": "流量使用优先级为：5G升级包 > 副卡专属流量包 > 月末27日生效流量加油包 > 套内国内流量。"
+  },
+  {
+    "representative_question": "联通云智电脑豪华版-Z移网75元/月产品与云智电脑通用版-Z移网（24年活动版）同时享受优惠时，为何实际收费为30元/月？",
+    "representative_answer": "优惠金额不叠加生效，系统自动取最大优惠值。75元/月产品享受45元/月优惠后，实际收费为30元/月。"
+  },
+  {
+    "representative_question": "号码是否存在未转分月的发票？",
+    "representative_answer": "若存在预存款订单未转分月，可通过【CBSS-发票账务打印设置】功能将订单转分月，以增加可开具发票的金额。"
+  },
+  {
+    "representative_question": "北京沃派校园套餐48元档预存250元11个月折扣合约是否会自动续约？",
+    "representative_answer": "该合约不会自动续约。"
+  },
+  {
+    "representative_question": "专票申请推送完成后，是否会通过政企平台的邮箱发送给客户？",
+    "representative_answer": "专票申请推送完成后，会通过政企平台的邮箱发送给客户。"
+  },
+  {
+    "representative_question": "斯瓦尔巴群岛的漫游资费是多少？",
+    "representative_answer": "斯瓦尔巴群岛属于国际漫游区域，具体资费请参考运营商最新公布的国际漫游资费标准或通过官方客服渠道查询。"
+  }
+]

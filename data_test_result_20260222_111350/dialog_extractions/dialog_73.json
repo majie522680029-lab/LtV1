@@ -1,0 +1,13 @@
+{
+  "dialog_index": 73,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:{businessId:，createTime:*，errorScreenshotUrl:，groupId:GROUPB*，id*，isInvolvedNumber:0，menuId:BIL9246，menuMsg:联通短信查询，questionContent:*，questionSource:cBSS，questionTitle:*} \nCUSTOMER:*，6月流量使用情况，通过余量查询本月的150G用尽，通过一屏清查询，总流量使用60.75G \nSERVICE:好的，请您稍等 \nSERVICE:剩下100G是另一个号用的，两个号共享 \nCUSTOMER:明白了，谢谢 \nSERVICE:请您对本次服务做出评价，有问题欢迎您再次咨询，感谢您的来访，再见。",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:{businessId:，createTime:*，errorScreenshotUrl:，groupId:GROUPB*，id*，isInvolvedNumber:0，menuId:BIL9246，menuMsg:联通短信查询，questionContent:*，questionSource:cBSS，questionTitle:...",
+  "extracted_qa_pairs": [
+    {
+      "question": "6月流量使用情况如何？",
+      "answer": "通过余量查询显示本月150G已用尽，通过一屏清查询显示总流量使用60.75G，剩余100G是另一个号码使用的，两个号码共享该流量。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

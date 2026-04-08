@@ -1,0 +1,46 @@
+[
+  {
+    "representative_question": "流量计费是否正常？",
+    "representative_answer": "核实话单真实存在，计费正常。套外流量费用按‘国内1元800MB日租宝’计费。可能影响计费的情况包括：话单跨天、计费话单产生在群组生效前、订购资源为非共享资源、群组资料异常导致数据不同步、收费发生在流量包订购前、用户使用习惯（如后台应用自启、Wi-Fi与数据切换等），以及业务类型由网络侧按IP地址判定等。"
+  },
+  {
+    "representative_question": "联通云智电脑豪华版-Z移网75元/月产品和云智电脑通用版-Z移网（24年活动版）的优惠如何计算？",
+    "representative_answer": "优惠金额不叠加，取最大值。例如75元/月产品优惠45元后，实际收费为30元/月。"
+  },
+  {
+    "representative_question": "主卡有次月生效的套餐时，如何办理家庭卡业务？",
+    "representative_answer": "需先取消主卡次月生效的套餐，再办理家庭卡业务；之后主卡可重新办理套餐变更。若副卡已办理为次月生效，可联系客服协助修改为立即生效。"
+  },
+  {
+    "representative_question": "郊区专属FTTR两年期赠费包（600元两年）到期后能否自动顺延？",
+    "representative_answer": "该赠费包到期后自动顺延，延续后费用可正常使用，用户不会有损失。"
+  },
+  {
+    "representative_question": "如何查询号码的开户部门和开户员工信息？",
+    "representative_answer": "号码的开户部门为北京市分公司社会渠道中心资源管理中心，开户员工信息可通过内部系统查询。"
+  },
+  {
+    "representative_question": "号码欠费销号前是否有提醒通知？",
+    "representative_answer": "没有"
+  },
+  {
+    "representative_question": "如何处理预存款未转分月导致无法打印营业发票的问题？",
+    "representative_answer": "请通过【CBSS-发票账务打印设置】功能将预存款订单转为分月，以增加用户的可打发票金额。"
+  },
+  {
+    "representative_question": "沃派校园套餐的合约到期后会自动续约吗？",
+    "representative_answer": "沃派校园套餐的合约到期后不会自动续约。"
+  },
+  {
+    "representative_question": "营业发票推送完成后是否会通过政企平台的邮箱发送给客户？",
+    "representative_answer": "营业发票推送完成后会按照政企平台登记的邮箱地址发送给客户。"
+  },
+  {
+    "representative_question": "关于斯瓦尔巴群岛的漫游资费如何查询？",
+    "representative_answer": "漫游资费相关咨询无法处理，仅能协助处理CB受理业务中涉及的数据问题。"
+  },
+  {
+    "representative_question": "该号码是否有过户记录？",
+    "representative_answer": "目前未查询到该号码的过户记录。"
+  }
+]

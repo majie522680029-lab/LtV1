@@ -1,0 +1,13 @@
+{
+  "dialog_index": 133,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，有什么可以帮您 \nCUSTOMER:您好是否 \nCUSTOMER:师傅 \nCUSTOMER:* \nCUSTOMER:这个号码上个月流量没有使用完 \nCUSTOMER:怎么没有结转 \nSERVICE:请稍等 \nCUSTOMER:好的 \nSERVICE:这个合约是5月底结束有关系 \nCUSTOMER:好的谢谢师傅 \nCUSTOMER:再见 \nSERVICE:请您对本次服务做出评价，有问题欢迎您再次咨询，感谢您的来访，再见",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，有什么可以帮您 \nCUSTOMER:您好是否 \nCUSTOMER:师傅 \nCUSTOMER:* \nCUSTOMER:这个号码上个月流量没有使用完 \nCUSTOMER:怎么没有结转 \nSERVICE:请稍等 \nCUSTOMER:好的 \nSERVICE:这个合约是5月底结束有关系 \nCUSTOMER:好的谢谢师傅 \nCUSTOMER...",
+  "extracted_qa_pairs": [
+    {
+      "question": "这个号码上个月流量没有使用完，怎么没有结转？",
+      "answer": "该合约5月底结束，因此影响了流量结转。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

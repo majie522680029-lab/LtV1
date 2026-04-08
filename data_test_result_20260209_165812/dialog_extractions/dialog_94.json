@@ -1,0 +1,13 @@
+{
+  "dialog_index": 94,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:您好师傅， 号码*，ECS自动充财付通 \nCUSTOMER:用户开通自动充业务，您帮忙看看，这个是支付宝形式，充值的吗 \nSERVICE:现在CB未查询到自动充业务  \nSERVICE:ECS是电商 建议联系电商咨询 \nCUSTOMER:好，谢谢 \nSERVICE:请问还有其他问题么 \nCUSTOMER:没有了",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:您好师傅， 号码*，ECS自动充财付通 \nCUSTOMER:用户开通自动充业务，您帮忙看看，这个是支付宝形式，充值的吗 \nSERVICE:现在CB未查询到自动充业务  \nSERVICE:ECS是电商 建议联系电商咨询 \nCUSTOMER:好，谢谢 \nSERVICE:请问还有其他问题么 \nCUSTOMER:没有了",
+  "extracted_qa_pairs": [
+    {
+      "question": "ECS自动充财付通是支付宝形式的充值吗？",
+      "answer": "ECS是电商，建议联系电商咨询。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

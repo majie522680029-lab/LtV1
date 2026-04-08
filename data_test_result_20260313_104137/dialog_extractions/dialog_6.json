@@ -1,0 +1,13 @@
+{
+  "dialog_index": 6,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，有什么可以帮您？ \nCUSTOMER:*反悔了，要求改别的套餐，取消不了，有办法吗 \nCUSTOMER:这月办理过融合拆机 \nSERVICE:取消次月的报错您提供一下 需要根据报错找解决方案 \nCUSTOMER:稍等 \nCUSTOMER:用户号码:*，业务限制:[当月受理过融合拆机，不允许在“移网变更_2.0体验版”菜单办理业务返销！]]服务名称 [ trades_mobilemodify_transform ] txid [79e552b4^**] 规则编码 [5001] 规则内容: 调用新的预提交服务异常，错误信息:[用户号码:*，业务限制:[当月受理过融合拆机，不允许在“移网变更_2.0体验版”菜单办理业务返销！]] \nSERVICE:请稍等 \nSERVICE:没有解决方法  \nSERVICE:原套餐未下架：请等待用户次月产生效后，再联系用户重新办理原套餐，同时请站在客户服务的角度对次月办理导致的多出费用问题进行人工调账处理 \nCUSTOMER:收到",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，有什么可以帮您？ \nCUSTOMER:*反悔了，要求改别的套餐，取消不了，有办法吗 \nCUSTOMER:这月办理过融合拆机 \nSERVICE:取消次月的报错您提供一下 需要根据报错找解决方案 \nCUSTOMER:稍等 \nCUSTOMER:用户号码:*，业务限制:[当月受理过融合拆机，不允许在“移网变更_2.0体验版”菜单办理业务...",
+  "extracted_qa_pairs": [
+    {
+      "question": "当月办理过融合拆机后，能否取消套餐变更？",
+      "answer": "原套餐未下架时，请等待次月生效后重新办理原套餐，并对次月办理导致的多出费用进行人工调账处理。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

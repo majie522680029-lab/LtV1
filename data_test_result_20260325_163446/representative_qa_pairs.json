@@ -1,0 +1,46 @@
+[
+  {
+    "representative_question": "主卡有未生效套餐时能否办理家庭卡相关业务？",
+    "representative_answer": "主卡有未生效套餐时，不允许新开家庭卡成员或选择家庭卡月功能费立即生效。建议先取消主卡未生效的套餐，办理家庭卡业务后，再重新受理主卡套餐变更。"
+  },
+  {
+    "representative_question": "郊区专属FTTR两年期赠费包（600元两年）到期后能否自动顺延？",
+    "representative_answer": "该赠费包到期后自动顺延；如因产品下架等原因无法自动续约，需联系市场部协助上架后方可办理续约。"
+  },
+  {
+    "representative_question": "5G升级包、2元1GB月末流量加油包（京）和副卡专属6元20GB通用流量包的使用优先级是怎样的？",
+    "representative_answer": "5G升级包优先使用，其次是2元1GB月末27日生效流量加油包（京）；副卡专属6元20GB通用流量包的使用优先级需进一步确认。"
+  },
+  {
+    "representative_question": "为什么APP会发送查询详单短信？",
+    "representative_answer": "如您收到异常的查询详单短信，建议提交沃工单进行核实处理。"
+  },
+  {
+    "representative_question": "联通云智电脑豪华版-Z移网75元/月产品为何实际收费30元/月？",
+    "representative_answer": "该产品优惠金额不叠加，按最大优惠计算，75元套餐优惠45元后，实际收费为30元/月。"
+  },
+  {
+    "representative_question": "号码还有没有可转分月的发票？",
+    "representative_answer": "若存在预存款订单，部分预存款可能尚未转分月。需通过【CBSS-发票账务打印设置】功能将未转分月的预存款订单转为分月，以增加可开具发票的金额；已转分月的部分会自动计入可打金额。"
+  },
+  {
+    "representative_question": "沃派校园套餐的预存折扣合约是否会自动续约？",
+    "representative_answer": "沃派校园套餐的预存折扣合约不会自动续约。"
+  },
+  {
+    "representative_question": "营业发票推送完成后是否会通过政企平台的邮箱发送给客户？",
+    "representative_answer": "营业发票推送完成后会按照政企平台登记的邮箱自动发送给客户。"
+  },
+  {
+    "representative_question": "斯瓦尔巴群岛的漫游资费是多少？",
+    "representative_answer": "该问题无法处理，仅能处理CB受理业务时遇到的数据问题。"
+  },
+  {
+    "representative_question": "号码欠费销户前是否有提醒通知？",
+    "representative_answer": "没有。"
+  },
+  {
+    "representative_question": "手机号码产生短信费用是否属于正常计费？",
+    "representative_answer": "如果系统中存在对应的话单记录，则短信费用属于正常计费。"
+  }
+]

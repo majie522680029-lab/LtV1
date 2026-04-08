@@ -1,0 +1,13 @@
+{
+  "dialog_index": 57,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:您好 \nSERVICE:您好，有什么可以帮您？ \nCUSTOMER:*主卡下2个副卡 \nCUSTOMER:免费贵部协助取消 5G副卡基本套餐(极速服务)  \nCUSTOMER:麻烦贵部协助取消 5G副卡基本套餐(极速服务) \nCUSTOMER:用户要变更套餐，明天套餐停售 \nSERVICE:5G副卡基本套餐(极速服务)，这个是哪个号码的业务 \nCUSTOMER:* \nCUSTOMER:* \nCUSTOMER:这两个 \nSERVICE:师傅，我方取消次月功能已被集团回收，建议通过移网变更取消 \nCUSTOMER:移网取消不了 \nCUSTOMER:用户宽带已经拆机，但是还有融合关系 \nCUSTOMER:移网无法操作 \nCUSTOMER:明天套餐还下架 \nSERVICE:建议通过：融合变更取消（含撤单），取消 \nSERVICE:有问题欢迎您再次咨询，感谢您的来访，再见！",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:您好 \nSERVICE:您好，有什么可以帮您？ \nCUSTOMER:*主卡下2个副卡 \nCUSTOMER:免费贵部协助取消 5G副卡基本套餐(极速服务)  \nCUSTOMER:麻烦贵部协助取消 5G副卡基本套餐(极速服务) \nCUSTOMER:用户要变更套餐，明天套餐停售 \nSERVICE:5G副卡基本套餐(极速服务)，这个是哪个号...",
+  "extracted_qa_pairs": [
+    {
+      "question": "如何取消5G副卡基本套餐(极速服务)？",
+      "answer": "建议通过融合变更取消（含撤单）来取消5G副卡基本套餐(极速服务)。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

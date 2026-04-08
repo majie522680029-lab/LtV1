@@ -1,0 +1,17 @@
+{
+  "dialog_index": 29,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，有什么可以帮您 \nCUSTOMER:*将   基础产品包（必选）改为长期生效 \nSERVICE:请稍等 \nSERVICE:已处理，请查看",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，有什么可以帮您 \nCUSTOMER:*将   基础产品包（必选）改为长期生效 \nSERVICE:请稍等 \nSERVICE:已处理，请查看",
+  "extracted_qa_pairs": [
+    {
+      "question": "如何将基础产品包（必选）设置为长期生效？",
+      "answer": "已处理，请查看。"
+    },
+    {
+      "question": "如何将基础产品包（必选）改为长期生效？",
+      "answer": "可将基础产品包（必选）设置为长期生效。"
+    }
+  ],
+  "extraction_count": 2,
+  "success": true
+}

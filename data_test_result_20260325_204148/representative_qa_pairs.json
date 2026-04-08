@@ -1,0 +1,66 @@
+[
+  {
+    "representative_question": "下个月会收取双重费用怎么办？",
+    "representative_answer": "建议取消次月先受理副卡再办理更改套餐。"
+  },
+  {
+    "representative_question": "账本钱不能抵扣怎么办？",
+    "representative_answer": "咱们处理不了。等后台处理。"
+  },
+  {
+    "representative_question": "如何处理用户次月办理过融合拆机的情况？",
+    "representative_answer": "请等待用户次月产生效后，再联系用户重新办理原套餐，同时请站在客户服务的角度对次月办理导致的多出费用问题进行人工调账处理"
+  },
+  {
+    "representative_question": "宽带号码能给提供下吗",
+    "representative_answer": "查不到。我这边查的话，两个号码没有上述短信。是的  我也没查到。"
+  },
+  {
+    "representative_question": "这个问题其他人提的其他系统的问题",
+    "representative_answer": "对。今天要求必须关单吗。哦  您是担心其他人看不见这个单子的进展哈。"
+  },
+  {
+    "representative_question": "您不方便提也行",
+    "representative_answer": "我 ROBOT:{processInitiatorAccount:caom61，processId*，createTime:2025-06-30 18:29:40，processName:B域问题咨询，processKey:OH*，tip:【您的问题已被转为问题工单，请关注！】，title:短信，userName:赵娜}。关注下这个单子。好的，谢谢。"
+  },
+  {
+    "representative_question": "合约会自动续约吗？",
+    "representative_answer": "北京沃派校园套餐48元档预存250元11个月套餐折扣合约 合约计划 2024-08-01 00:00:00 2025-06-30 23:59:59"
+  },
+  {
+    "representative_question": "我看见营业发票中显示的专票正在申请，这个推送完之后是否按照政企平台的邮箱发送给客户？",
+    "representative_answer": "您好，由于当前咨询较多，正在逐一处理中，请稍候"
+  },
+  {
+    "representative_question": "我什么时候操作",
+    "representative_answer": "可以，正常产品未失效操作用户续约批量导入即可，但是月底收回权限了"
+  },
+  {
+    "representative_question": "或者能不能临时上架我这边受理啊",
+    "representative_answer": "产品上架需要联系市场部协助处理"
+  },
+  {
+    "representative_question": "我的意思就是 能续上 用户没损失就可以 、",
+    "representative_answer": "您好，由于我明天不在，如果还需我侧【固网及融合】协助处理问题，麻烦再邀请我侧相关处理人员核实处理，谢谢。"
+  },
+  {
+    "representative_question": "如何解决 APP 办理副卡报错的问题？",
+    "representative_answer": "APP号卡办理报错，建议咨询公客销核实。"
+  },
+  {
+    "representative_question": "开户员工： 周伟，他这个工号呢",
+    "representative_answer": "周伟 zhouwei69 北京市分公司社会渠道中心.资源管理中心"
+  },
+  {
+    "representative_question": "系统自动续费的东西如何取消？",
+    "representative_answer": "这个只能后台给你改失效"
+  },
+  {
+    "representative_question": "K405账务打印设置失败 acts/invprinttag 异常",
+    "representative_answer": "后台已经协助增加了，正在集团审批中，请明日再看吧"
+  },
+  {
+    "representative_question": "基础产品包（必选）改为长期生效",
+    "representative_answer": "请稍等\n已处理，请查看"
+  }
+]

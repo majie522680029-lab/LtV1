@@ -1,0 +1,13 @@
+{
+  "dialog_index": 74,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:*路点点 \nCUSTOMER:未生效合约已经取消了 销户还是提示有合约   \nSERVICE:您好，有什么可以帮您 \nSERVICE:请稍等 \nSERVICE:沃派套餐48元优化版（北京）预存400元用一年折扣合约可以协助立即失效，确认的话帮您操作 \nCUSTOMER:可以  要销户  \nSERVICE:请稍等 \nSERVICE:现在重新试试 \nCUSTOMER:可以了  \nCUSTOMER:谢谢   \nCUSTOMER:，没有其他问题了  \nSERVICE:您客气 \nSERVICE:请您对本次服务做出评价，有问题欢迎您再次咨询，感谢您的来访，再见",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:*路点点 \nCUSTOMER:未生效合约已经取消了 销户还是提示有合约   \nSERVICE:您好，有什么可以帮您 \nSERVICE:请稍等 \nSERVICE:沃派套餐48元优化版（北京）预存400元用一年折扣合约可以协助立即失效，确认的话帮您操作 \nCUSTOMER:可以  要销户  \nSERVICE:请稍等 \nSERVICE:现...",
+  "extracted_qa_pairs": [
+    {
+      "question": "沃派套餐48元优化版（北京）的未生效合约已经取消，为什么销户时仍提示有合约？",
+      "answer": "沃派套餐48元优化版（北京）预存400元用一年折扣合约可以协助立即失效。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

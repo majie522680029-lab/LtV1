@@ -1,0 +1,14 @@
+{
+  "cluster_id": 1,
+  "size": 2,
+  "qa_pairs": [
+    {
+      "question": "*号码欠费销前是否有提醒通知？",
+      "answer": "没有"
+    },
+    {
+      "question": "*号码欠费是否有提醒？",
+      "answer": "没有"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "dialog_index": 18,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:*号码欠费销前是否有提醒通知？ \nSERVICE:请稍等 \nCUSTOMER:好 \nSERVICE:没有 \nCUSTOMER:欠费提醒也没有吗 \nSERVICE:没有往后查询了 也没有 \nSERVICE:稍等 \nCUSTOMER:是什么原因查询不到，那不就是有企责了吗 \nSERVICE:您好，此问题需要后台专家协助核查，已为您转接中，请稍等，转接成功后将转由后台专家为您服务，感谢配合。 \nSERVICE:转接说明：请协助核查  谢谢 \nSERVICE:您好，我是*，很高兴为您服务！ \nSERVICE:会话较多，按顺序处理，请稍等。【避免后边会话长时间排队，一个会话处理一个问题】 \nSERVICE:帮核实一下21年记录 \nSERVICE:会话较多，请稍等 \nCUSTOMER:好 \nSERVICE:@*  \nCUSTOMER:欠费提无问题吧 \nCUSTOMER:我没有问题了，谢谢！",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:*号码欠费销前是否有提醒通知？ \nSERVICE:请稍等 \nCUSTOMER:好 \nSERVICE:没有 \nCUSTOMER:欠费提醒也没有吗 \nSERVICE:没有往后查询了 也没有 \nSERVICE:稍等 \nCUSTOMER:是什么原因查询不到，那不就是有企责了吗 \nSERVICE:您好，此问题需要后台专家协助核查，已为您转接中...",
+  "extracted_qa_pairs": [
+    {
+      "question": "号码欠费销户前是否有提醒通知？",
+      "answer": "没有"
+    },
+    {
+      "question": "欠费提醒也没有吗？",
+      "answer": "没有往后查询了也没有"
+    }
+  ],
+  "extraction_count": 2,
+  "success": true
+}

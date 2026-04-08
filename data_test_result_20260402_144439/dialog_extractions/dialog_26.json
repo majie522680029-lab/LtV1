@@ -1,0 +1,13 @@
+{
+  "dialog_index": 26,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，请问有什么可以帮您 \nCUSTOMER:* 无法重发 \nSERVICE:您重复什么 \nSERVICE:受理什么业务 \nSERVICE:账务发票重发么 \nCUSTOMER:对 \nCUSTOMER:异常票了 \nSERVICE:转接说明：请核实 \nSERVICE:您好，我是*，很高兴为您服务！ \nSERVICE:稍等 \nSERVICE:需要联系税务系统核实 \nCUSTOMER:让用户么 ROBOT:{processInitiatorAccount:bjp-st-liup，processId*，createTime:2025-06-30 19:43:11，processName:M域问题咨询，processKey:OB*，tip:【您的问题已被转为问题工单，请关注！】，title:发票退票问题，userName:刘奇} \nSERVICE:我提集团协助核实了 \nSERVICE:关注一下工单意见 \nCUSTOMER:好的",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，请问有什么可以帮您 \nCUSTOMER:* 无法重发 \nSERVICE:您重复什么 \nSERVICE:受理什么业务 \nSERVICE:账务发票重发么 \nCUSTOMER:对 \nCUSTOMER:异常票了 \nSERVICE:转接说明：请核实 \nSERVICE:您好，我是*，很高兴为您服务！ \nSERVICE:稍等 \nSERVICE...",
+  "extracted_qa_pairs": [
+    {
+      "question": "发票异常重发如何处理？",
+      "answer": "需要联系税务系统核实，我已提集团协助核实，请关注工单意见。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

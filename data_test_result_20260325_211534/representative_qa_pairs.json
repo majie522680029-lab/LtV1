@@ -1,0 +1,106 @@
+[
+  {
+    "representative_question": "原有产品到期后能否自动续订，用户不会因此产生额外费用？",
+    "representative_answer": "原有产品到期后需要申请上架后才能继续订购。"
+  },
+  {
+    "representative_question": "如何操作逾期续约？",
+    "representative_answer": "需要在规定时间内进行逾期续约操作。"
+  },
+  {
+    "representative_question": "如何给主卡开通副卡？",
+    "representative_answer": "在主卡未生效的情况下，不允许选择副卡月功能费立即生效。"
+  },
+  {
+    "representative_question": "我看产品信息显示的优惠费用和实际收取的费用不一致，这是怎么回事？",
+    "representative_answer": "可能是产品信息中显示的优惠费用与实际收取的费用不一致。"
+  },
+  {
+    "representative_question": "为什么某些号码享受的优惠金额不叠加？",
+    "representative_answer": "优惠金额不是叠加生效，而是取最大值。"
+  },
+  {
+    "representative_question": "如何处理账务打印设置失败的异常？",
+    "representative_answer": "请等待后台处理结果，通常需要集团审批，建议明日再查看。"
+  },
+  {
+    "representative_question": "如何处理无法重发账务发票的问题？",
+    "representative_answer": "需要联系税务系统核实，集团协助核实后关注工单意见。"
+  },
+  {
+    "representative_question": "账本钱是否可以进行抵扣？",
+    "representative_answer": "无法进行抵扣，建议联系后台处理。"
+  },
+  {
+    "representative_question": "合约7月底到期，现在只有9元了",
+    "representative_answer": "要不您单独数一下"
+  },
+  {
+    "representative_question": "宽带号码能给提供下吗",
+    "representative_answer": "查不到"
+  },
+  {
+    "representative_question": "这笔预存款无法转分月吗？",
+    "representative_answer": "该用户存在预存款订单，详情如下：2023-06-21 11:45:22.0，您业务流水号为*】算费流水号为*】的预存款未转分月月，请通过【CBSS-发票账务打印设置】功能点将订单转分月，增加用户的可打金额；2024-06-05 18:21:45.0，您业务流水号为*】算费流水号为*】的预存款未转分月，请通过【CBSS-发票账务打印设置】功能点将订单转分月，增加用户的可打金额；2023-01-09 16:58:46.0，您业务流水号为*】算费流水号为*】的预存款已转分月，并增加可打额。"
+  },
+  {
+    "representative_question": "我看见营业发票中显示的专票正在申请，这个推送完之后是否按照政企平台的邮箱发送给客户？",
+    "representative_answer": "您好，您的问题已收到，请稍等， 谢谢"
+  },
+  {
+    "representative_question": "如何查询号码的开户部门和是否有过户记录？",
+    "representative_answer": "可查询号码的开户部门和是否存在过户记录。"
+  },
+  {
+    "representative_question": "在优先级上，升级包和月末27日流量哪个更优先？",
+    "representative_answer": "升级包优先于月末27日流量。副卡的优先级未查询到，建议咨询专家。"
+  },
+  {
+    "representative_question": "优先级小的先使用",
+    "representative_answer": "优先级小的先使用"
+  },
+  {
+    "representative_question": "为什么APP会一直给用户发送查询详单短信，而用户从未使用过该功能？",
+    "representative_answer": "建议提交工单，由工作人员核实具体情况。"
+  },
+  {
+    "representative_question": "需要邀请集团",
+    "representative_answer": "请稍等 转接说明：请协助核查 谢谢"
+  },
+  {
+    "representative_question": "确认是哪些号码吗？",
+    "representative_answer": "确认是哪些号码。"
+  },
+  {
+    "representative_question": "今天要求必须关单吗",
+    "representative_answer": "哦  您是担心其他人看不见这个单子的进展哈"
+  },
+  {
+    "representative_question": "我用其他人的工号提个沃工单吧",
+    "representative_answer": "嗯。。我是省份的"
+  },
+  {
+    "representative_question": "我 ROBOT:{processInitiatorAccount:caom61，processId*，createTime:2025-06-30 18:29:40，processName:B域问题咨询，processKey:OH*，tip:【您的问题已被转为问题工单，请关注！】，title:短信，userName:赵娜}",
+    "representative_answer": "关注下这个单子"
+  },
+  {
+    "representative_question": "下个月是否会收取双重费用",
+    "representative_answer": "建议在下月先受理副卡再办理更改套餐。"
+  },
+  {
+    "representative_question": "开户员工： 周伟，他这个工号呢",
+    "representative_answer": "周伟 zhouwei69 北京市分公司社会渠道中心.资源管理中心"
+  },
+  {
+    "representative_question": "改失效了",
+    "representative_answer": "改失效了"
+  },
+  {
+    "representative_question": "非直充方式的一卡通缴费是否增加可打金额？",
+    "representative_answer": "非直充方式的一卡通缴费不会增加可打金额。"
+  },
+  {
+    "representative_question": "如何核实发票打印情况？",
+    "representative_answer": "可通过【CBSS-账务管理-票据管理-账务票据辅助-账务票据打印日志查询】进行核实发票打印情况。"
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "cluster_id": 17,
+  "size": 1,
+  "qa_pairs": [
+    {
+      "question": "K405账务打印设置失败 acts/invprinttag 异常是什么原因？",
+      "answer": "K405账务打印设置失败 acts/invprinttag 异常是由于账务打印设置失败导致的。"
+    }
+  ]
+}

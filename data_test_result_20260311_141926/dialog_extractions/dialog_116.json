@@ -1,0 +1,13 @@
+{
+  "dialog_index": 116,
+  "full_dialog_text": "SRVICE:您好，请问有什么可以帮您 \nCUSTOMER:服务名称 [ trades_compmsgassemble ] txid [872de7c3^**] 规则编码 [4999]  规则内容:  立即拆机服务，封装svcstate节点异常0010XN*立即拆机服务，封装svcstate节点异常用户现在的服务状态不能办理该业务立即拆机服务，封装svcstate节点异常用户现在的服务状态不能办理该业务立即拆机服务，封装svcstate节点异常0010XN*立即拆机服务，封装svcstate节点异常用户现在的服务状态不能办理该业务立即拆机服务，封装svcstate节点异常用户现在的服务状态不能办理该业务 \nSERVICE:请您稍等 \nSERVICE:师傅您好，用户欠费半停机状态，无法办理拆机业务 \nCUSTOMER:交完费了 \nCUSTOMER:啥时候能开机 \nSERVICE:请您稍等 \nSERVICE:查询没有开机工单，我尝试下0交费，您稍等 \nCUSTOMER:我试了 0交费 \nCUSTOMER:没有开机工单 \nSERVICE:此问题需要后台专家协助核查，已为您转接中，请稍等，转接成功后将转由后台专家为您服务，感谢配合。 \nSERVICE:转接说明：请核实 \nSERVICE:您好，目前咨询人数较多，请您稍等，稍后为您解答问题 \nSERVICE:稍等 \nCUSTOMER:好的 \nCUSTOMER:您好 用户还在厅里等待 请问大概还需要等待多久 因为今天月底最后一天 \nCUSTOMER:@*  \nSERVICE:正在看，会话较多，正在逐一核实中 \nCUSTOMER:他组合号码 欠费半停机 交了欠费之后 没有开机的工单 \nSERVICE:群组号只能群组下其他号码交费开机关联开 \nSERVICE:其他号码是信用特殊开，不会关联 \nSERVICE:稍等，我帮你处理下 \nSERVICE:已经开通了，看下吧 \nCUSTOMER:群组号码 都交费了 现在还有余额 \nCUSTOMER:好的 麻烦了 谢谢",
+  "dialog_preview": "SRVICE:您好，请问有什么可以帮您 \nCUSTOMER:服务名称 [ trades_compmsgassemble ] txid [872de7c3^**] 规则编码 [4999]  规则内容:  立即拆机服务，封装svcstate节点异常0010XN*立即拆机服务，封装svcstate节点异常用户现在的服务状态不能办理该业务立即拆机服务，封装svcstate节点异常用户现在的服务状态不能办理...",
+  "extracted_qa_pairs": [
+    {
+      "question": "群组号码欠费半停机，交了欠费之后没有开机工单，怎么办？",
+      "answer": "群组号只能由群组下其他号码交费开机关联开通，其他号码是信用特殊开，不会关联。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

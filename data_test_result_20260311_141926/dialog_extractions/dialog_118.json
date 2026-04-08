@@ -1,0 +1,13 @@
+{
+  "dialog_index": 118,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:业务号码；* \nCUSTOMER:CB订* \nSERVICE:您好，有什么可以帮您 \nCUSTOMER:麻烦师傅您看能不能把客户这个两个业务恢复一下啊 \nCUSTOMER:取消错了 \nSERVICE:请稍等 \nSERVICE:您好，此问题需要后台专家协助核查，已为您转接中，请稍等，转接成功后将由后台专家为您服务，感谢配合 \nSERVICE:转接说明：请协助核实 \nSERVICE:您好，我是*，很高兴为您服务！ \nSERVICE:稍等 \nSERVICE:这涉及施工移机赠费包 \nSERVICE:建议重新订购 \nCUSTOMER:能恢复吗师傅 \nSERVICE:请重新订购",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:业务号码；* \nCUSTOMER:CB订* \nSERVICE:您好，有什么可以帮您 \nCUSTOMER:麻烦师傅您看能不能把客户这个两个业务恢复一下啊 \nCUSTOMER:取消错了 \nSERVICE:请稍等 \nSERVICE:您好，此问题需要后台专家协助核查，已为您转接中，请稍等，转接成功后将由后台专家为您服务，感谢配合 \nSERV...",
+  "extracted_qa_pairs": [
+    {
+      "question": "施工移机赠费包取消错了，能恢复吗？",
+      "answer": "建议重新订购。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

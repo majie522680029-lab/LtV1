@@ -1,0 +1,21 @@
+{
+  "dialog_index": 139,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ ROBOT:[融合业务新空白（8960关系），融合业务新中点击变更主号码没有反应，融合业务新：纳入报错提示产品有误，请重新选择套餐，融合业务新菜单报错：本地融合业务，纳入成员要进行拆分或者拆机，cBSS系统融合业务新菜单操作融合变更报错：请设置融合主号码] ROBOT:您可通过会话窗口右侧“相似问题”查看对应业务目录下的知识。 \nCUSTOMER:您好  \nCUSTOMER:* 这个手机号 做融合业务新 纳入手机号 报错 \nCUSTOMER:查询用户资料无数据！ 服务名称 [ users_comprodbringinto ] txid [87d54b63^**] 错误编码 [8888] 错误内容: 调用查询用户服务失败，错误信息:查询用户资料无数据！ \nSERVICE:纳入副卡么 副卡号请提供下 \nCUSTOMER:这个号做主号 \nCUSTOMER:融合新装 纳入固话 纳入宽带 都没问题 就纳手机号 报错 \nSERVICE:现在有融合啊 \nCUSTOMER:关系里也没这个号码 \nSERVICE:您好，此问题需要后台专家协助核查，已为您转接中，请稍等，转接成功后将转由后台专家为您服务，感谢配合。 \nSERVICE:转接说明：请协助核实 谢谢 \nSERVICE:您好，目前咨询人数较多，请您稍等，稍后为您解答问题 \nSERVICE:这个号码在融合内呀 \nCUSTOMER:这个没有别的号码了 \nCUSTOMER:*  *  * 这三个号码 要组成 一个 融合 \nCUSTOMER:首月 查询 就是个单号卡  \nSERVICE:您好，我是*，由于当前咨询较多，正在逐一处理中，回复可能不及时，期间请勿关闭会话，您可以先描述一下您的问题，提供报错截图以及业务菜单 \nSERVICE:您好，请描述一下您的问题 \nCUSTOMER:综合资料的话 是显示有融合 可是关系里 也没有这个号啊 \nSERVICE:好的，问题已收到，请稍候 \nSERVICE:select * from D_USERS.tf_f_user_relation where  mem_user_id >0 and primary_serial_number = '*';select * from D_USERS.tf_f_user_relation where  mem_user_id >0 and primary_serial_number = '*'; \nCUSTOMER:没看明白 啥意思？ \nSERVICE:您这个时哪个菜单显示的 \nCUSTOMER:[汗] \nCUSTOMER:我表达不准确么？ \nSERVICE:@* * \nCUSTOMER:您发的截图 融合里面 根本没有这个号码 \nSERVICE:电话沟通一下 \nSERVICE:* \nSERVICE:*  *  * \nSERVICE:@* 再试一下 \nSERVICE:PRIMARY_USER_ID错了 \nCUSTOMER:好的 稍等 \nCUSTOMER:这个号 是融合的主卡？ \nSERVICE:虚拟号码id \nCUSTOMER:* 现在在这个融合下面 \nCUSTOMER:我不确定往下做 行不行 如果做不了 也不能取消次月吧？ \nSERVICE:@* 办理不成功也没有次月呀 \nCUSTOMER:* 现在在这个融合里面 我得拆分出来啊 才能试 \nCUSTOMER:这个手机号 不能跟这个融合解除融合关系么 \nSERVICE:不变更拆分 \nSERVICE:查询用户资料无数据！ 服务名称 [ users_comprodbringinto ] txid [87d54b63^**] 错误编码 [8888] 错误内容: 调用查询用户服务失败，错误信息:查询用户资料无数据！ \nSERVICE:这现在不能试了是吗 \nSERVICE:看还报错不 \nCUSTOMER:我先拆分吧  \nSERVICE:好的 \nCUSTOMER:跟那个融合 先分开 在试 \nCUSTOMER:可以了 做过去了 \nCUSTOMER:多谢 \nSERVICE:好的 \nSERVICE:您客气了 \nSERVICE:您好，问题已处理完毕，关闭会话请选【已解决】，如针对该问题仍有疑问可继续咨询~",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ ROBOT:[融合业务新空白（8960关系），融合业务新中点击变更主号码没有反应，融合业务新：纳入报错提示产品有误，请重新选择套餐，融合业务新菜单报错：本地融合业务，纳入成员要进行拆分或者拆机，cBSS系统融合业务新菜单操作融合变更报错：请设置融合主号码] ROBOT:您可通过会话窗口右侧“相似问题”查看对应业务目录下的知识。 \nCUSTOMER:您好...",
+  "extracted_qa_pairs": [
+    {
+      "question": "在办理融合业务新纳入手机号时，系统报错“查询用户资料无数据”，是什么原因？",
+      "answer": "该报错表示调用查询用户服务失败，错误信息为“查询用户资料无数据”。"
+    },
+    {
+      "question": "融合业务新菜单中纳入手机号报错，但纳入固话和宽带正常，可能是什么问题？",
+      "answer": "可能是该手机号未正确关联到融合关系中，或系统中缺少该用户的资料信息。"
+    },
+    {
+      "question": "如何解除一个手机号与现有融合业务的关系？",
+      "answer": "需要通过拆分操作将该手机号从融合业务中移出，而非直接变更或取消。"
+    }
+  ],
+  "extraction_count": 3,
+  "success": true
+}

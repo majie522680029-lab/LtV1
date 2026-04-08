@@ -1,0 +1,78 @@
+[
+  {
+    "representative_question": "主卡有未生效套餐时能否办理家庭卡（副卡）相关业务？",
+    "representative_answer": "主卡有未生效套餐时，不允许新开家庭卡成员或选择副卡月功能费立即生效。需先取消主卡的未生效套餐，再办理家庭卡业务，之后可重新受理主卡套餐变更；副卡生效后如需调整生效时间，可联系客服处理。"
+  },
+  {
+    "representative_question": "靓号用户如何办理销户？",
+    "representative_answer": "靓号合约未到期的用户需在OA系统提交“在网靓号用户特殊事项审批单”，经市场部审批后，由数字化部通过CB系统“在网靓号协议调整”功能取消靓号协议并预约销户，营业厅无需另行操作。"
+  },
+  {
+    "representative_question": "郊区专属FTTR两年期赠费包（600元两年）到期后是否会自动顺延？",
+    "representative_answer": "该赠费包到期后自动顺延，延续后费用可正常使用，用户不会产生额外费用或损失。"
+  },
+  {
+    "representative_question": "如何查询号码的开户部门和开户员工信息？",
+    "representative_answer": "您可联系客服或通过系统查询该号码的开户部门及开户员工信息。具体信息包括开户部门（如北京市分公司社会渠道中心、资源管理中心）和开户员工姓名。"
+  },
+  {
+    "representative_question": "局方停机原因是什么？",
+    "representative_answer": "停机原因是受理时录入的，若未填写则系统中无具体原因。"
+  },
+  {
+    "representative_question": "福多多龙卡套餐停售后如何恢复原套餐？",
+    "representative_answer": "如福多多龙卡套餐已下架，需等待用户次月生效后联系其重新办理原套餐，并对次月办理导致的多出费用进行人工调账处理。若工号有受理权限，可发部门协作至数字化部/公众开发中心、市场部/产品规划与统筹组，申请临时上架产品；若无权限，需由市场部产品经理发起OOP工单，标明需上架的产品及赋权角色组。"
+  },
+  {
+    "representative_question": "联通公众系统的客服联系方式是什么？",
+    "representative_answer": "联通公众系统提供在线客服，您可以通过联通公众APP内的掌沃通或联通公众客服入口进行咨询。"
+  },
+  {
+    "representative_question": "北京创新远大科技有限公司宽带门店（电商）归属哪个部门或地区？",
+    "representative_answer": "很抱歉，未联系到您，有问题欢迎您再次咨询。"
+  },
+  {
+    "representative_question": "营业发票推送完成后是否会通过政企平台的邮箱发送给客户？",
+    "representative_answer": "营业发票推送完成后会按照政企平台登记的邮箱地址发送给客户。"
+  },
+  {
+    "representative_question": "斯瓦尔巴群岛的漫游资费是多少？",
+    "representative_answer": "斯瓦尔巴群岛属于挪威，国际漫游资费请参考您所使用运营商针对挪威的漫游资费标准。建议出行前联系您的运营商确认具体资费及开通方式。"
+  },
+  {
+    "representative_question": "小微ICT业务竣工后为何未同步到CBSS导致无法缴费？",
+    "representative_answer": "需在政企运营平台的客户运营模块中，进入集团账户资料管理，找到对应账户，在备注栏添加任意字符后提交，以触发账户信息同步至CBSS系统。"
+  },
+  {
+    "representative_question": "北六是什么？",
+    "representative_answer": "北六是原来的ESS系统。"
+  },
+  {
+    "representative_question": "账后调账现金账本是如何抵扣费用的？",
+    "representative_answer": "账后调账现金账本可退预存款1，该账本不区分具体月份，采用随机抵扣方式。"
+  },
+  {
+    "representative_question": "异地补办手机卡是否需要原归属地赋权？",
+    "representative_answer": "不需要原归属地赋权，由补卡所在地的营业员使用其操作工号进行赋权即可。"
+  },
+  {
+    "representative_question": "办理停机保号后为什么在优惠信息里查询不到？",
+    "representative_answer": "停机保号期间部分优惠信息可能无法显示，复机后可恢复正常查询。"
+  },
+  {
+    "representative_question": "为什么无法撤机，一直显示在未竣工状态？",
+    "representative_answer": "后台无法直接取消次月产品，因此设备状态会持续显示为未竣工。"
+  },
+  {
+    "representative_question": "为什么我没有使用抖音，但联通App显示有抖音的流量记录？",
+    "representative_answer": "话单中的“业务类型”字段由网络侧根据访问目标IP地址自动识别，并不完全对应用户实际使用的APP。例如，通过浏览器或其他应用跳转到抖音相关页面所产生的流量，也会被归类为抖音流量。"
+  },
+  {
+    "representative_question": "ECS自动充财付通是通过支付宝充值吗？",
+    "representative_answer": "ECS是电商服务，关于财付通或支付宝等支付方式的问题，请直接联系电商平台客服咨询。"
+  },
+  {
+    "representative_question": "如何处理撤机和拦截？",
+    "representative_answer": "次月生效的业务无法受理。"
+  }
+]

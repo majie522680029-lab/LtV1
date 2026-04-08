@@ -1,0 +1,34 @@
+[
+  {
+    "representative_question": "固网解约报错提示活动已经进行过转兑，不允许返销如何处理？",
+    "representative_answer": "固网解约报错提示活动已经进行过转兑，不允许返销，需派单核查处理。"
+  },
+  {
+    "representative_question": "发票账务打印设置失败如何处理？",
+    "representative_answer": "发票账务打印设置失败可能是由于预存款未转分月，需通过【CBSS-发票账务打印设置】功能点将订单转分月，增加用户可打金额。"
+  },
+  {
+    "representative_question": "为什么相同业务的号码有的收费30元/月而有的不收费？",
+    "representative_answer": "相同业务的号码如果未收费，可能是该号码已过户，需勾选所有账户并选择对应月份的账户进行查看。"
+  },
+  {
+    "representative_question": "宽带号码查不到如何处理？",
+    "representative_answer": "若查不到宽带号码，需核实用户提供的号码是否准确，并确认是否为双卡号码，检查是否有短信提醒及绑定的宽带信息。"
+  },
+  {
+    "representative_question": "主卡未生效的情况下能否开副卡？",
+    "representative_answer": "主卡未生效的情况下不允许选择副卡月功能费立即生效，需主卡取消未生效套餐办理家庭卡，然后主卡再办理套餐变更。"
+  },
+  {
+    "representative_question": "北京沃派校园套餐48元档预存250元11个月套餐折扣合约是否会自动续约？",
+    "representative_answer": "北京沃派校园套餐48元档预存250元11个月套餐折扣合约的合约计划为2024-08-01 00:00:00至2025-06-30 23:59:59，合约期内会自动续约。"
+  },
+  {
+    "representative_question": "郊区专属FTTR两年期赠费包续约失败如何处理？",
+    "representative_answer": "郊区专属FTTR两年期赠费包续约失败可能是由于产品已下架，需联系市场部申请临时上架后再办理。若产品未失效，可操作用户续约批量导入。若月底权限收回，需等待权限恢复后操作。"
+  },
+  {
+    "representative_question": "如何查询号码的开户部门和开户员工信息？",
+    "representative_answer": "可通过系统查询开户员工为周伟，开户部门为北京市分公司社会渠道中心.资源管理中心。"
+  }
+]

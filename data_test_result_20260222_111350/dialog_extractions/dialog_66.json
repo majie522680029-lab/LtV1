@@ -1,0 +1,17 @@
+{
+  "dialog_index": 66,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:{businessId*，createTime:*，errorScreenshotUrl:，groupId:GROUPB*，id*，isInvolvedNumber:1，menuId:BILN619_2I，menuMsg:黑名单信息查询，questionContent:黑名单，questionSource:cBSS，questionTitle:黑名单} \nCUSTOMER:您好，证件号码*麻烦给查询下有没有黑名单信息 ，谢谢 \nSERVICE:目前未查询到黑名单 \nCUSTOMER:能查有没有外省的吗 \nSERVICE:这边也没有异地号码数据 建议联系相应归属地核实 \nCUSTOMER:好的，谢谢 \nSERVICE:请问还有其他问题么 \nCUSTOMER:没有了 \nSERVICE:有问题欢迎您再次咨询，感谢您的来访，再见。",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:{businessId*，createTime:*，errorScreenshotUrl:，groupId:GROUPB*，id*，isInvolvedNumber:1，menuId:BILN619_2I，menuMsg:黑名单信息查询，questionContent:黑名单，questionSource:cBSS，question...",
+  "extracted_qa_pairs": [
+    {
+      "question": "证件号码有没有黑名单信息？",
+      "answer": "目前未查询到黑名单。"
+    },
+    {
+      "question": "能否查询外省的黑名单信息？",
+      "answer": "没有异地号码数据，建议联系相应归属地核实。"
+    }
+  ],
+  "extraction_count": 2,
+  "success": true
+}

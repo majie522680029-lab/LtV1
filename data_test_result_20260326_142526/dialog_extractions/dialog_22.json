@@ -1,0 +1,29 @@
+{
+  "dialog_index": 22,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:帮忙看下这个号码开户部门是哪里，当时开户是谁的名字，期间有没有过户记录 \nSERVICE:开户员工： 周伟 开户部门： 北京市分公司社会渠道中心.资源管理中心  \nCUSTOMER:开户时客户的名字能看到吗 \nSERVICE:BSS已下架无法查询 目前未查询到过户记录 \nCUSTOMER:开户员工： 周伟，他这个工号呢 \nSERVICE:周伟 zhouwei69 北京市分公司社会渠道中心.资源管理中心  \nCUSTOMER:好的，谢谢 \nCUSTOMER:没有其他问题了 \nSERVICE:有问题欢迎您再次咨询，感谢您的来访，再见。",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:帮忙看下这个号码开户部门是哪里，当时开户是谁的名字，期间有没有过户记录 \nSERVICE:开户员工： 周伟 开户部门： 北京市分公司社会渠道中心.资源管理中心  \nCUSTOMER:开户时客户的名字能看到吗 \nSERVICE:BSS已下架无法查询 目前未查询到过户记录 \nCUSTOMER:开户员工： 周伟，他这个工号呢 \nSERVI...",
+  "extracted_qa_pairs": [
+    {
+      "question": "如何查询号码的开户部门和开户员工信息？",
+      "answer": "可查询号码的开户部门和开户员工信息。"
+    },
+    {
+      "question": "如何查询开户时客户的名字？",
+      "answer": "无法查询开户时客户的名字。"
+    },
+    {
+      "question": "开户员工： 周伟，他这个工号呢",
+      "answer": "周伟 zhouwei69 北京市分公司社会渠道中心.资源管理中心"
+    },
+    {
+      "question": "如何查询号码的开户部门？",
+      "answer": "可查询号码的开户部门。"
+    },
+    {
+      "question": "如何查询开户员工的工号？",
+      "answer": "可查询开户员工的工号。"
+    }
+  ],
+  "extraction_count": 5,
+  "success": true
+}

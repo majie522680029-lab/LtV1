@@ -1,0 +1,33 @@
+{
+  "dialog_index": 11,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，有什么可以帮您？ \nCUSTOMER:麻烦转接核心二组 \nCUSTOMER:需要邀请集团 \nSERVICE:请稍等 \nSERVICE:转接说明：请协助核查  谢谢 \nSERVICE:您好，我是*，很高兴为您服务！当前会话可能较多，请稍等，我会尽快为您核实问题并处理！；注：一个会话请咨询一个问题； \nSERVICE: 业务号码*，*。用户双卡号码，请核实哪个号码收到短信提醒，绑定的宽带，烦请核实，详见附件，谢谢  \nSERVICE:您好，我是*，很高兴为您服务！如未能及时回复，请点催办。紧急问题可电话联系我*。 \nSERVICE:@* \nSERVICE:稍等 \nSERVICE:- \nSERVICE:宽带号码能给提供下吗 \nSERVICE:查不到 \nSERVICE:我这边查的话，两个号码没有上述短信 \nSERVICE:是的  我也没查到 \nSERVICE:我问问通知中心 \nSERVICE:确定是这两个号码吗 \nSERVICE:但是有个宽带的失效联系电话是其中一个号码； \nSERVICE:这个我核实不了，提单人提供的就是这两个 \nSERVICE:您这边着急吗 \nSERVICE:我明天。。不上班 \nSERVICE:要不您那边帮忙提个沃工单？ \nSERVICE:嗯。。主要是我后续也不上班，要不然我自己提了[喜极而泣] \nSERVICE:我明天邀请继续处理  和工单一样的，不关单就行 \nSERVICE:嗯。。我是省份的 \nSERVICE:这个问题其他人提的其他系统的问题 \nSERVICE:今天要求必须关单吗 \nSERVICE:哦  您是担心其他人看不见这个单子的进展哈 \nSERVICE:对 \nSERVICE:我用其他人的工号提个沃工单吧 \nSERVICE:没事  我提下就行 \nSERVICE:您不方便提也行 \nSERVICE:我 ROBOT:{processInitiatorAccount:caom61，processId*，createTime:2025-06-30 18:29:40，processName:B域问题咨询，processKey:OH*，tip:【您的问题已被转为问题工单，请关注！】，title:短信，userName:赵娜} \nSERVICE:关注下这个单子 \nSERVICE:好的，谢谢",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，有什么可以帮您？ \nCUSTOMER:麻烦转接核心二组 \nCUSTOMER:需要邀请集团 \nSERVICE:请稍等 \nSERVICE:转接说明：请协助核查  谢谢 \nSERVICE:您好，我是*，很高兴为您服务！当前会话可能较多，请稍等，我会尽快为您核实问题并处理！；注：一个会话请咨询一个问题； \nSERVICE: 业务号码*，...",
+  "extracted_qa_pairs": [
+    {
+      "question": "如何核实短信提醒是否收到？",
+      "answer": "请核实哪个号码收到短信提醒，绑定的宽带"
+    },
+    {
+      "question": "如何处理无法查到短信的情况？",
+      "answer": "我这边查的话，两个号码没有上述短信"
+    },
+    {
+      "question": "如何处理无法核实宽带失效联系电话的情况？",
+      "answer": "这个我核实不了，提单人提供的就是这两个"
+    },
+    {
+      "question": "如何处理需要关注工单的情况？",
+      "answer": "关注下这个单子"
+    },
+    {
+      "question": "查不到宽带号码怎么办？",
+      "answer": "我这边查的话，两个号码没有上述短信"
+    },
+    {
+      "question": "如何确保问题被持续跟进？",
+      "answer": "我明天邀请继续处理 和工单一样的，不关单就行"
+    }
+  ],
+  "extraction_count": 6,
+  "success": true
+}

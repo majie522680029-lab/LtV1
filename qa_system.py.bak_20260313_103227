@@ -1,0 +1,2093 @@
+# qa_analysis_streamlit_app.py
+import streamlit as st
+import pandas as pd
+import numpy as np
+import json
+import os
+import time
+import datetime
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from openai import OpenAI
+from sklearn.cluster import DBSCAN
+from sklearn.metrics.pairwise import cosine_distances
+from sentence_transformers import SentenceTransformer
+import re
+from llm_judge import build_deepseek_client, judge_with_cache, triage_gate_decision
+
+# ==================== 新增：知识库类 ====================
+class KnowledgeBase:
+    def __init__(self, path, embedding_generator):
+        self.path = path
+        self.embedding_generator = embedding_generator
+        self.knowledge_base = []
+        self.load_knowledge_base()
+    
+    def load_knowledge_base(self):
+        """从文件加载知识库"""
+        kb_file = os.path.join(self.path, "knowledge_base.json")
+        if os.path.exists(kb_file):
+            try:
+                with open(kb_file, 'r', encoding='utf-8') as f:
+                    self.knowledge_base = json.load(f)
+                st.info(f"✅ 加载知识库，包含 {len(self.knowledge_base)} 个问题")
+            except Exception as e:
+                st.warning(f"⚠️ 加载知识库失败: {str(e)}")
+        else:
+            st.info("ℹ️ 知识库文件不存在，将创建新知识库")
+            self.knowledge_base = []
+    
+    def save_knowledge_base(self):
+        """保存知识库到文件"""
+        kb_file = os.path.join(self.path, "knowledge_base.json")
+        try:
+            with open(kb_file, 'w', encoding='utf-8') as f:
+                json.dump(self.knowledge_base, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            st.error(f"❌ 保存知识库失败: {str(e)}")
+    
+    def add_qa_pair(self, question, answer, embedding=None):
+        """添加问答对；若问题已存在且答案不同，则直接替换旧答案。"""
+        normalized_question = normalize_compare_text(question)
+        normalized_answer = normalize_compare_text(answer)
+        now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        for idx, item in enumerate(self.knowledge_base):
+            existing_question = normalize_compare_text(item.get("question", ""))
+            if existing_question == normalized_question:
+                old_answer = item.get("answer", "")
+                existing_answer = normalize_compare_text(item.get("answer", ""))
+                if existing_answer != normalized_answer:
+                    self.knowledge_base[idx]["answer"] = answer
+                    self.knowledge_base[idx]["updated_at"] = now_str
+                    return {
+                        "action": "updated",
+                        "index": idx,
+                        "question": question,
+                        "old_answer": old_answer,
+                        "new_answer": answer
+                    }
+                return {"action": "unchanged", "index": idx}
+
+        if embedding is None:
+            embedding = self.embedding_generator.get_embedding(question)
+        self.knowledge_base.append({
+            "question": question,
+            "answer": answer,
+            "embedding": embedding.tolist() if hasattr(embedding, 'tolist') else embedding,
+            "created_at": now_str,
+            "updated_at": now_str
+        })
+        return {"action": "added", "index": len(self.knowledge_base) - 1}
+    
+    def find_similar_questions(self, question, similarity_threshold=0.7):
+        """查找与给定问题相似的现有问题"""
+        if not self.knowledge_base:
+            return []
+            
+        question_embedding = self.embedding_generator.get_embedding(question)
+        similar_items = []
+        
+        for item in self.knowledge_base:
+            # 计算相似度
+            similarity = 1 - cosine_distances([question_embedding], [item["embedding"]])[0][0]
+            
+            if similarity >= similarity_threshold:
+                similar_items.append({
+                    "similarity": similarity,
+                    "question": item["question"],
+                    "answer": item["answer"],
+                    "created_at": item["created_at"],
+                    "updated_at": item.get("updated_at", ""),
+                    "index": self.knowledge_base.index(item)
+                })
+        
+        # 按相似度排序
+        similar_items.sort(key=lambda x: x["similarity"], reverse=True)
+        return similar_items
+    
+    def update_answer(self, index, new_answer):
+        """更新知识库中指定索引的问答对答案"""
+        if 0 <= index < len(self.knowledge_base):
+            self.knowledge_base[index]["answer"] = new_answer
+            self.knowledge_base[index]["updated_at"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            return True
+        return False
+    
+    def get_answer_embedding_similarity(self, answer1, answer2):
+        """计算两个答案的语义相似度"""
+        emb1 = self.embedding_generator.get_embedding(answer1)
+        emb2 = self.embedding_generator.get_embedding(answer2)
+        return 1 - cosine_distances([emb1], [emb2])[0][0]
+
+# ==================== Streamlit 页面配置 ====================
+st.set_page_config(
+    layout="wide",
+    page_title="🔍 知识沉淀系统",
+    page_icon="🧠",
+    initial_sidebar_state="expanded"
+)
+
+# ==================== 1. 侧边栏配置参数 ====================
+with st.sidebar:
+    st.title("⚙️ 配置参数")
+    st.markdown("---")
+    
+    # API 配置
+    st.subheader("🌐 API 配置")
+    base_url = st.text_input("API 地址", "https://dashscope.aliyuncs.com/compatible-mode/v1", help="API 地址")
+    api_key = st.text_input("API Key", value="sk-64987e1a5a82403b8f878a6c3939ad8a", type="password", help="API 密钥")
+    model_name = st.selectbox("模型名称", ["qwen3-max", "qwen3-plus", "qwen3-turbo"], index=0, help="模型名称")
+    
+    st.markdown("---")
+    
+    # 数据源配置
+    st.subheader("📊 数据源配置")
+    excel_path = st.text_input("Excel 文件路径", "/home/majie/work/LtV1/data_test/2506_在线咨询-替换后.xlsx", help="包含对话记录的 Excel 文件路径")
+    excel_row_limit = st.number_input("读取行数限制", min_value=1, max_value=1000, value=30, help="读取前 N 行数据，0 表示全部")
+    if excel_row_limit == 0:
+        excel_row_limit = None
+    
+    st.markdown("---")
+    
+    # 嵌入模型配置 - 修改此部分
+    st.subheader("🧩 嵌入模型配置")
+    # 删除 qwen 选项，只保留 bge
+    embedding_method = "bge"  # 直接设置为 bge，不再提供选择
+    st.info("ℹ️ 系统使用 BGE 嵌入模型进行语义分析")
+    
+    bge_model_path = st.text_input("BGE 模型路径", "/home/majie/llm/models/bge-large-zh", help="BGE-Large 模型本地路径")
+    embedding_device = st.radio("计算设备", ["cuda", "cpu"], index=0, help="嵌入计算使用的设备")
+    
+    st.markdown("---")
+    
+    # 聚类参数
+    st.subheader("🔬 聚类参数")
+    clustering_metric = "cosine"
+
+    # 预设：保留原始参数，同时提供更稳健的默认参数，避免大簇串联
+    original_cluster_preset = {
+        "dbscan_min_samples": 1,
+        "dynamic_eps_coefficient": 0.7,
+        "min_eps_value": 0.1,
+        "max_eps_value": 0.8,
+    }
+    tuned_cluster_preset = {
+        "dbscan_min_samples": 2,
+        "dynamic_eps_coefficient": 0.5,
+        "min_eps_value": 0.08,
+        "max_eps_value": 0.4,
+    }
+
+    if "cluster_preset" not in st.session_state:
+        st.session_state.cluster_preset = "稳健（推荐）"
+    if "dbscan_min_samples" not in st.session_state:
+        st.session_state.dbscan_min_samples = tuned_cluster_preset["dbscan_min_samples"]
+    if "dynamic_eps_coefficient" not in st.session_state:
+        st.session_state.dynamic_eps_coefficient = tuned_cluster_preset["dynamic_eps_coefficient"]
+    if "min_eps_value" not in st.session_state:
+        st.session_state.min_eps_value = tuned_cluster_preset["min_eps_value"]
+    if "max_eps_value" not in st.session_state:
+        st.session_state.max_eps_value = tuned_cluster_preset["max_eps_value"]
+
+    st.selectbox(
+        "聚类参数预设",
+        ["稳健（推荐）", "原始配置"],
+        key="cluster_preset",
+        help="可在稳健配置和历史原始配置间切换；点击“应用预设”生效",
+    )
+    if st.button("应用预设", key="apply_cluster_preset", help="将当前预设写入下面四个聚类参数"):
+        selected_preset = tuned_cluster_preset if st.session_state.cluster_preset == "稳健（推荐）" else original_cluster_preset
+        st.session_state.dbscan_min_samples = selected_preset["dbscan_min_samples"]
+        st.session_state.dynamic_eps_coefficient = selected_preset["dynamic_eps_coefficient"]
+        st.session_state.min_eps_value = selected_preset["min_eps_value"]
+        st.session_state.max_eps_value = selected_preset["max_eps_value"]
+        st.success(f"已应用预设：{st.session_state.cluster_preset}")
+
+    dbscan_min_samples = st.slider(
+        "最小核心点数",
+        1,
+        10,
+        key="dbscan_min_samples",
+        help="DBSCAN 聚类的最小样本数（建议 >=2，减少不相关问答串联）",
+    )
+    dynamic_eps_coefficient = st.slider(
+        "动态 eps 系数",
+        0.1,
+        1.0,
+        0.5,
+        0.1,
+        key="dynamic_eps_coefficient",
+        help="动态计算 eps 的系数（建议 0.4~0.6）",
+    )
+    min_eps_value = st.slider(
+        "最小 eps 值",
+        0.0,
+        0.5,
+        0.08,
+        0.01,
+        key="min_eps_value",
+        help="eps 最小值",
+    )
+    max_eps_value = st.slider(
+        "最大 eps 值",
+        0.2,
+        1.0,
+        0.4,
+        0.01,
+        key="max_eps_value",
+        help="eps 最大值（建议 <=0.45，避免形成超大簇）",
+    )
+    
+    st.markdown("---")
+    
+    # 数据处理参数
+    st.subheader("🧹 数据处理参数")
+    min_dialog_length = st.number_input("最小对话长度", 0, 1000, 0, help="最小对话字符数，低于此值的对话将被忽略")
+    min_question_length = st.number_input("最小问题长度", 0, 100, 0, help="最小问题字符数，低于此值的问题将被忽略")
+    
+    max_cluster_qa_count = st.number_input("聚类最大 QA 数", 0, 100, 0, help="0 表示不限制")
+    if max_cluster_qa_count == 0:
+        max_cluster_qa_count = None
+        
+    max_input_length = st.number_input("最大输入长度", 1000, 10000, 4000, help="模型输入最大长度限制")
+    max_preview_chars = st.number_input("预览字符数", 10, 200, 30, help="结果预览显示的字符数")
+    extract_concurrency = st.slider(
+        "QA 抽取并发数",
+        1,
+        8,
+        4,
+        1,
+        help="并发调用 QA 抽取接口。若接口限流或网络不稳，可调回 1。",
+    )
+    
+    st.markdown("---")
+    
+    # 模型生成参数
+    st.subheader("🤖 模型生成参数")
+    temperature = st.slider("Temperature", 0.0, 1.0, 0.1, 0.1, help="控制生成结果的随机性，值越低越确定")
+    top_p = st.slider("Top-p", 0.0, 1.0, 0.9, 0.1, help="采样累积概率阈值")
+    use_backup_strategy = st.checkbox("启用备用策略", True, help="当模型挑选代表性QA对失败时，使用默认策略，即选取该簇首个QA对")
+    
+    st.markdown("---")
+    
+    # 知识库配置 - 新增部分
+    st.subheader("📚 知识库配置")
+    knowledge_base_path = st.text_input("知识库路径", "./knowledge_base", help="知识库存储路径")
+    similarity_threshold = st.slider("问题相似度阈值", 0.0, 1.0, 0.7, 0.05, help="问题相似度低于此阈值视为新问题")
+    answer_similarity_threshold = st.slider("答案相似度阈值", 0.0, 1.0, 0.8, 0.05, help="答案相似度低于此阈值视为答案需要更新") 
+
+
+    
+    st.markdown("---")
+    # 处理按钮
+    st.subheader("🚀 操作")
+    process_button = st.button("开始处理", type="primary", width='stretch')
+    reset_button = st.button("重置结果", width='stretch')
+
+# ==================== 2. 创建Tab页面结构 ====================
+st.title("🔍 知识沉淀系统")
+st.markdown("基于 大模型 + BGE 嵌入模型的问答对提取-聚类-筛选全流程")
+st.markdown("---")
+
+# 创建两个Tab
+tab1, tab2 = st.tabs(["📊 结果展示", "📚 知识库管理"])
+
+# ==================== 3. 通用函数定义 ====================
+# 读取结果目录的函数
+def load_results(result_dir):
+    """从结果目录加载处理结果"""
+    try:
+        # 加载统计信息
+        stats_path = os.path.join(result_dir, "processing_stats.json")
+        if os.path.exists(stats_path):
+            with open(stats_path, 'r', encoding='utf-8') as f:
+                stats = json.load(f)
+        
+        # 加载代表性QA
+        rep_qa_path = os.path.join(result_dir, "representative_qa_pairs.json")
+        if os.path.exists(rep_qa_path):
+            with open(rep_qa_path, 'r', encoding='utf-8') as f:
+                representative_qa = json.load(f)
+        
+        # 加载聚类结果，并统一数据结构
+        cluster_path = os.path.join(result_dir, "cluster_results.json")
+        clusters = {}
+        if os.path.exists(cluster_path):
+            with open(cluster_path, 'r', encoding='utf-8') as f:
+                cluster_results = json.load(f)
+                # 统一数据结构：直接使用 qa_pairs 列表
+                for label_str, cluster_data in cluster_results["clusters"].items():
+                    if isinstance(cluster_data, dict) and "qa_pairs" in cluster_data:
+                        clusters[int(label_str) if label_str.lstrip('-').isdigit() else label_str] = cluster_data["qa_pairs"]
+                    else:
+                        clusters[int(label_str) if label_str.lstrip('-').isdigit() else label_str] = cluster_data
+        
+        # 修复：加载原始QA对
+        raw_qa_path = os.path.join(result_dir, "raw_qa_pairs.json")
+        all_qa_pairs = []
+        if os.path.exists(raw_qa_path):
+            with open(raw_qa_path, 'r', encoding='utf-8') as f:
+                all_qa_pairs = json.load(f)
+        
+        return {
+            'stats': stats,
+            'representative_qa': representative_qa,
+            'clusters': clusters,  # 确保是统一结构
+            'all_qa_pairs': all_qa_pairs,
+            'result_dir': result_dir
+        }
+    except Exception as e:
+        st.error(f"加载结果失败: {str(e)}")
+        return None
+
+# 初始化BGE嵌入模型
+def init_bge_embedding(config):
+    """初始化BGE嵌入模型"""
+    try:
+        # 检查模型路径是否为空
+        if not config["bge_model_path"] or config["bge_model_path"].strip() == "":
+            st.error("❌ BGE模型路径不能为空，请在侧边栏配置")
+            return None
+        
+        model = SentenceTransformer(config["bge_model_path"], device=config["embedding_device"])
+        class EmbeddingGenerator:
+            def __init__(self, model):
+                self.model = model
+            def get_embedding(self, text):
+                return self.model.encode(text, normalize_embeddings=True, show_progress_bar=False)
+        return EmbeddingGenerator(model)
+    except Exception as e:
+        st.error(f"初始化BGE模型失败: {str(e)}")
+        return None
+
+# 数据类型转换函数
+def convert_numpy_types(obj):
+    """递归转换 NumPy 数据类型为 Python 原生类型"""
+    if isinstance(obj, (np.integer, np.int64, np.int32, np.int16, np.int8)):
+        return int(obj)
+    elif isinstance(obj, (np.floating, np.float64, np.float32, np.float16)):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, dict):
+        return {str(key): convert_numpy_types(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_numpy_types(value) for value in obj]
+    else:
+        return obj
+
+
+def normalize_compare_text(value):
+    """用于同问题判定的规范化文本。"""
+    return re.sub(r"\s+", " ", str(value or "")).strip()
+
+
+def push_replace_notice(source, message, question=None, old_answer=None, new_answer=None):
+    """缓存替换提示，rerun 后仍可见。"""
+    st.session_state["replace_notice"] = {
+        "source": source,
+        "message": message,
+        "question": question,
+        "old_answer": old_answer,
+        "new_answer": new_answer
+    }
+
+
+def render_replace_notice():
+    """显示明显的答案替换提示。"""
+    notice = st.session_state.get("replace_notice")
+    if not notice:
+        return
+    st.error(f"⚠️ {notice.get('source', '知识库操作')}：{notice.get('message', '')}")
+    if notice.get("question"):
+        st.markdown(f"**问题：** {notice.get('question')}")
+    if notice.get("old_answer") is not None:
+        st.markdown("**旧答案（已替换）**")
+        st.warning(notice.get("old_answer") or "(空)")
+    if notice.get("new_answer") is not None:
+        st.markdown("**新答案（当前生效）**")
+        st.success(notice.get("new_answer") or "(空)")
+    if st.button("关闭替换提示", key="close_replace_notice"):
+        st.session_state["replace_notice"] = None
+        st.rerun()
+
+
+def classify_api_exception(exc):
+    """将 API 异常分类为可诊断标签。"""
+    error_type = type(exc).__name__
+    def _build_exception_chain_message(err):
+        parts = []
+        seen = set()
+        current = err
+        while current is not None and id(current) not in seen:
+            seen.add(id(current))
+            text = (str(current).strip() or repr(current))
+            parts.append(f"{type(current).__name__}: {text}")
+            current = getattr(current, "__cause__", None) or getattr(current, "__context__", None)
+        return " | ".join(parts)
+
+    message = _build_exception_chain_message(exc)
+    lower_message = message.lower()
+    status_code = getattr(exc, "status_code", None)
+    response_obj = getattr(exc, "response", None)
+    if status_code is None and response_obj is not None:
+        status_code = getattr(response_obj, "status_code", None)
+
+    category = "UNKNOWN"
+    label = "未知错误"
+    hint = "请查看控制台详细日志定位问题"
+
+    timeout_error_names = {"APITimeoutError", "ConnectTimeout", "ReadTimeout", "TimeoutException"}
+    dns_signals = (
+        "temporary failure in name resolution",
+        "name or service not known",
+        "nodename nor servname",
+        "getaddrinfo",
+        "dns"
+    )
+    proxy_signals = ("proxy", "tunnel connection failed", "proxyerror")
+    connection_signals = ("connection error", "connection refused", "failed to establish a new connection")
+
+    if status_code == 401:
+        category = "HTTP_401"
+        label = "401 认证失败"
+        hint = "请检查 API Key 是否正确、是否过期或是否有权限访问该模型"
+    elif status_code == 429:
+        category = "HTTP_429"
+        label = "429 频率/配额限制"
+        hint = "可能触发限流或账户配额不足，请稍后重试并检查配额"
+    elif status_code is not None:
+        category = f"HTTP_{status_code}"
+        label = f"{status_code} 接口错误"
+        hint = "请检查请求参数、模型名称以及服务端状态"
+    elif error_type in timeout_error_names or "timeout" in lower_message or "timed out" in lower_message:
+        category = "TIMEOUT"
+        label = "连接超时"
+        hint = "请检查网络质量、代理链路，并确认服务端响应是否稳定"
+    elif any(signal in lower_message for signal in dns_signals):
+        category = "DNS"
+        label = "DNS 解析失败"
+        hint = "请检查域名解析设置和网络出口 DNS"
+    elif any(signal in lower_message for signal in proxy_signals):
+        category = "PROXY"
+        label = "代理异常"
+        hint = "请检查 http_proxy/https_proxy 配置及本地代理进程"
+    elif "apiconnectionerror" in error_type.lower() or any(signal in lower_message for signal in connection_signals):
+        category = "CONNECTION"
+        label = "连接失败"
+        hint = "请检查 API 地址、网络连通性或代理链路"
+
+    return {
+        "category": category,
+        "label": label,
+        "hint": hint,
+        "status_code": status_code,
+        "error_type": error_type,
+        "message": message
+    }
+
+
+def report_api_exception(scene, exc, request_url=None):
+    """输出标准化日志并在前端提示可诊断错误信息。"""
+    info = classify_api_exception(exc)
+    proxy_http = os.getenv("HTTP_PROXY") or os.getenv("http_proxy") or ""
+    proxy_https = os.getenv("HTTPS_PROXY") or os.getenv("https_proxy") or ""
+    proxy_no = os.getenv("NO_PROXY") or os.getenv("no_proxy") or ""
+    payload = {
+        "scene": scene,
+        "request_url": request_url or "",
+        "category": info["category"],
+        "status_code": info["status_code"],
+        "error_type": info["error_type"],
+        "message": info["message"],
+        "hint": info["hint"],
+        "http_proxy": proxy_http,
+        "https_proxy": proxy_https,
+        "no_proxy": proxy_no
+    }
+    print(f"[api_error] {json.dumps(payload, ensure_ascii=False)}")
+    status_suffix = f"（HTTP {info['status_code']}）" if info["status_code"] is not None else ""
+    st.toast(f"⚠️ {scene}失败: {info['label']} {status_suffix}")
+    st.caption(f"{info['hint']} | 详情: {info['message']}")
+    if info["category"] in {"CONNECTION", "PROXY", "TIMEOUT", "DNS"}:
+        st.caption(
+            f"请求地址: {request_url or 'N/A'} | HTTP_PROXY={proxy_http or '空'} | "
+            f"HTTPS_PROXY={proxy_https or '空'} | NO_PROXY={proxy_no or '空'}"
+        )
+
+
+def parse_optional_threshold(raw_value, field_name):
+    """解析可选阈值输入；空字符串表示未显式配置。"""
+    text_value = (raw_value or "").strip()
+    if text_value == "":
+        return None
+    try:
+        threshold = float(text_value)
+    except ValueError:
+        st.error(f"❌ {field_name} 必须是 0~1 的数字，当前输入: {raw_value}")
+        st.stop()
+    if not (0.0 <= threshold <= 1.0):
+        st.error(f"❌ {field_name} 必须在 0~1 之间，当前输入: {raw_value}")
+        st.stop()
+    return threshold
+
+
+def resolve_triage_thresholds(t_llm_gate, triage_t_low, triage_t_high):
+    """解析 triage 阈值，兼容旧单阈值配置。"""
+    derived = False
+    t_low = triage_t_low
+    t_high = triage_t_high
+    if t_low is None and t_high is None:
+        t_low = t_llm_gate
+        t_high = min(1.0, t_low + 0.08)
+        derived = True
+    else:
+        if t_low is None:
+            t_low = t_llm_gate
+            derived = True
+        if t_high is None:
+            t_high = min(1.0, t_low + 0.08)
+            derived = True
+
+    if t_high <= t_low:
+        adjusted_high = min(1.0, t_low + 0.05)
+        if adjusted_high <= t_low:
+            st.error(f"❌ triage 阈值非法：T_HIGH({t_high:.3f}) 必须大于 T_LOW({t_low:.3f})")
+            st.stop()
+        print(
+            f"[triage_gate] warning: invalid thresholds detected; "
+            f"auto-adjust T_HIGH from {t_high:.3f} to {adjusted_high:.3f}"
+        )
+        t_high = adjusted_high
+
+    if derived:
+        print(
+            f"[triage_gate] using derived triage thresholds: "
+            f"T_LOW={t_low:.3f}, T_HIGH={t_high:.3f}, source_t_llm_gate={t_llm_gate:.3f}"
+        )
+    else:
+        print(
+            f"[triage_gate] using explicit triage thresholds: "
+            f"T_LOW={t_low:.3f}, T_HIGH={t_high:.3f}"
+        )
+    return t_low, t_high
+
+
+def log_triage_event(sim, t_low, t_high, triage, llm_called, final_decision, confidence=None, reason=None):
+    """输出 triage 决策日志，便于观测门控行为。"""
+    log_payload = {
+        "sim": round(float(sim), 6),
+        "T_LOW": round(float(t_low), 6),
+        "T_HIGH": round(float(t_high), 6),
+        "triage": triage,
+        "llm_called": bool(llm_called),
+        "final_decision": bool(final_decision)
+    }
+    if confidence is not None:
+        log_payload["confidence"] = round(float(confidence), 6)
+    if reason is not None:
+        log_payload["reason"] = reason
+    print(f"[triage_gate] {json.dumps(log_payload, ensure_ascii=False)}")
+
+
+# 自动初始化知识库函数
+def auto_init_knowledge_base():
+    """自动初始化知识库"""
+    # 仅在未初始化或配置变更时执行
+    if st.session_state.get('kb_auto_init_done', False):
+        return
+    
+    # 创建配置字典
+    config = {
+        "bge_model_path": bge_model_path,
+        "embedding_device": embedding_device
+    }
+    
+    # 初始化嵌入模型
+    embedding_generator = init_bge_embedding(config)
+    if embedding_generator:
+        st.session_state.embedding_generator = embedding_generator
+        
+        # 创建知识库目录
+        os.makedirs(knowledge_base_path, exist_ok=True)
+        
+        # 初始化知识库
+        kb = KnowledgeBase(knowledge_base_path, embedding_generator)
+        st.session_state.kb_instance = kb
+        
+        # 标记初始化完成
+        st.session_state.kb_auto_init_done = True
+        
+        st.success(f"✅ 知识库初始化成功！当前知识库包含 {len(kb.knowledge_base)} 个问答对")
+
+# ==================== 4. Tab1: 结果展示 ====================
+with tab1:
+    # 初始化 session state
+    if 'processing_results' not in st.session_state or reset_button:
+        st.session_state.processing_results = None
+        st.session_state.processing_time = None
+        st.session_state.stats = None
+        st.session_state.clusters = None
+        st.session_state.representative_qa = None
+        st.session_state.result_dir = None
+
+    # 检测结果目录
+    result_dirs = [d for d in os.listdir('.') if d.startswith('data_test_result_') and os.path.isdir(d)]
+    if result_dirs:
+        with st.expander("📁 历史结果", expanded=True):
+            selected_dir = st.selectbox("选择历史结果", sorted(result_dirs, reverse=True), index=0)
+            load_button = st.button("加载选定结果", key="tab1_load")
+            
+            if load_button:
+                results = load_results(selected_dir)
+                if results:
+                    # 调试信息
+                    st.write("加载的聚类数据结构:", {k: type(v).__name__ for k, v in results['clusters'].items()})
+                    st.write("示例聚类值:", {k: (len(v) if isinstance(v, list) else str(v)[:50]) 
+                            for k, v in list(results['clusters'].items())[:2]})
+                    
+                    st.session_state.processing_results = results
+                    st.session_state.stats = results['stats']
+                    st.session_state.representative_qa = results['representative_qa']
+                    st.session_state.clusters = results['clusters']
+                    st.session_state.result_dir = results['result_dir']
+                    st.success(f"✅ 已加载结果: {selected_dir}")
+                    st.rerun()
+
+    # ==================== 处理逻辑 ====================
+    if process_button:
+        # 验证必要参数
+        if not api_key:
+            st.error("❌ 请提供 API Key")
+            st.stop()
+        
+        if not os.path.exists(excel_path):
+            st.error(f"❌ Excel 文件不存在: {excel_path}")
+            st.stop()
+        
+        # 显示处理状态
+        status_placeholder = st.empty()
+        progress_bar = st.progress(0)
+        status_placeholder.info("🚀 开始处理...")
+        
+        # 创建配置对象
+        class StreamlitConfig:
+            def __init__(self):
+                self.base_url = base_url
+                self.api_key = api_key
+                self.model_name = model_name
+                
+                # 聚类参数
+                self.dbscan_min_samples = dbscan_min_samples
+                self.clustering_metric = clustering_metric
+                self.dynamic_eps_coefficient = dynamic_eps_coefficient
+                self.min_eps_value = min_eps_value
+                self.max_eps_value = max_eps_value
+                
+                # 嵌入模型参数 - 简化配置
+                self.embedding_dim = 768
+                self.embedding_device = embedding_device
+                self.bge_model_path = bge_model_path
+                
+                # 模型生成参数
+                self.temperature = temperature
+                self.max_tokens = None
+                self.top_p = top_p
+                
+                # 数据处理参数
+                self.min_dialog_length = min_dialog_length
+                self.min_question_length = min_question_length
+                self.max_cluster_qa_count = max_cluster_qa_count
+                self.max_input_length = max_input_length
+                self.max_preview_chars = max_preview_chars
+                self.extract_concurrency = extract_concurrency
+                
+                # Excel 读取参数
+                self.excel_row_limit = excel_row_limit
+                
+                # 其他策略参数
+                self.use_backup_strategy = use_backup_strategy
+                self.embedding_method = embedding_method
+                
+                # 路径相关配置
+                self.excel_path = excel_path
+                
+                # 结果输出配置
+                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                self.result_dir = f"./data_test_result_{timestamp}"
+                os.makedirs(self.result_dir, exist_ok=True)
+                os.makedirs(os.path.join(self.result_dir, "dialog_extractions"), exist_ok=True)
+                os.makedirs(os.path.join(self.result_dir, "cluster_details"), exist_ok=True)
+        
+        config = StreamlitConfig()
+        
+        # 初始化 OpenAI 客户端
+        def init_openai_client(config):
+            client = OpenAI(
+                base_url=config.base_url.strip(),
+                api_key=config.api_key
+            )
+            return client
+        
+        # BGE嵌入生成器
+        class BGEEmbeddingGenerator:
+            def __init__(self, config):
+                self.local_model_path = config.bge_model_path
+                self.config = config
+                
+                if not os.path.exists(self.local_model_path):
+                    st.warning(f"⚠️ BGE 模型路径不存在: {self.local_model_path}，将使用在线下载")
+                
+                self.model = SentenceTransformer(self.local_model_path, device=config.embedding_device)
+            
+            def get_embedding(self, question):
+                return self.model.encode(question, normalize_embeddings=True, show_progress_bar=False)
+        
+        # QA 提取模块
+        class QAPairExtractor:
+            def __init__(self, client, config):
+                self.client = client
+                self.config = config
+                self.extract_prompt = """你需要从以下客服对话记录中提取**信息咨询类问答对**，并严格遵守以下规则：
+1.  仅提取客户提出的**信息寻求类问题**，忽略寒暄、闲聊、个人隐私内容（如手机号、姓名）。
+2.  答案必须来自客服的回复，可适当改写口语化表述，但不能添加额外信息。
+3.  排除时效性内容（如仅限某日有效）和特定客户的专属内容。
+4.  若问题涉及产品，必须在问答对中明确提及产品名称。
+5.  只允许输出严格 JSON，不要输出解释、标题、Markdown 代码块。
+6.  输出格式必须为 JSON 数组，每个元素仅包含"question"和"answer"两个字段。
+7.  如果没有可提取的有效问答对，返回 []。
+
+输出示例：
+[
+  {{"question": "如何办理家庭卡？", "answer": "可通过营业厅或客服渠道办理家庭卡业务。"}}
+]
+
+对话记录：
+{transcript}
+
+提取的问答对："""
+
+            def _parse_qa_output(self, output_text):
+                text = (output_text or "").strip()
+                if not text:
+                    return []
+
+                text = re.sub(r"^\s*```(?:json)?\s*", "", text, flags=re.IGNORECASE)
+                text = re.sub(r"\s*```\s*$", "", text)
+
+                candidate_texts = [text]
+                array_start, array_end = text.find("["), text.rfind("]")
+                if array_start != -1 and array_end != -1 and array_end > array_start:
+                    candidate_texts.append(text[array_start:array_end + 1])
+                obj_start, obj_end = text.find("{"), text.rfind("}")
+                if obj_start != -1 and obj_end != -1 and obj_end > obj_start:
+                    candidate_texts.append(text[obj_start:obj_end + 1])
+
+                for candidate in candidate_texts:
+                    try:
+                        parsed = json.loads(candidate)
+                    except Exception:
+                        continue
+                    qa_list = parsed
+                    if isinstance(parsed, dict):
+                        for key in ("qa_pairs", "items", "data", "result"):
+                            if isinstance(parsed.get(key), list):
+                                qa_list = parsed.get(key)
+                                break
+                    if not isinstance(qa_list, list):
+                        continue
+
+                    valid_pairs = []
+                    for qa in qa_list:
+                        if (
+                            isinstance(qa, dict)
+                            and "question" in qa
+                            and "answer" in qa
+                            and isinstance(qa["question"], str)
+                            and isinstance(qa["answer"], str)
+                            and len(qa["question"].strip()) >= self.config.min_question_length
+                        ):
+                            valid_pairs.append({
+                                "question": qa["question"].strip(),
+                                "answer": qa["answer"].strip()
+                            })
+                    if valid_pairs or qa_list == []:
+                        return valid_pairs
+
+                return []
+            
+            def extract_qa_from_transcript(self, transcript, report_error=True):
+                if not transcript or not isinstance(transcript, str) or len(transcript.strip()) < self.config.min_dialog_length:
+                    return []
+                
+                formatted_prompt = self.extract_prompt.format(transcript=transcript.strip())
+                
+                try:
+                    response = self.client.chat.completions.create(
+                        model=self.config.model_name,
+                        messages=[{"role": "user", "content": formatted_prompt}],
+                        temperature=self.config.temperature,
+                        max_tokens=self.config.max_tokens,
+                        top_p=self.config.top_p
+                    )
+                    
+                    output = response.choices[0].message.content.strip()
+                    output = re.sub(r'(\<think\>[\s\S]*?\<\/think\>)|(\<\|thinking\|\>[\s\S]*?\<\/\|thinking\|\>)', '', output)
+                    return self._parse_qa_output(output)
+                except Exception as e:
+                    if report_error:
+                        report_api_exception(
+                            "QA 抽取 API 调用",
+                            e,
+                            request_url=f"{self.config.base_url.strip()}/chat/completions"
+                        )
+                    else:
+                        print(f"[qa_extract] request_error={type(e).__name__}: {str(e)}")
+                    return []
+        
+        # 聚类与筛选模块
+        class QAClusterAndSelector:
+            def __init__(self, client, config, embedding_generator):
+                self.client = client
+                self.config = config
+                self.embedding_generator = embedding_generator
+                
+                self.select_prompt = """你需要从以下**语义相似的QA对聚类**中，筛选出1-2个**代表性问答对**，并严格遵守以下规则：
+1.  代表性QA对需覆盖聚类的核心信息，表述简洁通用，适用于未来客户。
+2.  合并重复内容，优先选择答案完整、适用范围广的QA对。
+3.  排除时效性、个性化、含隐私的内容；涉及产品时必须明确产品名。
+4.  输出格式为JSON数组，每个元素包含"representative_question"和"representative_answer"字段，不要添加其他内容。
+
+QA对聚类：
+{cluster_qa_text}
+
+代表性问答对："""
+            
+            def cluster_qa_pairs(self, all_qa_pairs):
+                if len(all_qa_pairs) < 2:
+                    return {0: all_qa_pairs}
+                
+                # 1. 生成所有问题的嵌入
+                questions = [qa["question"] for qa in all_qa_pairs]
+                embeddings = []
+                
+                for i, q in enumerate(questions):
+                    progress = (i + 1) / (len(questions) * 2)
+                    progress_bar.progress(progress)
+                    status_placeholder.info(f"生成问题嵌入: {i+1}/{len(questions)}")
+                    
+                    # 直接使用 BGE 生成嵌入，删除 qwen 选项
+                    emb = self.embedding_generator.get_embedding(q)
+                    embeddings.append(emb)
+                
+                embeddings = np.array(embeddings)
+                
+                # 2. 执行 DBSCAN 聚类
+                if len(embeddings) > 1:
+                    distance_matrix = cosine_distances(embeddings)
+                    upper_triangle = distance_matrix[np.triu_indices_from(distance_matrix, k=1)]
+                    distance_median = np.median(upper_triangle)
+                    dynamic_eps = max(self.config.min_eps_value, min(self.config.max_eps_value, distance_median * self.config.dynamic_eps_coefficient))
+                    st.info(f"✅ 动态计算 eps: {dynamic_eps:.3f}（距离中位数：{distance_median:.3f}）")
+                else:
+                    dynamic_eps = 0.2
+                
+                dbscan = DBSCAN(
+                    eps=dynamic_eps,
+                    min_samples=self.config.dbscan_min_samples,
+                    metric=self.config.clustering_metric
+                )
+                labels = dbscan.fit_predict(embeddings)
+                
+                # 3. 整理聚类结果
+                clusters = {}
+                for idx, label in enumerate(labels):
+                    if label not in clusters:
+                        clusters[label] = []
+                    clusters[label].append(all_qa_pairs[idx])
+                
+                status_placeholder.success(f"✅ 聚类完成，共生成 {len(clusters)} 个簇（标签 -1 为噪声簇）")
+                return clusters
+            
+            def select_representative_qa(self, cluster_qa_list):
+                if not cluster_qa_list:
+                    return []
+                
+                # 格式化聚类中的QA对
+                qa_to_use = cluster_qa_list if self.config.max_cluster_qa_count is None else cluster_qa_list[:self.config.max_cluster_qa_count]
+                cluster_qa_text = "\n".join([f"Q: {qa['question']}\nA: {qa['answer']}" for qa in qa_to_use])
+                formatted_input = cluster_qa_text[:self.config.max_input_length]
+                formatted_prompt = self.select_prompt.format(cluster_qa_text=formatted_input)
+                
+                try:
+                    response = self.client.chat.completions.create(
+                        model=self.config.model_name,
+                        messages=[{"role": "user", "content": formatted_prompt}],
+                        temperature=self.config.temperature,
+                        max_tokens=self.config.max_tokens,
+                        top_p=self.config.top_p
+                    )
+                    
+                    output = response.choices[0].message.content.strip()
+                    output = re.sub(r'(\<think\>[\s\S]*?\<\/think\>)|(\<\|thinking\|\>[\s\S]*?\<\/\|thinking\|\>)', '', output)
+                    
+                    try:
+                        result = json.loads(output)
+                        if isinstance(result, list):
+                            return [{
+                                "representative_question": item["representative_question"].strip(),
+                                "representative_answer": item["representative_answer"].strip()
+                            } for item in result if 
+                                isinstance(item, dict) and 
+                                "representative_question" in item and 
+                                "representative_answer" in item]
+                        return []
+                    except json.JSONDecodeError:
+                        return []
+                except Exception as e:
+                    report_api_exception(
+                        "代表性 QA 筛选",
+                        e,
+                        request_url=f"{self.config.base_url.strip()}/chat/completions"
+                    )
+                    return []
+        
+        # 安全保存 JSON
+        def save_json_safe(data, filepath, description=""):
+            try:
+                cleaned_data = convert_numpy_types(data)
+                with open(filepath, "w", encoding="utf-8") as f:
+                    json.dump(cleaned_data, f, ensure_ascii=False, indent=2)
+                return True
+            except Exception as e:
+                st.toast(f"❌ 保存 {description} 失败: {str(e)}")
+                return False
+        
+        # ========== 开始处理流程 ==========
+        start_time = time.time()
+        
+        try:
+            # 1. 初始化客户端
+            client = init_openai_client(config)
+            status_placeholder.info("✅ OpenAI 客户端初始化成功")
+            
+            # 2. 初始化嵌入生成器
+            embedding_generator = None
+            if config.embedding_method == "bge":
+                try:
+                    status_placeholder.info("🚀 初始化 BGE 嵌入模型...")
+                    embedding_generator = BGEEmbeddingGenerator(config)
+                    status_placeholder.success("✅ BGE 嵌入模型加载成功")
+                except Exception as e:
+                    st.warning(f"⚠️ BGE 模型加载失败: {str(e)}")
+            
+            # 3. 初始化处理模块
+            qa_extractor = QAPairExtractor(client, config)
+            qa_cluster_selector = QAClusterAndSelector(client, config, embedding_generator)
+            
+            # 4. 读取 Excel 数据
+            status_placeholder.info(f"📂 读取 Excel 文件: {excel_path}")
+            
+            try:
+                df = pd.read_excel(config.excel_path, usecols=[3])  # 读取 D 列
+                df.columns = ['dialog']
+                
+                if config.excel_row_limit is None:
+                    dialog_texts = df['dialog'].dropna().astype(str).tolist()
+                else:
+                    dialog_texts = df['dialog'].dropna().astype(str).head(config.excel_row_limit).tolist()
+                
+                status_placeholder.success(f"✅ 成功加载 {len(dialog_texts)} 条对话记录")
+            except Exception as e:
+                st.error(f"❌ 读取 Excel 失败: {str(e)}")
+                st.stop()
+            
+            # 5. 提取 QA 对
+            status_placeholder.info(f"🔍 开始提取问答对 (共 {len(dialog_texts)} 条对话)...")
+            all_qa_pairs = []
+            valid_count = 0
+
+            def extract_job(transcript):
+                local_client = init_openai_client(config)
+                local_extractor = QAPairExtractor(local_client, config)
+                return local_extractor.extract_qa_from_transcript(transcript, report_error=False)
+
+            extraction_results = {}
+            extract_errors = 0
+            max_workers = max(1, min(int(config.extract_concurrency), len(dialog_texts) or 1))
+
+            if max_workers == 1:
+                for idx, transcript in enumerate(dialog_texts, 1):
+                    progress = 0.5 + (idx / len(dialog_texts)) * 0.3  # 提取 QA 占总进度的 30%
+                    progress_bar.progress(progress)
+                    status_placeholder.info(f"处理对话 #{idx}/{len(dialog_texts)}")
+                    extraction_results[idx] = {
+                        "transcript": transcript,
+                        "qa_list": qa_extractor.extract_qa_from_transcript(transcript)
+                    }
+            else:
+                status_placeholder.info(f"并发提取 QA：共 {len(dialog_texts)} 条对话，并发数 {max_workers}")
+                with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                    future_map = {
+                        executor.submit(extract_job, transcript): (idx, transcript)
+                        for idx, transcript in enumerate(dialog_texts, 1)
+                    }
+                    completed = 0
+                    for future in as_completed(future_map):
+                        idx, transcript = future_map[future]
+                        try:
+                            qa_list = future.result()
+                        except Exception as e:
+                            print(f"[qa_extract] worker_error dialog={idx}: {type(e).__name__}: {str(e)}")
+                            qa_list = []
+                            extract_errors += 1
+                        extraction_results[idx] = {
+                            "transcript": transcript,
+                            "qa_list": qa_list
+                        }
+                        completed += 1
+                        progress = 0.5 + (completed / len(dialog_texts)) * 0.3
+                        progress_bar.progress(progress)
+                        status_placeholder.info(f"处理对话 {completed}/{len(dialog_texts)}（并发抽取中）")
+
+            for idx in range(1, len(dialog_texts) + 1):
+                result_item = extraction_results.get(idx, {"transcript": dialog_texts[idx - 1], "qa_list": []})
+                transcript = result_item["transcript"]
+                qa_list = result_item["qa_list"]
+
+                if qa_list:
+                    valid_count += 1
+                    dialog_result = {
+                        "dialog_index": idx,
+                        "full_dialog_text": transcript,
+                        "dialog_preview": transcript[:200] + "..." if len(transcript) > 200 else transcript,
+                        "extracted_qa_pairs": qa_list,
+                        "extraction_count": len(qa_list),
+                        "success": True
+                    }
+                    dialog_file = os.path.join(config.result_dir, "dialog_extractions", f"dialog_{idx}.json")
+                    save_json_safe(dialog_result, dialog_file, f"对话 #{idx}")
+                all_qa_pairs.extend(qa_list)
+            
+            # 保存原始 QA 对
+            raw_qa_file = os.path.join(config.result_dir, "raw_qa_pairs.json")
+            save_json_safe(all_qa_pairs, raw_qa_file, "原始 QA 对")
+            
+            status_placeholder.success(f"✅ 共提取 {len(all_qa_pairs)} 个 QA 对 (来自 {valid_count}/{len(dialog_texts)} 个对话)")
+            if extract_errors > 0:
+                st.warning(f"⚠️ 并发抽取阶段有 {extract_errors} 条对话请求失败，已按空结果处理。")
+            
+            if len(all_qa_pairs) == 0:
+                st.error("❌ 未提取到任何问答对，请检查对话数据或参数配置")
+                st.stop()
+            
+            # 6. 聚类
+            status_placeholder.info("🧩 开始聚类分析...")
+            clusters = qa_cluster_selector.cluster_qa_pairs(all_qa_pairs)
+            
+            # 保存聚类结果
+            cluster_results = {
+                "cluster_count": len(clusters),
+                "noise_cluster_count": len(clusters.get(-1, [])),
+                "total_qa_pairs": len(all_qa_pairs),
+                "clusters": {str(label): {"size": len(qa_list), "qa_pairs": qa_list} for label, qa_list in clusters.items()}
+            }
+            
+            cluster_file = os.path.join(config.result_dir, "cluster_results.json")
+            save_json_safe(cluster_results, cluster_file, "聚类结果")
+            
+            # 7. 筛选代表性 QA
+            status_placeholder.info("🌟 筛选代表性问答对...")
+            final_representative_qa = []
+            sorted_clusters = sorted(clusters.items(), key=lambda x: len(x[1]), reverse=True)
+            
+            for i, (label, cluster_qa) in enumerate(sorted_clusters):
+                if label == -1 or len(cluster_qa) == 0:
+                    continue
+                
+                progress = 0.8 + (i / len(sorted_clusters)) * 0.2  # 筛选代表性 QA 占总进度的 20%
+                progress_bar.progress(progress)
+                status_placeholder.info(f"处理簇 #{label} ({i+1}/{len(sorted_clusters)})")
+                
+                representative_qa = qa_cluster_selector.select_representative_qa(cluster_qa)
+                
+                if representative_qa:
+                    final_representative_qa.extend(representative_qa)
+                elif config.use_backup_strategy and cluster_qa:
+                    final_representative_qa.append({
+                        "representative_question": cluster_qa[0]["question"],
+                        "representative_answer": cluster_qa[0]["answer"]
+                    })
+            
+            # 8. 保存结果
+            rep_qa_file = os.path.join(config.result_dir, "representative_qa_pairs.json")
+            save_json_safe(final_representative_qa, rep_qa_file, "代表性 QA 对")
+            
+            # 保存每个簇的详细内容
+            cluster_details_dir = os.path.join(config.result_dir, "cluster_details")
+            os.makedirs(cluster_details_dir, exist_ok=True)
+            for i, (label, cluster_qa) in enumerate(clusters.items()):
+                if isinstance(cluster_qa, list) and len(cluster_qa) > 0:
+                    cluster_file = os.path.join(cluster_details_dir, f"cluster_{label}.json")
+                    cluster_data = {
+                        "cluster_id": label,
+                        "size": len(cluster_qa),
+                        "qa_pairs": cluster_qa
+                    }
+                    save_json_safe(cluster_data, cluster_file, f"簇 #{label} 详细内容")
+
+            # 9. 保存统计信息
+            processing_time = time.time() - start_time
+            stats = {
+                "start_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "processing_time_seconds": round(processing_time, 2),
+                "total_dialogs_processed": len(dialog_texts),
+                "dialogs_with_valid_qa": valid_count,
+                "total_raw_qa_pairs": len(all_qa_pairs),
+                "total_clusters": len(clusters),
+                "noise_cluster_size": len(clusters.get(-1, [])),
+                "final_representative_qa_count": len(final_representative_qa),
+                "success_rate": f"{valid_count/len(dialog_texts)*100:.1f}%",
+                "qa_extraction_rate": f"{len(all_qa_pairs)/len(dialog_texts):.2f} QA/对话",
+                "representative_qa_rate": f"{len(final_representative_qa)/len(all_qa_pairs)*100:.1f}%"
+            }
+            
+            stats_file = os.path.join(config.result_dir, "processing_stats.json")
+            save_json_safe(stats, stats_file, "处理统计")
+            
+            # 10. 保存到 session state
+            st.session_state.processing_results = {
+                'stats': stats,
+                'representative_qa': final_representative_qa,
+                'clusters': clusters,
+                'all_qa_pairs': all_qa_pairs,
+                'result_dir': config.result_dir
+            }
+            st.session_state.stats = stats
+            st.session_state.representative_qa = final_representative_qa
+            st.session_state.clusters = clusters
+            st.session_state.processing_time = processing_time
+            st.session_state.result_dir = config.result_dir
+            
+            progress_bar.progress(1.0)
+            status_placeholder.success(f"🎉 处理完成！总耗时: {processing_time:.2f} 秒")
+            st.rerun()
+        
+        except Exception as e:
+            st.error(f"❌ 处理过程中出错: {str(e)}")
+            st.exception(e)
+
+    # ==================== 结果展示 ====================
+    if st.session_state.processing_results:
+        results = st.session_state.processing_results
+        stats = results['stats']
+        representative_qa = results['representative_qa']
+        clusters = results['clusters']
+        all_qa_pairs = results['all_qa_pairs']
+        result_dir = results['result_dir']
+        
+        # 统计摘要
+        st.subheader("📈 处理统计摘要")
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("总耗时", f"{stats['processing_time_seconds']} 秒")
+        col2.metric("对话成功率", stats['success_rate'])
+        col3.metric("QA提取率", stats['qa_extraction_rate'])
+        col4.metric("最终QA数量", stats['final_representative_qa_count'])
+        
+        # 聚类详情展示
+        st.subheader("🔍 聚类详情")
+        if clusters:
+            valid_clusters = [(label, qa_list) for label, qa_list in clusters.items() if isinstance(qa_list, list) and len(qa_list) > 0]
+            if valid_clusters:
+                clusters_per_page = 10
+                total_pages = (len(valid_clusters) + clusters_per_page - 1) // clusters_per_page
+                if 'current_cluster_page' not in st.session_state:
+                    st.session_state.current_cluster_page = 1
+                current_page = st.number_input('页码', min_value=1, max_value=total_pages, value=st.session_state.current_cluster_page,key='cluster_page_input')
+                if current_page != st.session_state.current_cluster_page:
+                    st.session_state.current_cluster_page = current_page
+                    st.rerun()
+                st.caption(f"第 {st.session_state.current_cluster_page}/{total_pages} 页，共 {len(valid_clusters)} 个簇")
+                start_idx = (st.session_state.current_cluster_page - 1) * clusters_per_page
+                end_idx = start_idx + clusters_per_page
+                page_clusters = valid_clusters[start_idx:end_idx]
+                for label, qa_list in page_clusters:
+                    with st.expander(f"簇 #{label} - 共 {len(qa_list)} 个问答对"):
+                        qa_df = pd.DataFrame(qa_list)
+                        if not qa_df.empty:
+                            qa_df['question_preview'] = qa_df['question'].apply(lambda x: x[:max_preview_chars] + '...' if len(x) > max_preview_chars else x)
+                            qa_df['answer_preview'] = qa_df['answer'].apply(lambda x: x[:max_preview_chars] + '...' if len(x) > max_preview_chars else x)
+                            display_df = qa_df[['question_preview', 'answer_preview']]
+                            display_df.columns = ['问题预览', '回答预览']
+                            st.dataframe(display_df, width='stretch',height=min(250, len(qa_list) * 35 + 40))
+                            if st.checkbox(f"查看簇 #{label} 的完整问答对", key=f"full_qa_{label}"):
+                                st.markdown('<div style="max-height: 300px; overflow-y: auto; border: 1px solid #e9ecef; border-radius: 5px; padding: 10px;">',unsafe_allow_html=True)
+                                for i, qa in enumerate(qa_list, 1):
+                                    st.markdown(f"**Q{i}:** {qa['question']}")
+                                    st.markdown(f"**A{i}:** {qa['answer']}")
+                                    st.markdown("---")
+                                st.markdown('</div>', unsafe_allow_html=True)
+            else:
+                st.info("没有可用的聚类数据可供展示")
+        
+        # 簇详情表格概览
+        st.subheader("📊 所有簇概览")
+        if clusters:
+            cluster_summary = []
+            for label, qa_list in clusters.items():
+                if isinstance(qa_list, list):
+                    cluster_summary.append({
+                        "簇ID": label,
+                        "QA对数量": len(qa_list),
+                        "噪声簇": "是" if label == -1 else "否"
+                    })
+            if cluster_summary:
+                summary_df = pd.DataFrame(cluster_summary)
+                summary_df = summary_df.sort_values(by="QA对数量", ascending=False)
+                st.dataframe(summary_df, width='stretch')
+                total_clusters = len([c for c in clusters if isinstance(clusters[c], list) and len(clusters[c]) > 0])
+                noise_cluster_size = len(clusters.get(-1, [])) if isinstance(clusters.get(-1, []), list) else 0
+                total_qa_pairs = sum(len(qa_list) for qa_list in clusters.values() if isinstance(qa_list, list))
+                st.caption(f"总簇数: {total_clusters} | 噪声簇大小: {noise_cluster_size} | 总QA对数: {total_qa_pairs}")
+            else:
+                st.info("没有可用的聚类数据")
+        
+        # 原始提取的QA对展示
+        st.subheader(f"📋 原始提取的 QA 对 ({len(all_qa_pairs)} 个)")
+        if all_qa_pairs:
+            qa_df = pd.DataFrame(all_qa_pairs)
+            qa_df.insert(0, '序号', range(1, len(qa_df) + 1))
+            qa_df['question_preview'] = qa_df['question'].apply(lambda x: x[:max_preview_chars] + '...' if len(x) > max_preview_chars else x)
+            qa_df['answer_preview'] = qa_df['answer'].apply(lambda x: x[:max_preview_chars] + '...' if len(x) > max_preview_chars else x)
+            display_columns = ['序号', 'question_preview', 'answer_preview']
+            column_names = ['序号', '问题预览', '回答预览']
+            st.dataframe(qa_df[display_columns].rename(columns=dict(zip(display_columns, column_names))), width='stretch',height=min(400, len(all_qa_pairs) * 35 + 40))
+            qa_pair_options = [f"QA对 #{i+1}: {qa['question'][:50]}{'...' if len(qa['question'])>50 else ''}" for i, qa in enumerate(all_qa_pairs)]
+            selected_qa = st.selectbox("选择要查看的QA对:", [""] + qa_pair_options)
+            if selected_qa:
+                qa_index = qa_pair_options.index(selected_qa)
+                qa = all_qa_pairs[qa_index]
+                st.markdown(f"### 问题:")
+                st.markdown(f"**{qa['question']}**")
+                st.markdown(f"### 回答:")
+                st.markdown(f"{qa['answer']}")
+                cluster_info = []
+                for label, qa_list in clusters.items():
+                    if isinstance(qa_list, list):
+                        for cluster_qa in qa_list:
+                            if cluster_qa['question'] == qa['question'] and cluster_qa['answer'] == qa['answer']:
+                                cluster_info.append(f"簇 #{label}")
+                if cluster_info:
+                    st.info(f"该QA对属于: {', '.join(cluster_info)}")
+                else:
+                    st.warning("该QA对未被分配到任何簇中")
+        else:
+            st.info("没有原始 QA 对可供展示")
+        
+        # 对话提取结果
+        st.subheader("📂 对话提取结果")
+        dialog_extractions_dir = os.path.join(result_dir, "dialog_extractions")
+        if os.path.exists(dialog_extractions_dir):
+            dialog_files = sorted([f for f in os.listdir(dialog_extractions_dir) if f.endswith('.json')])
+            if dialog_files:
+                dialog_data = []
+                for file in dialog_files:
+                    file_path = os.path.join(dialog_extractions_dir, file)
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                        dialog_data.append({
+                            "对话索引": data.get("dialog_index", "N/A"),
+                            "QA数量": data.get("extraction_count", 0),
+                            "状态": "✅" if data.get("success", False) else "❌",
+                            "预览": data.get("dialog_preview", data.get("dialog_text", ""))[:100] + "..."
+                        })
+                df_dialogs = pd.DataFrame(dialog_data)
+                st.dataframe(df_dialogs, width='stretch')
+                selected_dialog = st.selectbox("选择一个对话查看详细提取结果：", [""] + [f"对话 {item['对话索引']}" for item in dialog_data])
+                if selected_dialog:
+                    dialog_index = int(selected_dialog.split()[1])
+                    file_path = os.path.join(dialog_extractions_dir, f"dialog_{dialog_index}.json")
+                    if os.path.exists(file_path):
+                        with open(file_path, 'r', encoding='utf-8') as f:
+                            dialog_result = json.load(f)
+                        st.subheader(f"对话 #{dialog_index} 详情")
+                        st.text_area("完整对话内容", dialog_result.get("full_dialog_text", ""),height=150,max_chars=None)
+                        if dialog_result["success"] and dialog_result["extracted_qa_pairs"]:
+                            st.success(f"✅ 成功提取 {len(dialog_result['extracted_qa_pairs'])} 个QA对")
+                            for i, qa in enumerate(dialog_result["extracted_qa_pairs"], 1):
+                                with st.expander(f"QA对 #{i}"):
+                                    st.markdown(f"**问题:** {qa['question']}")
+                                    st.markdown(f"**回答:** {qa['answer']}")
+                        else:
+                            st.warning("❌ 该对话未提取到任何QA对")
+            else:
+                st.info("目录中未找到对话提取结果。")
+        else:
+            st.warning("对话提取目录未找到。")
+        
+        # 代表性问答对
+        st.subheader(f"🎯 代表性问答对 ({len(representative_qa)} 个)")
+        if representative_qa:
+            qa_per_page = 10
+            total_pages = (len(representative_qa) + qa_per_page - 1) // qa_per_page
+            if 'current_rep_qa_page' not in st.session_state:
+                st.session_state.current_rep_qa_page = 1
+            current_page = st.number_input('页码', min_value=1, max_value=total_pages, value=st.session_state.current_rep_qa_page,key='rep_qa_page_input')
+            if current_page != st.session_state.current_rep_qa_page:
+                st.session_state.current_rep_qa_page = current_page
+                st.rerun()
+            st.caption(f"第 {st.session_state.current_rep_qa_page}/{total_pages} 页，共 {len(representative_qa)} 个QA对")
+            start_idx = (st.session_state.current_rep_qa_page - 1) * qa_per_page
+            end_idx = start_idx + qa_per_page
+            page_qa = representative_qa[start_idx:end_idx]
+            scroll_container = st.container()
+            with scroll_container:
+                st.markdown('<div style="max-height: 400px; overflow-y: auto; padding-right: 10px;">', unsafe_allow_html=True)
+                for i, qa in enumerate(page_qa, start=start_idx+1):
+                    with st.expander(f"Q{i}: {qa['representative_question'][:50]}{'...' if len(qa['representative_question'])>50 else ''}"):
+                        st.markdown(f"**问题:** {qa['representative_question']}")
+                        st.markdown(f"**回答:** {qa['representative_answer']}")
+                st.markdown('</div>', unsafe_allow_html=True)
+        else:
+            st.info("没有生成代表性问答对")
+        
+        # 结果下载
+        st.subheader("📥 结果下载")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            with open(os.path.join(result_dir, "representative_qa_pairs.json"), 'r', encoding='utf-8') as f:
+                st.download_button('⬇️ 代表性QA对', f.read(), 'representative_qa_pairs.json', 'application/json',width='stretch')
+        with col2:
+            with open(os.path.join(result_dir, "cluster_results.json"), 'r', encoding='utf-8') as f:
+                st.download_button('⬇️ 聚类结果', f.read(), 'cluster_results.json', 'application/json',width='stretch')
+        with col3:
+            cluster_details_zip = os.path.join(result_dir, "cluster_details.zip")
+            import zipfile
+            with zipfile.ZipFile(cluster_details_zip, 'w') as zipf:
+                for root, dirs, files in os.walk(os.path.join(result_dir, "cluster_details")):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        zipf.write(file_path, os.path.relpath(file_path, os.path.join(result_dir, "cluster_details")))
+            with open(cluster_details_zip, 'rb') as f:
+                st.download_button('⬇️ 所有簇详情', f.read(), 'cluster_details.zip', 'application/zip',width='stretch')
+        col4,col5, col6 = st.columns(3)
+        with col4:
+            with open(os.path.join(result_dir, "raw_qa_pairs.json"), 'r', encoding='utf-8') as f:
+                st.download_button('⬇️ 原始QA对', f.read(), 'raw_qa_pairs.json', 'application/json',width='stretch')
+        with col5:
+            dialog_extractions_zip = os.path.join(result_dir, "dialog_extractions.zip")
+            with zipfile.ZipFile(dialog_extractions_zip, 'w') as zipf:
+                for root, dirs, files in os.walk(os.path.join(result_dir, "dialog_extractions")):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        zipf.write(file_path, os.path.relpath(file_path, os.path.join(result_dir, "dialog_extractions")))
+            with open(dialog_extractions_zip, 'rb') as f:
+                st.download_button('⬇️ 对话提取结果', f.read(), 'dialog_extractions.zip', 'application/zip',width='stretch')
+        with col6:
+            with open(os.path.join(result_dir, "processing_stats.json"), 'r', encoding='utf-8') as f:
+                st.download_button('⬇️ 处理统计', f.read(), 'processing_stats.json', 'application/json',width='stretch')
+        
+        # 结果目录
+        st.subheader("📁 结果目录")
+        st.code(result_dir)
+    else:
+        st.info("ℹ️ 请在侧边栏配置参数后点击「开始处理」按钮，或加载历史结果查看")
+
+# ==================== 5. Tab2: 知识库管理（最终版：已有问题+相似问题均显示答案+动态更新） ====================
+with tab2:
+    st.subheader("📚 知识库管理")
+    st.markdown("将历史分析结果导入知识库，支持相似度比对和人工确认")
+    render_replace_notice()
+    st.markdown("---")
+    
+    # 初始化会话状态
+    for key in ['kb_instance', 'kb_selected_dir', 'kb_analysis_results', 'embedding_generator', 'similarity_analysis', 'similarity_analysis_no_llm', 'similarity_analysis_with_llm', 'show_llm_compare']:
+        if key not in st.session_state:
+            st.session_state[key] = None
+    if 'kb_auto_init_done' not in st.session_state:
+        st.session_state.kb_auto_init_done = False
+    
+    # 自动初始化知识库
+    auto_init_knowledge_base()
+    
+    # 1. 加载历史结果和知识库操作区
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        result_dirs = [d for d in os.listdir('.') if d.startswith('data_test_result_') and os.path.isdir(d)]
+        if result_dirs:
+            selected_dir = st.selectbox("选择要导入的历史结果", sorted(result_dirs, reverse=True), index=0)
+            if st.button("加载结果", key="kb_load"):
+                st.session_state.similarity_analysis = None  # 清除旧分析结果
+                results = load_results(selected_dir)
+                if results:
+                    st.session_state.kb_selected_dir = selected_dir
+                    st.session_state.kb_analysis_results = results
+                    st.success(f"✅ 已加载结果: {selected_dir}")
+                    st.rerun()  # 加载结果需要刷新，保留这个rerun
+        # 重新初始化按钮（无刷新，提示永久显示）
+        if st.button("🔄 重新初始化知识库", key="reinit_kb"):
+            st.session_state.kb_auto_init_done = False
+            st.session_state.similarity_analysis = None
+            auto_init_knowledge_base()
+            st.session_state['kb_reinit_success'] = True  # 标记初始化成功
+        
+       
+    
+    with col2:
+        st.info("📊 知识库统计")
+        if st.session_state.kb_instance:
+            kb = st.session_state.kb_instance
+            st.metric("问答对数量", len(kb.knowledge_base))
+            st.metric("问题相似度阈值", f"{similarity_threshold:.2f}")
+            st.metric("答案相似度阈值", f"{answer_similarity_threshold:.2f}")
+        else:
+            st.warning("知识库初始化中...")
+    
+    st.markdown("---")
+    # 默认值来源（可改）：若环境变量 DEEPSEEK_API_KEY 有值，则优先作为初始 Key
+    deepseek_api_key_env = os.getenv("DEEPSEEK_API_KEY", "")
+    if "kb_deepseek_api_key" not in st.session_state:
+        # Key 默认值：首次进入页面时使用 deepseek_api_key_env
+        st.session_state.kb_deepseek_api_key = "sk-1e471ad7388742e69dc3d5a96dddabaf"
+    if "kb_judge_model" not in st.session_state:
+        # Judge 模型默认值：可在这里改
+        st.session_state.kb_judge_model = "deepseek-chat"
+    if "kb_judge_base_url" not in st.session_state:
+        # Judge Base URL 默认值：可在这里改（也可用环境变量 JUDGE_BASE_URL）
+        st.session_state.kb_judge_base_url = os.getenv("JUDGE_BASE_URL", "https://api.deepseek.com")
+    if "kb_t_llm_gate" not in st.session_state:
+        # 旧单阈值默认值：用于推导 triage 阈值（T_LOW/T_HIGH）时的基准
+        st.session_state.kb_t_llm_gate = 0.8
+    if "kb_triage_t_low_raw" not in st.session_state:
+        # T_LOW 默认值：留空表示“自动推导”（由 kb_t_llm_gate 推导）
+        st.session_state.kb_triage_t_low_raw = "0.7"
+    if "kb_triage_t_high_raw" not in st.session_state:
+        # T_HIGH 默认值：留空表示“自动推导”（通常是 T_LOW + 0.08）
+        st.session_state.kb_triage_t_high_raw = "0.9"
+    if "kb_enable_llm_judge" not in st.session_state:
+        st.session_state.kb_enable_llm_judge = True
+
+    with st.expander("🧪 LLM Judge 配置（知识库管理）", expanded=True):
+        deepseek_api_key = st.text_input(
+            "DeepSeek API Key",
+            type="password",
+            help="用于 LLM Judge 的 API Key，可用环境变量 DEEPSEEK_API_KEY 作为初始值",
+            key="kb_deepseek_api_key"
+        )
+        # 在页面上填写 Key：这里输入后会写入 st.session_state['kb_deepseek_api_key']
+        judge_base_url = st.text_input(
+            "Judge API Base URL",
+            help="LLM Judge 接口地址（例如 https://api.deepseek.com 或兼容 OpenAI 的代理地址）",
+            key="kb_judge_base_url"
+        )
+        judge_model = st.text_input("Judge 模型", help="LLM Judge 使用的模型名称", key="kb_judge_model")
+        t_llm_gate = st.slider(
+            "LLM Judge 触发阈值（旧参数）",
+            0.0,
+            1.0,
+            step=0.05,
+            help="仅提供旧参数兼容，若 T_LOW/T_HIGH 留空则由此派生",
+            key="kb_t_llm_gate"
+        )
+        # 在页面上填写 triage 阈值：建议优先填 T_LOW/T_HIGH；留空则使用自动推导
+        triage_t_low_raw = st.text_input("T_LOW（可选）", key="kb_triage_t_low_raw")
+        triage_t_high_raw = st.text_input("T_HIGH（可选）", key="kb_triage_t_high_raw")
+        st.caption("填写说明：API Key 填在 DeepSeek API Key；triage 低阈值填在 T_LOW（可选）。")
+        if st.button("🔌 测试 Judge 连通性", key="kb_test_judge_connectivity"):
+            if not (deepseek_api_key or "").strip():
+                st.warning("请先填写 DeepSeek API Key。")
+            elif not (judge_base_url or "").strip():
+                st.warning("请先填写 Judge API Base URL。")
+            elif not (judge_model or "").strip():
+                st.warning("请先填写 Judge 模型。")
+            else:
+                try:
+                    test_client = build_deepseek_client(
+                        deepseek_api_key.strip(),
+                        base_url=judge_base_url.strip()
+                    )
+                    test_resp = test_client.chat.completions.create(
+                        model=judge_model.strip(),
+                        messages=[{"role": "user", "content": "ping"}],
+                        temperature=0,
+                        max_tokens=8,
+                        timeout=15
+                    )
+                    test_text = (test_resp.choices[0].message.content or "").strip()
+                    st.success("✅ Judge 连通性测试通过。")
+                    if test_text:
+                        st.caption(f"测试返回片段：{test_text[:160]}")
+                except Exception as e:
+                    report_api_exception(
+                        "Judge 连通性测试",
+                        e,
+                        request_url=f"{judge_base_url.strip().rstrip('/')}/chat/completions"
+                    )
+    
+    # 2. 分析并比对相似度（基础逻辑不变）
+    if st.session_state.kb_instance and st.session_state.kb_analysis_results:
+        kb = st.session_state.kb_instance
+        analysis_results = st.session_state.kb_analysis_results
+        representative_qa = analysis_results['representative_qa']
+        
+        st.subheader(f"🔍 相似度分析 ({len(representative_qa)} 个代表性问答对)")
+        st.caption("先做向量相似度召回，再按 triage gate（高/低直判，灰区调用 LLM Judge）判定")
+        st.info("说明：左侧是🆕新问题（本次抽取），右侧是📌旧问题（知识库已有）。相似度越接近 1 越相似。")
+        triage_t_low = parse_optional_threshold(triage_t_low_raw, "T_LOW")
+        triage_t_high = parse_optional_threshold(triage_t_high_raw, "T_HIGH")
+        resolved_t_low, resolved_t_high = resolve_triage_thresholds(t_llm_gate, triage_t_low, triage_t_high)
+        st.caption(f"当前 triage 阈值：T_LOW={resolved_t_low:.3f}，T_HIGH={resolved_t_high:.3f}")
+
+        def compute_similarity_analysis(enable_llm):
+            similarity_analysis = []
+            progress_bar = st.progress(0)
+            status_text = st.empty()
+            judge_client = (
+                build_deepseek_client(deepseek_api_key, base_url=judge_base_url.strip())
+                if (enable_llm and deepseek_api_key and (judge_base_url or "").strip())
+                else None
+            )
+            for i, qa in enumerate(representative_qa):
+                status_text.info(f"分析 QA 对 {i+1}/{len(representative_qa)}")
+                progress_bar.progress((i+1)/len(representative_qa))
+                question = qa['representative_question']
+                answer = qa['representative_answer']
+                recalled_candidates = kb.find_similar_questions(question, similarity_threshold)
+                display_candidates = recalled_candidates
+                similar_questions = recalled_candidates
+                if enable_llm and recalled_candidates:
+                    display_candidates = []
+                    similar_questions = []
+                    for cand in recalled_candidates:
+                        cand = dict(cand)
+                        similarity_score = float(cand.get("similarity", 0.0))
+                        triage_result = triage_gate_decision(similarity_score, resolved_t_low, resolved_t_high)
+                        llm_called = triage_result["llm_called"]
+                        final_decision = triage_result["final_decision"]
+                        judge_result = {
+                            "is_similar": bool(final_decision) if final_decision is not None else False,
+                            "confidence": 1.0 if final_decision else 0.0,
+                            "reason": triage_result["reason"]
+                        }
+                        if llm_called:
+                            judge_result = judge_with_cache(
+                                st.session_state,
+                                question,
+                                answer,
+                                cand.get("question", ""),
+                                cand.get("answer", ""),
+                                judge_model,
+                                deepseek_api_key,
+                                judge_client,
+                                judge_base_url.strip()
+                            )
+                            final_decision = judge_result.get("is_similar", False)
+                            log_triage_event(
+                                similarity_score,
+                                resolved_t_low,
+                                resolved_t_high,
+                                triage_result["triage"],
+                                llm_called,
+                                final_decision,
+                                judge_result.get("confidence"),
+                                judge_result.get("reason")
+                            )
+                        else:
+                            log_triage_event(
+                                similarity_score,
+                                resolved_t_low,
+                                resolved_t_high,
+                                triage_result["triage"],
+                                llm_called,
+                                final_decision,
+                                judge_result.get("confidence"),
+                                judge_result.get("reason")
+                            )
+                        cand["llm_judge"] = judge_result
+                        cand["llm_is_similar"] = bool(final_decision)
+                        cand["llm_confidence"] = judge_result.get("confidence", 0.0)
+                        cand["llm_reason"] = judge_result.get("reason", "")
+                        cand["triage"] = triage_result["triage"]
+                        cand["llm_called"] = llm_called
+                        cand["final_decision"] = bool(final_decision)
+                        cand["triage_t_low"] = resolved_t_low
+                        cand["triage_t_high"] = resolved_t_high
+                        display_candidates.append(cand)
+                        if final_decision:
+                            similar_questions.append(cand)
+                analysis_result = {
+                    "index": i,
+                    "question": question,
+                    "answer": answer,
+                    "display_candidates": display_candidates,
+                    "similar_questions": similar_questions,
+                    "is_new": len(similar_questions) == 0,
+                    "has_manual_review_pending": False,
+                    "action": None,  # 标记状态：added/updated/None
+                    "selected_similar_index": None
+                }
+                # 计算答案相似度
+                candidates_for_answer_compare = display_candidates if display_candidates else similar_questions
+                if candidates_for_answer_compare:
+                    answer_similarities = []
+                    for sim_q in candidates_for_answer_compare:
+                        question_sim = sim_q.get("similarity", 0.0)
+                        ans_sim = kb.get_answer_embedding_similarity(answer, sim_q['answer'])
+                        high_question_similarity = question_sim >= resolved_t_high
+                        exact_question_match = normalize_compare_text(sim_q.get("question", "")) == normalize_compare_text(question)
+                        answer_changed_for_same_question = (
+                            exact_question_match and
+                            normalize_compare_text(sim_q.get("answer", "")) != normalize_compare_text(answer)
+                        )
+                        need_manual_review = high_question_similarity and ans_sim < answer_similarity_threshold
+                        need_update = answer_changed_for_same_question or (
+                            ans_sim < answer_similarity_threshold and (
+                                (not analysis_result["is_new"]) or need_manual_review
+                            )
+                        )
+                        answer_similarities.append({
+                            "answer_similarity": ans_sim,
+                            "question_similarity": question_sim,
+                            "need_update": need_update,
+                            "need_manual_review": need_manual_review,
+                            "exact_question_match": exact_question_match,
+                            "answer_changed_for_same_question": answer_changed_for_same_question,
+                            "existing_answer": sim_q['answer'],
+                            "existing_question": sim_q.get("question", ""),
+                            "new_answer": answer,
+                            "index": sim_q['index'],
+                            "action": None  # 标记答案更新状态
+                        })
+                    analysis_result["answer_similarities"] = answer_similarities
+                    analysis_result["has_manual_review_pending"] = any(
+                        ans.get("need_manual_review") and ans.get("action") != "updated"
+                        for ans in answer_similarities
+                    )
+                similarity_analysis.append(analysis_result)
+            progress_bar.empty()
+            status_text.empty()
+            return similarity_analysis
+
+        def render_new_old_compare(new_q, new_a, old_q, old_a, question_sim=None, answer_sim=None, llm_info=None):
+            st.markdown("**对比：🆕新问题 vs 📌旧问题**")
+            col_left, col_right = st.columns(2)
+            with col_left:
+                st.markdown("#### 🆕 新问题")
+                st.write(new_q)
+                st.markdown("**新答案**")
+                st.write(new_a)
+            with col_right:
+                st.markdown("#### 📌 旧问题（知识库）")
+                st.write(old_q)
+                st.markdown("**旧答案**")
+                st.write(old_a)
+            metric_cols = st.columns(3)
+            if question_sim is not None:
+                metric_cols[0].metric("问题相似度", f"{question_sim:.3f}")
+            if answer_sim is not None:
+                metric_cols[1].metric("答案相似度", f"{answer_sim:.3f}")
+            if llm_info is not None:
+                if llm_info.get("llm_called") is True:
+                    metric_cols[2].metric("LLM 判定", "相似" if llm_info.get("is_similar") else "不相似")
+                    st.caption(
+                        f"LLM 已调用 | 置信度: {llm_info.get('confidence', 0.0):.2f} | 理由: {llm_info.get('reason', '')}"
+                    )
+                elif llm_info.get("llm_called") is False:
+                    decision_text = "相似" if llm_info.get("is_similar") else "不相似"
+                    metric_cols[2].metric("规则直判", f"{llm_info.get('triage', 'N/A')}: {decision_text}")
+                    st.caption(f"LLM 未调用 | 理由: {llm_info.get('reason', '')}")
+                else:
+                    metric_cols[2].metric("判定状态", "未知")
+            st.markdown("---")
+
+        col_llm_1, col_llm_2, col_llm_3 = st.columns([1, 2, 2])
+        with col_llm_1:
+            enable_llm_judge = st.checkbox("启用 LLM Judge", key="kb_enable_llm_judge")
+        with col_llm_2:
+            if st.button("🔍 运行 LLM Judge", help="对当前已加载结果重新执行相似度分析与 LLM 判定"):
+                st.session_state.similarity_analysis = None
+                st.session_state.show_llm_compare = False
+                st.session_state["judge_cache"] = {}
+                st.rerun()
+        with col_llm_3:
+            if st.button("🆚 一键并排对比", help="生成不使用 LLM 与使用 LLM 的对比视图"):
+                st.session_state["judge_cache"] = {}
+                st.session_state.similarity_analysis_no_llm = compute_similarity_analysis(False)
+                st.session_state.similarity_analysis_with_llm = compute_similarity_analysis(True)
+                st.session_state.similarity_analysis = st.session_state.similarity_analysis_with_llm
+                st.session_state.show_llm_compare = True
+        st.caption("对比视图会区分：LLM 判定（灰区）与规则直判（HIGH/LOW）。")
+
+        if st.session_state.show_llm_compare and st.session_state.similarity_analysis_no_llm and st.session_state.similarity_analysis_with_llm:
+            no_llm_items = st.session_state.similarity_analysis_no_llm or []
+            with_llm_items = st.session_state.similarity_analysis_with_llm or []
+            rep_count = len(representative_qa)
+            left_count = len(no_llm_items)
+            right_count = len(with_llm_items)
+            compare_count = min(rep_count, left_count, right_count)
+
+            with st.expander("🧾 LLM 对比视图（左：不使用 LLM / 右：使用 LLM）", expanded=True):
+                if compare_count == 0:
+                    st.warning("当前没有可对比的数据，请先执行「一键并排对比」。")
+                elif compare_count < rep_count or left_count != right_count:
+                    st.warning(
+                        f"检测到对比缓存数量不一致：代表性QA={rep_count}，无LLM={left_count}，有LLM={right_count}。"
+                        f"当前先展示前 {compare_count} 条，请点击「一键并排对比」刷新。"
+                    )
+
+                for i in range(compare_count):
+                    qa = representative_qa[i]
+                    left_item = no_llm_items[i]
+                    right_item = with_llm_items[i]
+                    with st.expander(f"Q{i+1}: {qa['representative_question'][:60]}{'...' if len(qa['representative_question'])>60 else ''}"):
+                        st.markdown("**🆕 新问题（本次抽取）**")
+                        st.write(qa['representative_question'])
+                        st.markdown("**新答案**")
+                        st.write(qa['representative_answer'])
+                        is_new = right_item.get("is_new", False)
+                        has_manual_review_pending = right_item.get("has_manual_review_pending", False)
+                        already_added = right_item.get("action") == "added"
+                        answer_similarities = right_item.get("answer_similarities") or []
+                        has_pending_update = any(
+                            ans.get("need_update") and ans.get("action") != "updated"
+                            for ans in answer_similarities
+                        )
+                        has_any_update_candidate = any(ans.get("need_update") for ans in answer_similarities)
+
+                        if has_pending_update:
+                            category_label = "需要更新"
+                        elif is_new and not already_added and not has_any_update_candidate:
+                            category_label = "新问题"
+                        else:
+                            category_label = "已有问题"
+
+                        st.caption(f"当前分类：{category_label}")
+
+                        if category_label == "新问题":
+                            if st.button("添加到知识库", key=f"llm_compare_add_{i}"):
+                                add_result = kb.add_qa_pair(qa['representative_question'], qa['representative_answer'])
+                                kb.save_knowledge_base()
+                                right_item["action"] = "added"
+                                left_item["action"] = "added"
+                                if st.session_state.similarity_analysis and i < len(st.session_state.similarity_analysis):
+                                    st.session_state.similarity_analysis[i]["action"] = "added"
+                                if add_result and add_result.get("action") == "updated":
+                                    push_replace_notice(
+                                        "添加到知识库",
+                                        "检测到同问题不同答案，已用新答案替换旧答案。",
+                                        question=add_result.get("question", qa['representative_question']),
+                                        old_answer=add_result.get("old_answer"),
+                                        new_answer=add_result.get("new_answer", qa['representative_answer'])
+                                    )
+                                elif add_result and add_result.get("action") == "unchanged":
+                                    st.info("ℹ️ 知识库中已存在同问题同答案，无需变更。")
+                                else:
+                                    st.success("✅ 已添加到知识库！")
+                                st.rerun()
+                        elif category_label == "需要更新":
+                            st.warning("该问题当前归类到「需要更新」，请到「需要更新」标签页处理。")
+                        elif has_manual_review_pending:
+                            st.warning("该问题当前归类到「需要更新」，请到「需要更新」标签页处理。")
+                        elif already_added:
+                            st.success("✅ 已添加到知识库（当前归类：已有问题）")
+                        else:
+                            st.info("该问题当前归类到「已有问题」，请到「已有问题」标签页查看。")
+                        st.markdown("---")
+                        st.markdown("**📌 旧问题候选（知识库）**")
+                        cand_list = right_item.get("display_candidates") or right_item.get("similar_questions") or []
+                        if cand_list:
+                            cand = cand_list[0]
+                            ans_map = {a['index']: a for a in (right_item.get("answer_similarities") or left_item.get("answer_similarities") or [])}
+                            ans_sim = ans_map.get(cand.get("index"))
+                            st.write(cand.get("question", ""))
+                            st.markdown("**旧答案**")
+                            st.write(cand.get("answer", ""))
+                            metric_cols = st.columns(4)
+                            metric_cols[0].metric("问题相似度", f"{cand.get('similarity', 0.0):.3f}")
+                            if ans_sim and ans_sim.get("answer_similarity") is not None:
+                                metric_cols[1].metric("答案相似度", f"{ans_sim.get('answer_similarity', 0.0):.3f}")
+                            else:
+                                on_demand_ans_sim = None
+                                try:
+                                    if cand.get("answer"):
+                                        on_demand_ans_sim = kb.get_answer_embedding_similarity(
+                                            qa['representative_answer'],
+                                            cand.get("answer", "")
+                                        )
+                                except Exception:
+                                    on_demand_ans_sim = None
+                                if on_demand_ans_sim is None:
+                                    metric_cols[1].metric("答案相似度", "-")
+                                else:
+                                    metric_cols[1].metric("答案相似度", f"{on_demand_ans_sim:.3f}")
+                            if "triage" in cand:
+                                metric_cols[2].metric("triage 分流", cand.get("triage", "-"))
+                            else:
+                                metric_cols[2].metric("triage 分流", "-")
+                            if cand.get("llm_called") is True:
+                                metric_cols[3].metric("LLM 判定", "相似" if cand.get("llm_is_similar") else "不相似")
+                                st.caption(
+                                    f"LLM 已调用 | 置信度: {cand.get('llm_confidence', 0.0):.2f} | 理由: {cand.get('llm_reason', '')}"
+                                )
+                            elif "final_decision" in cand:
+                                metric_cols[3].metric(
+                                    "规则直判",
+                                    f"{cand.get('triage', 'N/A')}: {'相似' if cand.get('final_decision') else '不相似'}"
+                                )
+                                st.caption(f"LLM 未调用 | 理由: {cand.get('llm_reason', '')}")
+                            else:
+                                metric_cols[3].metric("LLM 判定", "未启用")
+                                st.caption("本列为未启用 LLM 的对照结果，不含 LLM 判定")
+                            if len(cand_list) > 1:
+                                st.caption(f"还有 {len(cand_list)-1} 个候选（未展开）")
+                        else:
+                            st.info("无相似候选")
+        
+        # 重新计算相似度分析（基础逻辑不变）
+        if st.session_state.similarity_analysis is None:
+            st.session_state.similarity_analysis = compute_similarity_analysis(enable_llm_judge)
+        
+        # 取最新的相似度分析结果
+        similarity_analysis = st.session_state.similarity_analysis
+
+        # 动态筛选函数，每次渲染都重新计算分类
+        def get_dynamic_categories():
+            new_qs = []
+            update_qs = []
+            existing_qs = []
+            for x in similarity_analysis:
+                answer_similarities = x.get('answer_similarities') or []
+                has_pending_update = any(
+                    ans.get('need_update') and ans.get('action') != 'updated'
+                    for ans in answer_similarities
+                )
+                has_any_update_candidate = any(ans.get('need_update') for ans in answer_similarities)
+                if has_pending_update:
+                    update_qs.append(x)
+                elif x['is_new'] and x.get('action') != 'added' and not has_any_update_candidate:
+                    new_qs.append(x)
+                else:
+                    existing_qs.append(x)
+            return new_qs, update_qs, existing_qs
+        
+        # 每次渲染都重新获取动态分类
+        new_questions, update_questions, existing_questions = get_dynamic_categories()
+
+        # 动态生成标签页标题（计数实时更新）
+        tab_new, tab_update, tab_existing = st.tabs([
+            f"🆕 新问题 ({len(new_questions)})",
+            f"🔄 需要更新 ({len(update_questions)})",
+            f"✅ 已有问题 ({len(existing_questions)})"
+        ])
+        
+        # 新问题标签页（正常显示问题+答案，供添加操作）
+        with tab_new:
+            if new_questions:
+                for idx, item in enumerate(new_questions):
+                    with st.expander(f"Q{item['index']+1}: {item['question'][:60]}{'...' if len(item['question'])>60 else ''}", expanded=True):
+                        col1, col2 = st.columns([3, 1])
+                        with col1:
+                            st.markdown("**问题:**")
+                            st.write(item['question'])
+                            st.markdown("**回答:**")
+                            st.write(item['answer'])
+                        with col2:
+                            st.markdown("### 操作")
+                            if st.button(f"添加到知识库", key=f"add_{item['index']}"):
+                                add_result = kb.add_qa_pair(item['question'], item['answer'])
+                                kb.save_knowledge_base()
+                                item['action'] = 'added'  # 标记已添加
+                                st.session_state.similarity_analysis = similarity_analysis
+                                if add_result and add_result.get("action") == "updated":
+                                    push_replace_notice(
+                                        "添加到知识库",
+                                        "检测到同问题不同答案，已用新答案替换旧答案。",
+                                        question=add_result.get("question", item['question']),
+                                        old_answer=add_result.get("old_answer"),
+                                        new_answer=add_result.get("new_answer", item['answer'])
+                                    )
+                                elif add_result and add_result.get("action") == "unchanged":
+                                    st.info("ℹ️ 知识库中已存在同问题同答案，无需变更。")
+                                else:
+                                    st.success("✅ 已添加到知识库！")
+                                st.rerun()  # 刷新触发重新分类
+            else:
+                st.info("✅ 暂无未添加的新问题（已添加的新问题已移至「已有问题」）")
+        
+        # 需要更新标签页（正常显示问题+答案，供更新操作）
+        with tab_update:
+            if update_questions:
+                for idx, item in enumerate(update_questions):
+                    with st.expander(f"Q{item['index']+1}: {item['question'][:60]}{'...' if len(item['question'])>60 else ''}", expanded=True):
+                        st.caption("左侧是🆕新问题/新答案，右侧是📌旧问题/旧答案。")
+                        st.markdown("### 需要更新的旧问题")
+                        sim_map = {
+                            cand['index']: cand
+                            for cand in (item.get('display_candidates') or item.get('similar_questions') or [])
+                        }
+                        for ans_idx, ans_sim in enumerate(item['answer_similarities']):
+                            if ans_sim['need_update'] and ans_sim.get('action') != 'updated':
+                                cand = sim_map.get(ans_sim['index'], {})
+                                llm_info = None
+                                if cand and "llm_is_similar" in cand:
+                                    llm_info = {
+                                        "is_similar": cand.get("llm_is_similar", False),
+                                        "confidence": cand.get("llm_confidence", 0.0),
+                                        "reason": cand.get("llm_reason", ""),
+                                        "llm_called": cand.get("llm_called"),
+                                        "triage": cand.get("triage")
+                                    }
+                                if ans_sim.get("need_manual_review"):
+                                    st.warning("问题相似度高但答案相似度低：请人工比对后决定是否更新知识库答案。")
+                                if ans_sim.get("answer_changed_for_same_question"):
+                                    st.warning("检测到同一问题但答案不同：更新后将用新答案替换旧答案。")
+                                render_new_old_compare(
+                                    new_q=item['question'],
+                                    new_a=item['answer'],
+                                    old_q=ans_sim.get('existing_question', ''),
+                                    old_a=ans_sim.get('existing_answer', ''),
+                                    question_sim=ans_sim.get('question_similarity'),
+                                    answer_sim=ans_sim.get('answer_similarity'),
+                                    llm_info=llm_info
+                                )
+                                st.markdown("### 操作")
+                                if st.button(f"更新答案 (索引: {ans_sim['index']})", key=f"update_{item['index']}_{ans_idx}"):
+                                    success = kb.update_answer(ans_sim['index'], ans_sim['new_answer'])
+                                    if success:
+                                        ans_sim['action'] = 'updated'  # 标记已更新
+                                        st.session_state.similarity_analysis = similarity_analysis
+                                        push_replace_notice(
+                                            "更新答案",
+                                            "已将旧答案替换为新答案。",
+                                            question=item['question'],
+                                            old_answer=ans_sim.get('existing_answer'),
+                                            new_answer=ans_sim.get('new_answer')
+                                        )
+                                        st.rerun()  # 刷新触发重新分类
+                                    else:
+                                        st.error("❌ 更新失败，请检查索引")
+            else:
+                st.info("✅ 暂无未更新的答案（已更新的内容已移至「已有问题」）")
+        
+        # 已有问题标签页【核心修改：显示问题+答案 + 相似问题（含问题+答案）】
+        with tab_existing:
+            if existing_questions:
+                for idx, item in enumerate(existing_questions):
+                    # 区分显示：是“已添加的新问题”还是“原有已处理问题”
+                    tag = "🆕 已添加新问题" if item['is_new'] else "📌 原有问题"
+                    with st.expander(f"{tag} | Q{item['index']+1}: {item['question'][:60]}{'...' if len(item['question'])>60 else ''}"):
+                        st.markdown("**🆕 新问题（本次抽取）**")
+                        st.write(item['question'])
+                        st.markdown("**新答案（本次抽取）**")
+                        st.write(item['answer'])
+                        # 显示处理状态
+                        if item['is_new'] and item.get('action') == 'added':
+                            st.success("✅ 状态：该新问题已成功添加到知识库")
+                        else:
+                            st.info("✅ 状态：该问题无需更新/所有更新已完成")
+                        # 显示相似问题（如有，新增：完整显示相似问题的问题+答案，加分隔线）
+                        if item.get('similar_questions') and not item['is_new']:
+                            st.markdown("### 📌 匹配的旧问题（知识库）")
+                            ans_sim_map = {a['index']: a for a in item.get('answer_similarities', [])}
+                            for sim_q in item['similar_questions']:
+                                ans_sim = ans_sim_map.get(sim_q.get('index'))
+                                llm_info = None
+                                if "llm_is_similar" in sim_q:
+                                    llm_info = {
+                                        "is_similar": sim_q.get("llm_is_similar", False),
+                                        "confidence": sim_q.get("llm_confidence", 0.0),
+                                        "reason": sim_q.get("llm_reason", ""),
+                                        "llm_called": sim_q.get("llm_called"),
+                                        "triage": sim_q.get("triage")
+                                    }
+                                render_new_old_compare(
+                                    new_q=item['question'],
+                                    new_a=item['answer'],
+                                    old_q=sim_q.get('question', ''),
+                                    old_a=sim_q.get('answer', ''),
+                                    question_sim=sim_q.get('similarity'),
+                                    answer_sim=(ans_sim or {}).get('answer_similarity'),
+                                    llm_info=llm_info
+                                )
+            else:
+                st.info("ℹ️ 暂无已有问题，请先处理「新问题」或「需要更新」的内容")
+        
+        # 批量操作（基于动态分类，仅处理未完成的内容）
+        st.markdown("---")
+        st.subheader("⚡ 批量操作")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            # 批量添加：仅处理动态筛选的未添加新问题
+            if len(new_questions) > 0:
+                if st.button("批量添加所有新问题", type="primary"):
+                    count_added = 0
+                    count_updated = 0
+                    count_unchanged = 0
+                    for item in similarity_analysis:
+                        if item['is_new'] and item.get('action') != 'added':
+                            add_result = kb.add_qa_pair(item['question'], item['answer'])
+                            item['action'] = 'added'
+                            action = (add_result or {}).get("action")
+                            if action == "updated":
+                                count_updated += 1
+                            elif action == "unchanged":
+                                count_unchanged += 1
+                            else:
+                                count_added += 1
+                    kb.save_knowledge_base()
+                    st.session_state.similarity_analysis = similarity_analysis
+                    if count_updated > 0:
+                        push_replace_notice(
+                            "批量添加",
+                            f"检测到 {count_updated} 条同问题不同答案，已自动替换为新答案。"
+                        )
+                    st.success(
+                        f"✅ 批量处理完成：新增 {count_added}，替换旧答案 {count_updated}，无变化 {count_unchanged}。"
+                    )
+                    st.rerun()
+            else:
+                st.info("✅ 暂无未添加的新问题")
+        with col2:
+            # 批量更新：仅处理动态筛选的未更新答案
+            if len(update_questions) > 0:
+                if st.button("批量更新所有需要更新的答案"):
+                    count = 0
+                    for item in similarity_analysis:
+                        if not item['is_new'] and item.get('answer_similarities'):
+                            for ans_sim in item['answer_similarities']:
+                                if ans_sim['need_update'] and ans_sim.get('action') != 'updated':
+                                    success = kb.update_answer(ans_sim['index'], ans_sim['new_answer'])
+                                    if success:
+                                        ans_sim['action'] = 'updated'
+                                        count += 1
+                    kb.save_knowledge_base()
+                    st.session_state.similarity_analysis = similarity_analysis
+                    if count > 0:
+                        push_replace_notice(
+                            "批量更新",
+                            f"已替换 {count} 条旧答案为新答案。"
+                        )
+                    st.success(f"✅ 已批量更新 {count} 个答案！")
+                    st.rerun()
+            else:
+                st.info("✅ 暂无未更新的答案")
+        with col3:
+            if st.button("导出当前知识库"):
+                kb.save_knowledge_base()
+                kb_file = os.path.join(knowledge_base_path, "knowledge_base.json")
+                with open(kb_file, 'r', encoding='utf-8') as f:
+                    st.download_button(
+                        '⬇️ 下载知识库',f.read(),'knowledge_base.json',
+                        'application/json',key='download_kb'
+                    )
+    else:
+        if not st.session_state.kb_instance:
+            st.warning("⚠️ 知识库正在初始化中，请稍候...")
+        if not st.session_state.kb_analysis_results:
+            st.info("ℹ️ 请先选择并加载历史分析结果")
+# ==================== 6. 页脚 ====================
+st.markdown("---")
+st.markdown("""
+<div style="text-align: center; color: #666; font-size: 0.9em;">
+    <p>© 知识沉淀系统</p>
+</div>
+""", unsafe_allow_html=True)

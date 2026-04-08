@@ -1,0 +1,13 @@
+{
+  "dialog_index": 85,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:取消次月产品 \nSERVICE:无取消次月权限 取消有什么提示还是什么情况 \nCUSTOMER:用户融合注销办理的变更 \nCUSTOMER:现在通过移网变更取消提示让去融合业务新2.0里面取消 \nCUSTOMER:但是用户已经融合业务新拆机了 \nCUSTOMER:无法通过融合取消 \nSERVICE:完整提示是什么请提供下 \nSERVICE:目前无其他方法 之前给的回复是 请等待用户次月产生效后，再联系用户重新办理原套餐，同时请站在客户服务的角度对次月办理导致的多出费用问题进行人工调账处理。 \nCUSTOMER:好的 \nSERVICE:请问还有其他问题么 \nCUSTOMER:没有了 \nCUSTOMER:孝心 \nCUSTOMER:谢谢 \nSERVICE:有问题欢迎您再次咨询，感谢您的来访，再见。",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:取消次月产品 \nSERVICE:无取消次月权限 取消有什么提示还是什么情况 \nCUSTOMER:用户融合注销办理的变更 \nCUSTOMER:现在通过移网变更取消提示让去融合业务新2.0里面取消 \nCUSTOMER:但是用户已经融合业务新拆机了 \nCUSTOMER:无法通过融合取消 \nSERVICE:完整提示是什么请提供下 \nSERV...",
+  "extracted_qa_pairs": [
+    {
+      "question": "用户已办理融合业务拆机，但无法通过融合业务新2.0取消次月产品，应如何处理？",
+      "answer": "请等待用户次月生效后，再联系用户重新办理原套餐，同时请站在客户服务的角度对次月办理导致的多出费用问题进行人工调账处理。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

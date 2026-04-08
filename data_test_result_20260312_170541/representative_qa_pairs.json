@@ -1,0 +1,58 @@
+[
+  {
+    "representative_question": "流量或短信计费是否正常？",
+    "representative_answer": "经核实，话单真实存在，计费正常。"
+  },
+  {
+    "representative_question": "郊区专属FTTR两年期赠费包（600元两年）到期后是否会自动顺延？",
+    "representative_answer": "该赠费包到期后自动顺延，延续后费用可正常使用，用户不会产生损失。"
+  },
+  {
+    "representative_question": "如何办理已下架的郊区专属FTTR两年期赠费包（600元两年）续约？",
+    "representative_answer": "需联系市场部协助申请产品重新上架，上架后可正常订购续约。"
+  },
+  {
+    "representative_question": "固话欠费销户前是否有提醒通知？",
+    "representative_answer": "没有，相关语音提示属于催缴性质，并非销户前提醒。"
+  },
+  {
+    "representative_question": "如何查询号码的开户部门和开户员工信息？",
+    "representative_answer": "号码的开户部门为北京市分公司社会渠道中心资源管理中心，开户员工信息可通过内部系统查询。"
+  },
+  {
+    "representative_question": "主副卡解绑或主卡销户后，副卡的资费如何计算？",
+    "representative_answer": "主副卡关系解绑或主卡销户后，副卡将不再享受主卡资费，按标准资费计费。"
+  },
+  {
+    "representative_question": "局方停机原因是什么？",
+    "representative_answer": "停机原因是受理时录入的，若未填写则系统中无具体原因。"
+  },
+  {
+    "representative_question": "当月办理融合拆机后，能否取消次月生效的套餐变更？",
+    "representative_answer": "若原套餐未下架，请等待次月生效后联系客服重新办理原套餐；因次月生效导致的额外费用，可申请人工调账处理。"
+  },
+  {
+    "representative_question": "主卡有未生效套餐时能否办理家庭卡相关业务？",
+    "representative_answer": "主卡存在未生效套餐时，不允许新开家庭卡成员或让家庭卡月功能费立即生效。需先取消主卡的未生效套餐，完成家庭卡办理后，再重新办理主卡套餐变更。"
+  },
+  {
+    "representative_question": "福多多龙卡套餐停售后如何恢复办理？",
+    "representative_answer": "如工号下有受理该产品的权限，可发部门协作至数字化部/公众开发中心、市场部/产品规划与统筹组，注明需恢复的产品及恢复时间，申请临时上架；如无权限，需由市场部产品经理发起OOP工单，明确需上架的产品及赋权角色组。"
+  },
+  {
+    "representative_question": "如何查询用户名或证件号码是否在黑名单中？",
+    "representative_answer": "系统可查询多省市特殊黑名单，若未查询到相关信息，则表示当前无黑名单记录。"
+  },
+  {
+    "representative_question": "靓号销户是否需要审批，审批后如何处理？",
+    "representative_answer": "靓号销户需走审批流程。审批完成后，数字化部会直接操作靓号协议取消及预约销户，营业厅无需再办理注销业务。"
+  },
+  {
+    "representative_question": "北京创新远大科技有限公司宽带门店（电商）归属哪个部门或地区？",
+    "representative_answer": "很抱歉，未联系到您，有问题欢迎您再次咨询。"
+  },
+  {
+    "representative_question": "【联通智家-臻宽带】预存0元送396元（12个月）合约智享-光宽带U5-166元/月产品已下线，还能续订或自动续约吗？",
+    "representative_answer": "该产品已下线且已解约，不会自动续约；如需续订，需咨询当地省份产品部门是否可临时上架后通过前台重新订购。"
+  }
+]

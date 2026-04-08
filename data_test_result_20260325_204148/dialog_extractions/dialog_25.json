@@ -1,0 +1,13 @@
+{
+  "dialog_index": 25,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:您好，劳驾看眼上边这个 \nSERVICE:请稍等 \nCUSTOMER:用户撤机，系统自动续费下月生效的东西解不了 \nSERVICE:您好，此问题需要后台专家协助核查，已为您转接中，请稍等，转接成功后将由后台专家为您服务，感谢配合 \nSERVICE:转接说明：请协助核实 \nSERVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:劳驾，您看眼上边那个，用户这月撤机，系统自动续的下月生效的东西取消不了 \nSERVICE:稍等 \nCUSTOMER:就差这一个，解了就能撤了 \nSERVICE:这个只能后台给你改失效 \nSERVICE:稍等 \nSERVICE:号码 \nCUSTOMER:* \nSERVICE:这个吗 \nCUSTOMER:对 \nSERVICE:稍等 \nSERVICE:改失效了 \nSERVICE:再看看 \nCUSTOMER:好嘞我试试 \nSERVICE:我直接改失效了 \nSERVICE:不用你退订了 \nCUSTOMER:好嘞，已经好了，谢谢您 \nSERVICE:ok",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:您好，劳驾看眼上边这个 \nSERVICE:请稍等 \nCUSTOMER:用户撤机，系统自动续费下月生效的东西解不了 \nSERVICE:您好，此问题需要后台专家协助核查，已为您转接中，请稍等，转接成功后将由后台专家为您服务，感谢配合 \nSERVICE:转接说明：请协助核实 \nSERVICE:您好，我是*，很高兴为您服务！ \nCUSTOM...",
+  "extracted_qa_pairs": [
+    {
+      "question": "系统自动续费的东西如何取消？",
+      "answer": "这个只能后台给你改失效"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

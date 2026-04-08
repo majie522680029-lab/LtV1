@@ -1,0 +1,17 @@
+{
+  "dialog_index": 83,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:*，您好这个手机号码和*这个手机号要办理销户 \nSERVICE:主卡副卡关系没有退订 \nCUSTOMER:这个主副卡关系已经解绑了 \nCUSTOMER:看到新套餐明天生效 \nSERVICE:主卡没有退订 \nSERVICE:把副卡失效后您在试下 \nCUSTOMER:我这边尝试了还是不行 \nSERVICE:还没失效呢 \nSERVICE:等下 \nSERVICE:失效后副卡不享受主卡资费了 \nCUSTOMER:对，是的，用户知晓 \nCUSTOMER:请问失效成功了吗？ \nSERVICE:邀请专家核实咱们失效显示成功但是还是有 \nSERVICE:转接说明：请核实 \nSERVICE:您好，目前咨询人数较多，请您稍等，稍后为您解答问题 \nSERVICE:现在已经是月底失效了 \nSERVICE:可以办理销户的 \nSERVICE:你现在办理销户有报错吗 \nSERVICE:@* 还在吗 \nSERVICE:很抱歉，未联系到您，有问题欢迎您再次咨询，感谢您的来访，再见",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:*，您好这个手机号码和*这个手机号要办理销户 \nSERVICE:主卡副卡关系没有退订 \nCUSTOMER:这个主副卡关系已经解绑了 \nCUSTOMER:看到新套餐明天生效 \nSERVICE:主卡没有退订 \nSERVICE:把副卡失效后您在试下 \nCUSTOMER:我这边尝试了还是不行 \nSERVICE:还没失效呢 \nSERVICE:...",
+  "extracted_qa_pairs": [
+    {
+      "question": "主副卡关系解绑后，副卡失效成功了吗？",
+      "answer": "失效后副卡不享受主卡资费了。"
+    },
+    {
+      "question": "副卡失效后是否可以办理销户？",
+      "answer": "现在已经是月底失效了，可以办理销户的。"
+    }
+  ],
+  "extraction_count": 2,
+  "success": true
+}

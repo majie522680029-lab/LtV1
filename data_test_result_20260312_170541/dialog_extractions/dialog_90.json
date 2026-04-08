@@ -1,0 +1,13 @@
+{
+  "dialog_index": 90,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，有什么可以帮您？ \nCUSTOMER: * 宽带统一包年费（北京） 1171.70 0 0.00 1171.70 此费用可以转为余额使用吗  \nSERVICE:前台办理余额转账 或将账本失效 在余额到期处理办理  \nCUSTOMER:没权限 \nSERVICE:那您使用有权限的工号处理 \nCUSTOMER:没有 \nCUSTOMER:您那能操作吗 \nSERVICE:您好，此问题需要后台专家协助核查，已为您转接中，请稍等，转接成功后将转由后台专家为您服务，感谢配合。",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，有什么可以帮您？ \nCUSTOMER: * 宽带统一包年费（北京） 1171.70 0 0.00 1171.70 此费用可以转为余额使用吗  \nSERVICE:前台办理余额转账 或将账本失效 在余额到期处理办理  \nCUSTOMER:没权限 \nSERVICE:那您使用有权限的工号处理 \nCUSTOMER:没有 \nCUSTOMER...",
+  "extracted_qa_pairs": [
+    {
+      "question": "宽带统一包年费（北京）1171.70元是否可以转为余额使用？",
+      "answer": "可通过前台办理余额转账，或将账本失效后在余额到期处理时办理。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

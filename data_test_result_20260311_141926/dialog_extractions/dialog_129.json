@@ -1,0 +1,13 @@
+{
+  "dialog_index": 129,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，请问有什么可以帮您 \nCUSTOMER:*    宽带特惠千兆提速包10元(北京)-      立即失效    ！！ \nSERVICE:请您稍等 \nSERVICE:已经失效 \nSERVICE:请问您还有其他问题么",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，请问有什么可以帮您 \nCUSTOMER:*    宽带特惠千兆提速包10元(北京)-      立即失效    ！！ \nSERVICE:请您稍等 \nSERVICE:已经失效 \nSERVICE:请问您还有其他问题么",
+  "extracted_qa_pairs": [
+    {
+      "question": "宽带特惠千兆提速包10元(北京)是否已经失效？",
+      "answer": "宽带特惠千兆提速包10元(北京)已经失效。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

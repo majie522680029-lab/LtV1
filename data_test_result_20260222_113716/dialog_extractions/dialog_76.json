@@ -1,0 +1,17 @@
+{
+  "dialog_index": 76,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:北京创新远大科技有限公司宽带门店（电商）是什么地方的 \nCUSTOMER:归属哪个部门 \nSERVICE:请您稍等 \nSERVICE:请您参考 \nSERVICE:很抱歉，未联系到您，有问题欢迎您再次咨询，感谢您的来访，再见。",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:北京创新远大科技有限公司宽带门店（电商）是什么地方的 \nCUSTOMER:归属哪个部门 \nSERVICE:请您稍等 \nSERVICE:请您参考 \nSERVICE:很抱歉，未联系到您，有问题欢迎您再次咨询，感谢您的来访，再见。",
+  "extracted_qa_pairs": [
+    {
+      "question": "北京创新远大科技有限公司宽带门店（电商）是什么地方的？",
+      "answer": "很抱歉，未联系到您，有问题欢迎您再次咨询。"
+    },
+    {
+      "question": "北京创新远大科技有限公司宽带门店（电商）归属哪个部门？",
+      "answer": "很抱歉，未联系到您，有问题欢迎您再次咨询。"
+    }
+  ],
+  "extraction_count": 2,
+  "success": true
+}

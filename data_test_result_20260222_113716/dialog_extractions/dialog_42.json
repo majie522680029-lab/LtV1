@@ -1,0 +1,13 @@
+{
+  "dialog_index": 42,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:{businessId:，createTime:*，errorScreenshotUrl:，groupId:GROUPB*，id*，isInvolvedNumber:0，menuId:BIL651K_2I，menuMsg:套餐余量查询，questionContent*，核实用户名下是否有黑名单，questionSource:cBSS，questionTitle*，核实用户名下是否有黑名单} \nSERVICE:好的，请您稍等 \nSERVICE:多省市特殊黑名单 \nSERVICE:请您对本次服务做出评价，有问题欢迎您再次咨询，感谢您的来访，再见。",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:{businessId:，createTime:*，errorScreenshotUrl:，groupId:GROUPB*，id*，isInvolvedNumber:0，menuId:BIL651K_2I，menuMsg:套餐余量查询，questionContent*，核实用户名下是否有黑名单，questionSource:cBSS...",
+  "extracted_qa_pairs": [
+    {
+      "question": "核实用户名下是否有黑名单",
+      "answer": "多省市特殊黑名单"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

@@ -1,0 +1,17 @@
+{
+  "dialog_index": 96,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:撤机，拦截，如何处理 \nSERVICE:这个有次月生效无法受理业务 \nCUSTOMER:可以取消次月未生效产品么 \nSERVICE:咱们没有权限 \nSERVICE:取消 \nCUSTOMER:那如何处理？ \nSERVICE:前台自行受理取消 \nSERVICE:没有权限受理取消让用户去营业厅受理 \nSERVICE:很抱歉，未联系到您，有问题欢迎您再次咨询，感谢您的来访，再见。",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:撤机，拦截，如何处理 \nSERVICE:这个有次月生效无法受理业务 \nCUSTOMER:可以取消次月未生效产品么 \nSERVICE:咱们没有权限 \nSERVICE:取消 \nCUSTOMER:那如何处理？ \nSERVICE:前台自行受理取消 \nSERVICE:没有权限受理取消让用户去营业厅受理 \nSERVICE:很抱歉，未联系到您，有...",
+  "extracted_qa_pairs": [
+    {
+      "question": "如何处理撤机和拦截？",
+      "answer": "次月生效的业务无法受理。"
+    },
+    {
+      "question": "可以取消次月未生效的产品吗？",
+      "answer": "没有权限取消，需用户前往营业厅自行受理取消。"
+    }
+  ],
+  "extraction_count": 2,
+  "success": true
+}

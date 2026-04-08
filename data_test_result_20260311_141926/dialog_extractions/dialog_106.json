@@ -1,0 +1,13 @@
+{
+  "dialog_index": 106,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:未查询到客户资料 服务名称 [ trades/limitcreateuser/checkcreategroupassemblereq ] txid [b42932d7^**] 规则编码 [4K88] 规则内容: 调用集团新装订单预提交服务(trades/groupopens/creategroupuser)出错！(TXID=b42932d7^**) 错误编码: 8888，错误提示: rules:rules/contactservice/convertReq系统异常{MSG:服务调用成功！，STATUS:0000，TXID:2f2a844f0b72^*^29367，RSP:{SUB_CODE:5020，RSP_DESC:系统异常： 调用/custs/custinfo/qcust3info服务报错！查询客户类型！未查询到客户资料【custs_crpersoninfo】，DATA:[]，SUB_DESC:系统异常： 调用/custs/custinfo/qcust3info服务报错！查询客户类型！未查询到客户资料【custs_crpersoninfo】，RSP_CODE:8888}}，子系统编码: 5020，子系统提示: 调用服务trades:trades/pretradeplus/preflow异常，rules:rules/contactservice/convertReq校验异常:{MSG:服务调用成功！，STATUS:0000，TXID:2f2a844f0b72^*^29367，RSP:{SUB_CODE:5020，RSP_DESC:系统异常： 调用/custs/custinfo/qcust3info服务报错！查询客户类型！未查询到客户资料【custs_crpersoninfo】，DATA:[]，SUB_DESC:系统异常： 调用/custs/custinfo/qcust3info服务报错！查询客户类型！未查询到客户资料【custs_crpersoninfo】，RSP_CODE:8888}} \nCUSTOMER:这个报错什么意思 \nSERVICE:哪个号码办理什么 请先提供下 \nCUSTOMER:没有号码，办理的集团新装业务 \nSERVICE:新集团用户么 证件号码请提供下 \nCUSTOMER*MA01G6UX20 \nSERVICE:您好，此问题需要后台专家协助核查，已为您转接中，请稍等，转接成功后将转由后台专家为您服务，感谢配合。 \nSERVICE:转接说明：请协助核实 谢谢 \nSERVICE:您好，目前咨询人数较多，请您稍等，稍后为您解答问题 \nSERVICE:稍等 \nCUSTOMER:营业电子发票查询 \nCUSTOMER:营业电子发票查询 ROBOT:[电子发票 备注，账务电子发票自动推送，账务电子发票 地址电话 有逗号分割，营业电子发票查不到已打印信息，账务电子发票 邮箱填写错误，能否在前台界面进行修改] ROBOT:您可通过会话窗口右侧“相似问题”查看对应业务目录下的知识。 ROBOT:[电子发票 备注，账务电子发票自动推送，账务电子发票 地址电话 有逗号分割，营业电子发票查不到已打印信息，账务电子发票 邮箱填写错误，能否在前台界面进行修改] ROBOT:您可通过会话窗口右侧“相似问题”查看对应业务目录下的知识。",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:未查询到客户资料 服务名称 [ trades/limitcreateuser/checkcreategroupassemblereq ] txid [b42932d7^**] 规则编码 [4K88] 规则内容: 调用集团新装订单预提交服务(trades/groupopens/creategroupuser)出错！(TXID=b429...",
+  "extracted_qa_pairs": [
+    {
+      "question": "营业电子发票查询不到已打印信息是什么原因？",
+      "answer": "营业电子发票查不到已打印信息。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

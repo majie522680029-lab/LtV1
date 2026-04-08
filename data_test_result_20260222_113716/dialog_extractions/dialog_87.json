@@ -1,0 +1,13 @@
+{
+  "dialog_index": 87,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:您好 \nSERVICE:开户已完工 无法撤单 \nCUSTOMER:实际装机装不了，只能撤，，，，怎么处理？ \nSERVICE:哪个号码请先提供下 \nCUSTOMER:目前联通公众操作如图 \nSERVICE:这边只能查询CB系统问题 其他系统请联系对应系统支撑咨询 \nCUSTOMER:但是发短信提示结果，如图 \nCUSTOMER:联通公众找哪里，您能转接下么？ \nSERVICE:不是一个系统不太清楚 请咨询业务指导或组长 \nSERVICE:请问还有其他问题么",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:您好 \nSERVICE:开户已完工 无法撤单 \nCUSTOMER:实际装机装不了，只能撤，，，，怎么处理？ \nSERVICE:哪个号码请先提供下 \nCUSTOMER:目前联通公众操作如图 \nSERVICE:这边只能查询CB系统问题 其他系统请联系对应系统支撑咨询 \nCUSTOMER:但是发短信提示结果，如图 \nCUSTOMER:联通...",
+  "extracted_qa_pairs": [
+    {
+      "question": "联通公众系统的问题应该找哪里咨询？",
+      "answer": "请咨询业务指导或组长。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

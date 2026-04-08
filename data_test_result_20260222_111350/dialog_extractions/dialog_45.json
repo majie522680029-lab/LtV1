@@ -1,0 +1,13 @@
+{
+  "dialog_index": 45,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，请问有什么可以帮您 \nCUSTOMER:110YWX*，这个业务竣工了为什么还没同步到CBSS，交不了费，因为用户是和宽带预存款一起汇的，所以钱不能跨月 \nCUSTOMER:益企组网业务 \nSERVICE:这个是集团号吗 \nCUSTOMER:不是 \nCUSTOMER:单一业务号 \nSERVICE:您好，此问题需要后台专家协助核查，已经为你转接中，请稍等，转接成功后将由后台专家为您服务感谢配合 \nCUSTOMER:从联通政企APP里的联通益企组网下的单 \nSERVICE:您这个还是集团号 \nSERVICE:联通政企受理集团号么 \nCUSTOMER:不是 \nCUSTOMER:他就是个小微ICT的业务 \nSERVICE:转集客队列核实稍等稍等 \nSERVICE:转接说明：请核实 \nSERVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:您好 \nSERVICE:您好 \nCUSTOMER:110YWX*，这个业务竣工了为什么还没同步到CBSS，交不了费，因为用户是和宽带预存款一起汇的，所以钱不能跨月 \nCUSTOMER:小微ICT的业务 \nSERVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:110YWX*，这个业务竣工了为什么还没同步到CBSS，交不了费，因为用户是和宽带预存款一起汇的，所以钱不能跨月，小微ICT的业务 \nSERVICE:辛苦师傅您看看咱这边能同步不 \nSERVICE:问题排查中，请稍等，如需电话沟通可以联系* \nCUSTOMER:哦好，我能赶紧给他交上钱就行，主要不能跨月 \nSERVICE:您好，我是*，很高兴为您服务！ \nSERVICE:110YWX* \nSERVICE:稍等 \nSERVICE* \nSERVICE:麻烦看下 \nSERVICE:您好，我是*，很高兴为您服务！ \nSERVICE:稍等 \nSERVICE:ACCT_ID * \nSERVICE:@* 到政企运营平台--客户运营--集团账户资料管理中，找到该账户(账户标识：*)，在备注上加任意一个字后提交。同步下账户信息。 \nSERVICE:@* 您好，如当前没有问题需要解决，请及时关闭会话窗口，避免影响其他会话的接入；感谢~ \nSERVICE:@* 那如果没什么其他问题那这边就先结束会话了，如果还有问题可以再次发起会话， 感谢各位配合， 再见",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，请问有什么可以帮您 \nCUSTOMER:110YWX*，这个业务竣工了为什么还没同步到CBSS，交不了费，因为用户是和宽带预存款一起汇的，所以钱不能跨月 \nCUSTOMER:益企组网业务 \nSERVICE:这个是集团号吗 \nCUSTOMER:不是 \nCUSTOMER:单一业务号 \nSERVICE:您好，此问题需要后台专家协助核查...",
+  "extracted_qa_pairs": [
+    {
+      "question": "小微ICT的业务竣工后为什么还没同步到CBSS导致无法交费？",
+      "answer": "需在政企运营平台--客户运营--集团账户资料管理中，找到该账户（账户标识：*），在备注上加任意一个字后提交，以同步账户信息。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

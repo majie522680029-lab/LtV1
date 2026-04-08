@@ -1,0 +1,13 @@
+{
+  "dialog_index": 38,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:*你好师傅用户套餐内北京宽视界基础0元月包误操作取消了，烦请核实能否为其恢复谢谢 \nSERVICE:您好，此问题需要后台专家协助核查，已为您转接中，请稍等，转接成功后将转由后台专家为您服务，感谢配合。 \nSERVICE:转接说明：请处理。 \nSERVICE:您好，我是*，很高兴为您服务！ \nSERVICE:建议前台为用户重新订购 \nCUSTOMER:系统无法重新订购 \nCUSTOMER:烦请尝试为其恢复 \nSERVICE:建议提供报错截图以便核实 \nCUSTOMER:额外订购内没有此业务 \nSERVICE:我可以协助立即失效，你前台重新订购 \nCUSTOMER:可以师傅 \nCUSTOMER:那您这边操作吧 \nCUSTOMER:我这边重新订购 \nCUSTOMER: 宽视界终端一次性费用赠费红包（100元）增费包一并做立即失效 \nSERVICE:修改不了 \nSERVICE:应该是涉及施工无法修改 \nSERVICE:只能次月重新订购了 \nCUSTOMER:好的谢谢",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:*你好师傅用户套餐内北京宽视界基础0元月包误操作取消了，烦请核实能否为其恢复谢谢 \nSERVICE:您好，此问题需要后台专家协助核查，已为您转接中，请稍等，转接成功后将转由后台专家为您服务，感谢配合。 \nSERVICE:转接说明：请处理。 \nSERVICE:您好，我是*，很高兴为您服务！ \nSERVICE:建议前台为用户重新订购 \n...",
+  "extracted_qa_pairs": [
+    {
+      "question": "用户套餐内的“北京宽视界基础0元月包”误操作取消了，能否恢复？",
+      "answer": "只能次月重新订购。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

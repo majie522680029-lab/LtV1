@@ -1,0 +1,17 @@
+{
+  "dialog_index": 84,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，有什么可以帮您？ \nCUSTOMER:*  \nCUSTOMER:这个我要撤机 \nCUSTOMER:因为有次月生效产品 \nCUSTOMER:我就点了解约 \nCUSTOMER:答案是一直显示在未竣工 \nCUSTOMER:我就没法撤机啊 \nSERVICE:*，这个号码没有次月 \nSERVICE:师傅，请问还有其他问题吗 \nSERVICE:*对应的组合号码是*，不是截图内的组合号码 \nCUSTOMER:这个这个 \nCUSTOMER:您看看 \nSERVICE:*套餐内的*有次月套餐 \nCUSTOMER:那这怎么弄 \nSERVICE:师傅，能取消次月套餐吗 \nCUSTOMER:我这试了，取消不了 \nSERVICE:那转接专家试下吧，师傅 \nSERVICE:转接说明：1 \nSERVICE:您好，我是*，很高兴为您服务！ \nSERVICE:后台无法直接取消次月 产品 \nSERVICE:请提供报错信息以便核实 \nSERVICE:还有问题不",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nSERVICE:您好，有什么可以帮您？ \nCUSTOMER:*  \nCUSTOMER:这个我要撤机 \nCUSTOMER:因为有次月生效产品 \nCUSTOMER:我就点了解约 \nCUSTOMER:答案是一直显示在未竣工 \nCUSTOMER:我就没法撤机啊 \nSERVICE:*，这个号码没有次月 \nSERVICE:师傅，请问还有其他问题吗 \nSERVIC...",
+  "extracted_qa_pairs": [
+    {
+      "question": "为什么无法撤机？",
+      "answer": "因为存在次月生效产品，后台无法直接取消次月产品。"
+    },
+    {
+      "question": "如何处理无法取消次月套餐的问题？",
+      "answer": "需提供报错信息以便核实，或转接专家处理。"
+    }
+  ],
+  "extraction_count": 2,
+  "success": true
+}

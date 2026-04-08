@@ -1,0 +1,13 @@
+{
+  "dialog_index": 72,
+  "full_dialog_text": "SRVICE:您好，请问有什么可以帮您 \nCUSTOMER:*我刚才办理的停机保号，历史里查询已经完工，但是在优惠信息里查询不到 \nCUSTOMER:什么原因 \nSERVICE:请您稍等 \nSERVICE:师傅您好，您是优惠信息里什么查询不到 \nCUSTOMER:办理的停机保号怎么看不到 \nCUSTOMER:首页也没有显示 \nCUSTOMER:只能在受理历史中能看到办理成功 \nSERVICE:用户停机保号后又复机了 \nCUSTOMER:好的 \nCUSTOMER:谢谢 \nSERVICE:请问您还有其他问题么",
+  "dialog_preview": "SRVICE:您好，请问有什么可以帮您 \nCUSTOMER:*我刚才办理的停机保号，历史里查询已经完工，但是在优惠信息里查询不到 \nCUSTOMER:什么原因 \nSERVICE:请您稍等 \nSERVICE:师傅您好，您是优惠信息里什么查询不到 \nCUSTOMER:办理的停机保号怎么看不到 \nCUSTOMER:首页也没有显示 \nCUSTOMER:只能在受理历史中能看到办理成功 \nSERVICE:用户...",
+  "extracted_qa_pairs": [
+    {
+      "question": "办理的停机保号为什么在优惠信息里查询不到？",
+      "answer": "用户停机保号后又复机了。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}

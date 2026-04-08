@@ -1,0 +1,13 @@
+{
+  "start_time": "2026-02-22 11:18:08",
+  "processing_time_seconds": 258.53,
+  "total_dialogs_processed": 100,
+  "dialogs_with_valid_qa": 43,
+  "total_raw_qa_pairs": 70,
+  "total_clusters": 18,
+  "noise_cluster_size": 0,
+  "final_representative_qa_count": 19,
+  "success_rate": "43.0%",
+  "qa_extraction_rate": "0.70 QA/对话",
+  "representative_qa_rate": "27.1%"
+}

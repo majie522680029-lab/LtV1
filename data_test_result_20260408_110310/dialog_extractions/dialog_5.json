@@ -1,0 +1,17 @@
+{
+  "dialog_index": 5,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:*办 理的新全家福106档套餐对应5G升级包9元专享合约 ，开始时间2024-08-01 ，结束时间2025-07-31 23:59:59，但少了一个9元费用，请协助核实，谢谢！ \nSERVICE:转接说明：. \nSERVICE:您好，我是*，很高兴为您服务！ \nSERVICE:请稍等 \nCUSTOMER:* \nSERVICE:请稍等 \nSERVICE:账本收支里看都转兑了 \nCUSTOMER:合约7月底到期，现在只有9元了 \nCUSTOMER:差一个9元 \nSERVICE:要不您单独数一下 \nSERVICE:很抱歉，未联系到您，有问题欢迎您再次咨询，感谢您的来访，再见",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:*办 理的新全家福106档套餐对应5G升级包9元专享合约 ，开始时间2024-08-01 ，结束时间2025-07-31 23:59:59，但少了一个9元费用，请协助核实，谢谢！ \nSERVICE:转接说明：. \nSERVICE:您好，我是*，很高兴为您服务！ \nSERVICE:请稍等 \nCUSTOMER:* \nSERVICE:请稍...",
+  "extracted_qa_pairs": [
+    {
+      "question": "全家福106档套餐对应5G升级包9元专享合约少了一个9元费用怎么办？",
+      "answer": "账本收支里看都转兑了"
+    },
+    {
+      "question": "全家福106档套餐对应5G升级包9元专享合约少一个9元费用怎么办？",
+      "answer": "账本收支里看都转兑了"
+    }
+  ],
+  "extraction_count": 2,
+  "success": true
+}

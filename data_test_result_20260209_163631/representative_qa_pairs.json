@@ -1,0 +1,66 @@
+[
+  {
+    "representative_question": "福多多龙卡套餐已下架或即将停售，如何为用户恢复办理？",
+    "representative_answer": "若福多多龙卡套餐已下架，需先上架产品后再重新受理。如工号有受理权限，可发部门协作至数字化部/公众开发中心、市场部/产品规划与统筹组，注明需恢复的产品及时间，申请临时上架；如无权限，需由市场部产品经理发起OOP工单，标明需上架的产品及赋权角色组。"
+  },
+  {
+    "representative_question": "靓号用户申请销户是否需要审批？流程是什么？",
+    "representative_answer": "是的，所有靓号销户均需提交“在网靓号用户特殊事项审批单”进行审批。审批通过后，由数字化部通过CB系统“在网靓号协议调整”功能取消靓号协议并预约销户，营业厅无需再办理注销业务。"
+  },
+  {
+    "representative_question": "号码欠费是否有提醒通知？",
+    "representative_answer": "没有"
+  },
+  {
+    "representative_question": "流量或短信计费是否正常？",
+    "representative_answer": "核实用户话单真实存在，计费正常。产生套外费用的情况均按照‘国内1元800MB日租宝’计费（适用于流量）。可能影响计费的因素包括：话单跨天、计费话单产生在群组生效前、订购资源为非共享资源、群组资料异常导致数据不同步、收费发生在流量包订购前、用户使用习惯（如后台应用自启、Wi-Fi与数据切换等），以及业务类型由网络侧按IP地址判定等。"
+  },
+  {
+    "representative_question": "郊区专属FTTR两年期赠费包（600元两年）到期后是否会自动顺延？",
+    "representative_answer": "该赠费包到期后自动顺延，延续后费用可正常使用，用户不会有损失。"
+  },
+  {
+    "representative_question": "如何查询号码的开户部门？",
+    "representative_answer": "号码的开户部门可通过系统查询，例如：北京市分公司社会渠道中心资源管理中心。"
+  },
+  {
+    "representative_question": "为什么APP会发送查询详单短信，即使用户从未使用过该功能？",
+    "representative_answer": "系统可能因异常触发了短信通知，建议提交工单进行核实处理。"
+  },
+  {
+    "representative_question": "号码是否存在未转分月的发票？",
+    "representative_answer": "若存在预存款订单未转分月，需通过【CBSS-发票账务打印设置】功能将订单转分月，以增加可开具发票的金额。"
+  },
+  {
+    "representative_question": "沃派校园套餐的预存折扣合约是否会自动续约？",
+    "representative_answer": "沃派校园套餐的预存折扣合约不会自动续约。"
+  },
+  {
+    "representative_question": "营业发票推送完成后是否会通过政企平台的邮箱发送给客户？",
+    "representative_answer": "营业发票推送完成后会按照政企平台登记的邮箱地址发送给客户。"
+  },
+  {
+    "representative_question": "斯瓦尔巴群岛的漫游资费是多少？",
+    "representative_answer": "无法处理斯瓦尔巴群岛的漫游资费咨询，仅能处理CB受理业务时遇到的数据问题。"
+  },
+  {
+    "representative_question": "北京宽视界基础0元月包取消后能否恢复？",
+    "representative_answer": "取消后无法立即恢复，需次月重新订购。"
+  },
+  {
+    "representative_question": "用户名下是否存在黑名单记录？",
+    "representative_answer": "部分省市存在特殊黑名单记录，具体需根据当地政策及用户实际情况查询。"
+  },
+  {
+    "representative_question": "小微ICT业务竣工后为何未同步到CBSS导致无法缴费？",
+    "representative_answer": "需在政企运营平台的客户运营模块中，进入集团账户资料管理，找到对应账户，在备注栏添加任意字符后提交，以触发账户信息同步至CBSS。"
+  },
+  {
+    "representative_question": "北六是什么？",
+    "representative_answer": "北六是原来的ESS系统。"
+  },
+  {
+    "representative_question": "如何提取客服热线的历史录音？",
+    "representative_answer": "客服系统已上线历史录音自助提取功能，可联系省内管理员获取系统权限。操作路径：新客服 >> 会话记录 >> 查询管理 >> 热线归档录音恢复。根据集团服务响应规范，不得通过在线咨询或沃运营工单进行数据提取。"
+  }
+]

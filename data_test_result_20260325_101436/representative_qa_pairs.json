@@ -1,0 +1,82 @@
+[
+  {
+    "representative_question": "主卡有未生效套餐时，如何办理家庭卡成员加入？",
+    "representative_answer": "需先取消主卡的未生效套餐，再办理家庭卡成员加入，之后主卡可重新受理套餐变更。因家庭卡立即生效且速率需与主卡当月保持一致，无法保证与主卡次月变更后套餐速率一致。"
+  },
+  {
+    "representative_question": "用户流量计费是否正常？为何产生套外费用？",
+    "representative_answer": "经核实话单真实存在，计费正常。套外费用可能由以下原因导致：1）话单跨天计费；2）资源订购前已用尽套餐内流量；3）副卡未共享非共享资源；4）群组资料异常导致计费侧未同步；5）用户使用习惯（如后台应用、双卡切换、高清视频等）引发额外流量消耗。具体费用按‘国内1元800MB日租宝’规则计收。"
+  },
+  {
+    "representative_question": "如何查询号码的开户部门和开户员工信息？",
+    "representative_answer": "开户部门和开户员工信息可通过内部系统查询，但部分历史数据因系统下架（如BSS系统）可能无法获取。"
+  },
+  {
+    "representative_question": "流量使用优先级是如何排序的？",
+    "representative_answer": "系统优先使用升级包中的流量，之后再使用月末27日发放的流量。"
+  },
+  {
+    "representative_question": "发票打印方式有哪些？",
+    "representative_answer": "发票打印方式包括现金发票和月结发票两种，均占用可打额度。可通过【CBSS-账务管理-票据管理-账务票据辅助-账务票据打印日志查询】核实打印情况。"
+  },
+  {
+    "representative_question": "账户余额无法抵扣费用，能否协助处理？",
+    "representative_answer": "该问题无法处理。"
+  },
+  {
+    "representative_question": "合约7月底到期，现在只有9元了",
+    "representative_answer": "要不您单独数一下"
+  },
+  {
+    "representative_question": "为什么APP一直给用户发送查询详单短信，用户一次都没有使用过",
+    "representative_answer": "稍等 有排队会话 请稍等"
+  },
+  {
+    "representative_question": "需要邀请集团",
+    "representative_answer": "请稍等"
+  },
+  {
+    "representative_question": "如何查询我的宽带账号？",
+    "representative_answer": "您可通过登录运营商官方App、拨打客服热线或前往营业厅查询您的宽带账号信息。"
+  },
+  {
+    "representative_question": "如何提交沃工单？",
+    "representative_answer": "您可以通过相关渠道提交沃工单，以便我们及时处理您的需求。"
+  },
+  {
+    "representative_question": "北京沃派校园套餐48元档的合约是否会自动续约？",
+    "representative_answer": "北京沃派校园套餐48元档预存250元享11个月套餐折扣，合约到期后不会自动续约。"
+  },
+  {
+    "representative_question": "增值税专用发票申请完成后，是否会通过政企平台预留的邮箱发送给客户？",
+    "representative_answer": "增值税专用发票申请完成后，系统会通过政企平台中客户预留的邮箱自动推送电子发票。"
+  },
+  {
+    "representative_question": "开户费用中包含300元，如何开具增值税专用发票？",
+    "representative_answer": "开户流程中若已开具普通发票，需先在【营业发票退票】页面操作退票；如涉及税务系统已开具的专票（如30000元），也需完成税务退票。退票完成后，在账务系统中重新设置发票打印类型，即可重新开具增值税专用发票。"
+  },
+  {
+    "representative_question": "逾期续约的操作截止时间是什么时候？",
+    "representative_answer": "请在7月5日前通过前台操作逾期续约。"
+  },
+  {
+    "representative_question": "如何申请临时上架产品？",
+    "representative_answer": "产品上架需联系市场部协助处理。"
+  },
+  {
+    "representative_question": "我的票出现了异常，该怎么办？",
+    "representative_answer": "已提交至集团协助核实，请关注相关工单的处理意见。"
+  },
+  {
+    "representative_question": "K405账务打印设置失败，提示acts/invprinttag异常，如何处理？",
+    "representative_answer": "请联系后台支持人员协助处理该异常。"
+  },
+  {
+    "representative_question": "有2个可以了",
+    "representative_answer": "后台已经协助增加了，正在集团审批中，请明日再看吧"
+  },
+  {
+    "representative_question": "一卡通的缴费明细包含哪些信息？",
+    "representative_answer": "一卡通的缴费明细包括每次缴费的具体时间与金额。"
+  }
+]

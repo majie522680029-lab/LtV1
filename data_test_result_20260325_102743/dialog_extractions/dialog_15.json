@@ -1,0 +1,13 @@
+{
+  "dialog_index": 15,
+  "full_dialog_text": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:师傅您好 \nCUSTOMER:您看一下号码：* \nCUSTOMER:他这个合约会自动续约吗 \nSERVICE* 北京沃派校园套餐48元档预存250元11个月套餐折扣合约 合约计划 2024-08-01 00:00:00 2025-06-30 23:59:59  \nCUSTOMER:对 \nSERVICE:目前查询显示如图 \nCUSTOMER:好的谢谢师傅 \nSERVICE:请问还有其他问题么",
+  "dialog_preview": "SRVICE:您好，我是*，很高兴为您服务！ \nCUSTOMER:师傅您好 \nCUSTOMER:您看一下号码：* \nCUSTOMER:他这个合约会自动续约吗 \nSERVICE* 北京沃派校园套餐48元档预存250元11个月套餐折扣合约 合约计划 2024-08-01 00:00:00 2025-06-30 23:59:59  \nCUSTOMER:对 \nSERVICE:目前查询显示如图 \nCUSTO...",
+  "extracted_qa_pairs": [
+    {
+      "question": "北京沃派校园套餐48元档预存250元11个月套餐折扣合约是否会自动续约？",
+      "answer": "目前查询显示该合约不会自动续约。"
+    }
+  ],
+  "extraction_count": 1,
+  "success": true
+}
