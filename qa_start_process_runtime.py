@@ -1656,15 +1656,12 @@ A: {answer}
             "转后台专家", "后台专家协助", "派单处理", "需派单", "提交工单",
             "关注工单", "待核实", "联系后台处理", "联系相关部门处理",
             "发协作", "中台协助", "信息化部协助", "省份核实",
-            # v1 新增：常见转派变体
+            # 新增：常见转派变体
             "联系中台", "联系政企", "反馈后台", "反馈至后台",
             "邀请专家", "在线邀请专家", "需后台处理", "需要通过后台",
             "需后台操作", "后台进行处理", "后台加急处理",
             "需由后台", "需派单核查", "派单核查处理",
             "需提供完整报告给后台",
-            # v2 新增：补齐漏网模式
-            "联系营业厅", "走协作", "报后台",
-            "需等待后台", "加急反馈",
         )
         if any(signal in answer_text for signal in action_only_signals):
             return True
@@ -1673,24 +1670,14 @@ A: {answer}
         escalate_keywords = (
             "中台", "政企", "后台处理", "转后台", "派单", "发协作",
             "联系.*部门", "联系.*处理", "邀请.*专家",
-            # v2 新增：补齐漏网
-            "走协作", "加急反馈",
-            "需.{0,4}后台",  # 匹配 "需后台处理"/"需等待后台处理"/"需由后台处理"
         )
-        # 强知识信号：出现即视为有可复用知识
-        strong_knowledge = (
-            "规则", "条件", "功能点", "操作步骤", "系统会", "自动",
-            "步骤", "路径",
-        )
-        # 弱知识信号：单独出现不能算有知识，需至少出现2个
-        weak_knowledge = (
-            "原因", "由于", "因为", "需注意", "注意", "确认", "检查",
-            "流程", "可尝试",
+        knowledge_signals = (
+            "规则", "条件", "原因", "由于", "因为", "自动", "系统会",
+            "需注意", "注意", "确认", "检查", "功能点", "操作步骤",
+            "步骤", "路径", "流程",
         )
         has_escalate = any(re.search(kw, answer_text) for kw in escalate_keywords)
-        has_strong = any(signal in answer_text for signal in strong_knowledge)
-        weak_count = sum(1 for signal in weak_knowledge if signal in answer_text)
-        has_knowledge = has_strong or weak_count >= 2
+        has_knowledge = any(signal in answer_text for signal in knowledge_signals)
         if has_escalate and not has_knowledge:
             return True
 
