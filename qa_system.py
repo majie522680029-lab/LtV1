@@ -4,6 +4,10 @@ import pandas as pd
 import numpy as np
 import json
 import os
+import signal
+import shutil
+import subprocess
+import sys
 import time
 import datetime
 from difflib import SequenceMatcher
@@ -14,6 +18,11 @@ from sentence_transformers import SentenceTransformer
 import re
 from dialog_step_debug_ui import render_dialog_step_debug_page
 from llm_judge import build_deepseek_client, judge_with_cache, triage_gate_decision
+from qa_start_process_runtime import (
+    BGEEmbeddingGenerator as RuntimeBGEEmbeddingGenerator,
+    QAPairExtractor as RuntimeQAPairExtractor,
+    QAClusterAndSelector as RuntimeQAClusterAndSelector,
+)
 
 # ==================== 新增：知识库类 ====================
 class KnowledgeBase:
@@ -130,6 +139,7 @@ st.set_page_config(
 LOCAL_QA_DEFAULT_BASE_URL = "http://127.0.0.1:43722/v1"
 LOCAL_QA_DEFAULT_API_KEY = "sk-local"
 LOCAL_QA_DEFAULT_MODEL_NAME = "qa-extractor-qwen3"
+BATCH_EXTRACT_TEST_ROOT = "/home/majie/work/LtV1/batch_extract_test_runs"
 
 # ==================== 1. 侧边栏配置参数 ====================
 with st.sidebar:
@@ -149,7 +159,7 @@ with st.sidebar:
     qa_extract_model_source = st.radio(
         "模型来源",
         ["线上模型", "本地模型"],
-        index=0,
+        index=1,
         help="影响对话转 QA 的抽取步骤和代表性 QA 筛选步骤"
     )
     if qa_extract_model_source == "线上模型":
@@ -179,7 +189,7 @@ with st.sidebar:
     
     # 数据源配置
     st.subheader("📊 数据源配置")
-    excel_path = st.text_input("Excel 文件路径", "/home/majie/work/LtV1/data_test/2506_在线咨询-替换后.xlsx", help="包含对话记录的 Excel 文件路径")
+    excel_path = st.text_input("Excel 文件路径", "/home/majie/work/LtV1/data_test/ivr_cleaning/turn_outputs/cleaned_dialogues_qa_input.xlsx", help="包含对话记录的 Excel 文件路径")
     excel_row_limit = st.number_input("读取行数限制", min_value=1, max_value=1000, value=30, help="读取前 N 行数据，0 表示全部")
     if excel_row_limit == 0:
         excel_row_limit = None
@@ -274,6 +284,11 @@ with st.sidebar:
         key="max_eps_value",
         help="eps 最大值（建议 <=0.45，避免形成超大簇）",
     )
+    enable_cluster_zero_split = st.checkbox(
+        "启用簇0二次切分",
+        value=False,
+        help="开启后会在首次聚类完成后，仅对簇0再做一次温和切分；关闭则保留原始聚类结果。",
+    )
     
     st.markdown("---")
     
@@ -341,14 +356,19 @@ if st.session_state.show_embedded_debug_panel:
     )
     st.markdown("---")
 
-# 创建两个Tab
-tab1, tab2 = st.tabs(["📊 结果展示", "📚 知识库管理"])
+# 创建三个Tab
+tab1, tab2, tab3 = st.tabs(["📊 结果展示", "📚 知识库管理", "📦 分批处理"])
 
 # ==================== 3. 通用函数定义 ====================
 # 读取结果目录的函数
 def load_results(result_dir):
     """从结果目录加载处理结果"""
     try:
+        stats = {}
+        representative_qa = []
+        clusters = {}
+        all_qa_pairs = []
+
         # 加载统计信息
         stats_path = os.path.join(result_dir, "processing_stats.json")
         if os.path.exists(stats_path):
@@ -363,7 +383,6 @@ def load_results(result_dir):
         
         # 加载聚类结果，并统一数据结构
         cluster_path = os.path.join(result_dir, "cluster_results.json")
-        clusters = {}
         if os.path.exists(cluster_path):
             with open(cluster_path, 'r', encoding='utf-8') as f:
                 cluster_results = json.load(f)
@@ -376,10 +395,42 @@ def load_results(result_dir):
         
         # 修复：加载原始QA对
         raw_qa_path = os.path.join(result_dir, "raw_qa_pairs.json")
-        all_qa_pairs = []
         if os.path.exists(raw_qa_path):
             with open(raw_qa_path, 'r', encoding='utf-8') as f:
                 all_qa_pairs = json.load(f)
+
+        # 分批抽取目录没有 representative_qa_pairs.json 时，回退使用 raw_qa_pairs.json。
+        if not representative_qa and all_qa_pairs:
+            representative_qa = [
+                {
+                    "representative_question": item["question"],
+                    "representative_answer": item["answer"],
+                }
+                for item in all_qa_pairs
+                if isinstance(item, dict)
+                and isinstance(item.get("question"), str)
+                and isinstance(item.get("answer"), str)
+            ]
+
+        # 分批抽取目录没有 processing_stats.json 时，尝试使用 batch_manifest.json 兜底。
+        if not stats:
+            batch_manifest_path = os.path.join(result_dir, "batch_manifest.json")
+            if os.path.exists(batch_manifest_path):
+                with open(batch_manifest_path, 'r', encoding='utf-8') as f:
+                    batch_manifest = json.load(f)
+                stats = {
+                    "start_time": batch_manifest.get("generated_at", ""),
+                    "processing_time_seconds": batch_manifest.get("processing_time_seconds", 0),
+                    "total_dialogs_processed": batch_manifest.get("dialogs_processed_in_batch", 0),
+                    "dialogs_with_valid_qa": batch_manifest.get("dialogs_with_valid_qa", 0),
+                    "total_raw_qa_pairs": batch_manifest.get("total_raw_qa_pairs", len(all_qa_pairs)),
+                    "total_clusters": len(clusters),
+                    "noise_cluster_size": len(clusters.get(-1, [])) if isinstance(clusters.get(-1, []), list) else 0,
+                    "final_representative_qa_count": len(representative_qa),
+                    "success_rate": "",
+                    "qa_extraction_rate": "",
+                    "representative_qa_rate": "",
+                }
         
         return {
             'stats': stats,
@@ -391,6 +442,51 @@ def load_results(result_dir):
     except Exception as e:
         st.error(f"加载结果失败: {str(e)}")
         return None
+
+
+def list_kb_importable_result_dirs():
+    """列出知识库管理页可导入的历史结果目录。"""
+    result_dirs = []
+
+    for name in os.listdir('.'):
+        if name.startswith('data_test_result_') and os.path.isdir(name):
+            result_dirs.append(name)
+
+    batch_root = BATCH_EXTRACT_TEST_ROOT
+    if os.path.isdir(batch_root):
+        for root, dirs, _files in os.walk(batch_root):
+            for name in dirs:
+                full_path = os.path.join(root, name)
+                if (
+                    os.path.exists(os.path.join(full_path, "raw_qa_pairs.json"))
+                    or os.path.exists(os.path.join(full_path, "representative_qa_pairs.json"))
+                ):
+                    result_dirs.append(full_path)
+
+    return sorted(set(result_dirs), reverse=True)
+
+
+def list_displayable_result_dirs():
+    """列出结果展示页可加载的完整结果目录。"""
+    result_dirs = []
+
+    for name in os.listdir('.'):
+        if name.startswith('data_test_result_') and os.path.isdir(name):
+            result_dirs.append(name)
+
+    batch_root = BATCH_EXTRACT_TEST_ROOT
+    if os.path.isdir(batch_root):
+        for root, dirs, _files in os.walk(batch_root):
+            for name in dirs:
+                full_path = os.path.join(root, name)
+                if (
+                    os.path.exists(os.path.join(full_path, "cluster_results.json"))
+                    and os.path.exists(os.path.join(full_path, "representative_qa_pairs.json"))
+                    and os.path.exists(os.path.join(full_path, "processing_stats.json"))
+                ):
+                    result_dirs.append(full_path)
+
+    return sorted(set(result_dirs), reverse=True)
 
 # 初始化BGE嵌入模型
 def init_bge_embedding(config):
@@ -429,9 +525,1052 @@ def convert_numpy_types(obj):
         return obj
 
 
+def save_json_file(data, filepath):
+    """通用 JSON 保存函数。"""
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    with open(filepath, "w", encoding="utf-8") as f:
+        json.dump(convert_numpy_types(data), f, ensure_ascii=False, indent=2)
+
+
 def normalize_compare_text(value):
     """用于同问题判定的规范化文本。"""
     return re.sub(r"\s+", " ", str(value or "")).strip()
+
+
+def is_case_specific_query_result_qa(question, answer):
+    """识别具体用户/具体月份/具体数据的查询回显，避免 backup_first 兜底写入知识库。"""
+    text = normalize_compare_text(f"{question} {answer}")
+    data_result_signals = (
+        "流量使用", "使用流量", "话单", "账单", "费用明细", "业务类型", "套餐使用",
+        "共计使用", "产生费用", "计费正常", "话单真实存在", "批价轨迹",
+        "查询结果", "核查结果", "系统回显", "系统显示", "数据明细",
+    )
+    case_query_signals = (
+        "查询", "核实", "查看", "看一下", "使用情况", "明细", "本次",
+        "用户", "号码", "具体", "月份", "时间段",
+    )
+    concrete_patterns = (
+        r"\d+(?:\.\d+)?\s*MB",
+        r"\d+(?:\.\d+)?\s*GB",
+        r"\d+(?:\.\d+)?\s*元",
+        r"\b20\d{6}\b",
+        r"\b20\d{2}-\d{2}-\d{2}\b",
+        r"\d{1,2}\s*月份?",
+        r"[一二三四五六七八九十]月份?",
+        r"\d{11}",
+    )
+    return (
+        any(signal in text for signal in data_result_signals)
+        and any(signal in text for signal in case_query_signals)
+        and any(re.search(pattern, text, flags=re.IGNORECASE) for pattern in concrete_patterns)
+    )
+
+
+def should_skip_backup_first_qa(qa):
+    if not isinstance(qa, dict):
+        return True
+    question = qa.get("question") or qa.get("representative_question") or ""
+    answer = qa.get("answer") or qa.get("representative_answer") or ""
+    if not isinstance(question, str) or not isinstance(answer, str):
+        return True
+    if len(normalize_compare_text(question)) < 3 or len(normalize_compare_text(answer)) < 2:
+        return True
+    return is_case_specific_query_result_qa(question, answer)
+
+
+def normalize_excel_column_name(value):
+    """规范化 Excel 列名，便于兼容不同来源文件的表头差异。"""
+    return re.sub(r"\s+", "", str(value or "")).strip().lower()
+
+
+def load_dialogs_from_excel(excel_path, row_limit=None):
+    """从 Excel 中读取对话列，兼容不同格式的表头。"""
+    df = pd.read_excel(excel_path)
+    normalized_columns = {
+        normalize_excel_column_name(column): column
+        for column in df.columns
+    }
+
+    dialog_column_candidates = (
+        "专家对话内容",
+        "对话内容",
+        "清洗后对话",
+        "会话内容",
+        "聊天内容",
+        "聊天记录",
+        "对话",
+        "dialog",
+    )
+
+    dialog_column = None
+    for candidate in dialog_column_candidates:
+        normalized_candidate = normalize_excel_column_name(candidate)
+        if normalized_candidate in normalized_columns:
+            dialog_column = normalized_columns[normalized_candidate]
+            break
+
+    if dialog_column is None:
+        raise ValueError(
+            "未找到对话内容列。请确认 Excel 中包含以下列名之一："
+            + "、".join(dialog_column_candidates)
+        )
+
+    dialogs = df[dialog_column].dropna().astype(str)
+    dialogs = dialogs[dialogs.str.strip() != ""]
+    if row_limit is not None:
+        dialogs = dialogs.head(row_limit)
+
+    return dialogs.tolist(), dialog_column
+
+
+def init_openai_client(base_url, api_key):
+    return OpenAI(
+        base_url=base_url.strip(),
+        api_key=api_key,
+    )
+
+
+def build_runtime_config(result_dir, excel_path_value, row_limit_value):
+    class StreamlitRuntimeConfig:
+        def __init__(self):
+            self.base_url = base_url
+            self.api_key = api_key
+            self.model_name = model_name
+            self.qa_extract_model_source = qa_extract_model_source
+            self.use_local_model_branch = qa_extract_model_source == "本地模型"
+            if qa_extract_model_source == "本地模型":
+                self.qa_extract_base_url = local_qa_base_url
+                self.qa_extract_api_key = local_qa_api_key
+                self.qa_extract_model_name = local_qa_model_name
+                self.selector_base_url = local_qa_base_url
+                self.selector_api_key = local_qa_api_key
+                self.selector_model_name = local_qa_model_name
+            else:
+                self.qa_extract_base_url = base_url
+                self.qa_extract_api_key = api_key
+                self.qa_extract_model_name = model_name
+                self.selector_base_url = base_url
+                self.selector_api_key = api_key
+                self.selector_model_name = model_name
+
+            self.dbscan_min_samples = dbscan_min_samples
+            self.clustering_metric = clustering_metric
+            self.dynamic_eps_coefficient = dynamic_eps_coefficient
+            self.min_eps_value = min_eps_value
+            self.max_eps_value = max_eps_value
+            self.enable_cluster_zero_split = enable_cluster_zero_split
+
+            self.embedding_dim = 768
+            self.embedding_device = embedding_device
+            self.bge_model_path = bge_model_path
+
+            self.temperature = temperature
+            self.max_tokens = None
+            self.top_p = top_p
+            self.local_temperature = 0.0
+            self.local_top_p = 1.0
+            self.local_max_tokens = 1536
+            self.local_presence_penalty = 0.0
+            self.local_frequency_penalty = 0.0
+            self.local_timeout = 45
+            self.local_max_attempts = 2
+            self.local_selector_max_tokens = 1024
+
+            self.min_dialog_length = min_dialog_length
+            self.min_question_length = min_question_length
+            self.max_cluster_qa_count = max_cluster_qa_count
+            self.max_input_length = max_input_length
+            self.max_preview_chars = max_preview_chars
+
+            self.excel_row_limit = row_limit_value
+            self.use_backup_strategy = use_backup_strategy
+            self.embedding_method = embedding_method
+            self.excel_path = excel_path_value
+            self.result_dir = result_dir
+
+    config = StreamlitRuntimeConfig()
+    ensure_result_output_dirs(config.result_dir)
+    return config
+
+
+def ensure_result_output_dirs(result_dir):
+    os.makedirs(result_dir, exist_ok=True)
+    os.makedirs(os.path.join(result_dir, "dialog_extractions"), exist_ok=True)
+    os.makedirs(os.path.join(result_dir, "cluster_details"), exist_ok=True)
+
+
+def save_json_safe(data, filepath, description=""):
+    try:
+        save_json_file(data, filepath)
+        return True
+    except Exception as exc:
+        st.toast(f"❌ 保存 {description} 失败: {str(exc)}")
+        return False
+
+
+def clear_directory_files(directory):
+    os.makedirs(directory, exist_ok=True)
+    for name in os.listdir(directory):
+        file_path = os.path.join(directory, name)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+
+
+def normalize_runtime_qa_list(items):
+    normalized_items = []
+    for item in items or []:
+        if (
+            isinstance(item, dict)
+            and isinstance(item.get("question"), str)
+            and isinstance(item.get("answer"), str)
+        ):
+            normalized_items.append({
+                "question": item["question"].strip(),
+                "answer": item["answer"].strip(),
+            })
+    return normalized_items
+
+
+def attach_source_dialog_to_qa_list(qa_list, dialog_index, transcript):
+    annotated_items = []
+    dialog_preview = transcript[:200] + "..." if len(transcript) > 200 else transcript
+    for qa in qa_list or []:
+        item = dict(qa)
+        item["source_dialog_index"] = dialog_index
+        item["source_dialog_text"] = transcript
+        item["source_dialog_preview"] = dialog_preview
+        annotated_items.append(item)
+    return annotated_items
+
+
+def run_exact_processing_pipeline(
+    config,
+    dialog_texts,
+    dialog_indices,
+    result_dir,
+    status_placeholder,
+    progress_bar,
+    dialog_column="",
+    batch_manifest_path=None,
+    batch_manifest_base=None,
+    resume_existing=False,
+    info_reporter=None,
+):
+    ensure_result_output_dirs(result_dir)
+    if (
+        os.getenv("QA_DEBUG_TRACE", "").strip()
+        and (
+            not os.getenv("QA_DEBUG_TRACE_FILE", "").strip()
+            or os.getenv("QA_DEBUG_TRACE_FILE_AUTO", "").strip() == "1"
+        )
+    ):
+        os.environ["QA_DEBUG_TRACE_FILE"] = os.path.join(result_dir, "qa_debug_trace.log")
+        os.environ["QA_DEBUG_TRACE_FILE_AUTO"] = "1"
+    dialog_extractions_dir = os.path.join(result_dir, "dialog_extractions")
+    cluster_details_dir = os.path.join(result_dir, "cluster_details")
+    raw_qa_file = os.path.join(result_dir, "raw_qa_pairs.json")
+    cluster_file = os.path.join(result_dir, "cluster_results.json")
+    rep_qa_file = os.path.join(result_dir, "representative_qa_pairs.json")
+    rep_qa_before_review_file = os.path.join(result_dir, "representative_qa_pairs_before_review.json")
+    rep_qa_dropped_file = os.path.join(result_dir, "representative_qa_pairs_dropped.json")
+    stats_file = os.path.join(result_dir, "processing_stats.json")
+
+    processed_dialog_indices = set()
+    batch_manifest_seed = dict(batch_manifest_base or {})
+    if resume_existing and batch_manifest_path and os.path.exists(batch_manifest_path):
+        try:
+            with open(batch_manifest_path, "r", encoding="utf-8") as f:
+                existing_manifest = json.load(f)
+            processed_dialog_indices = set(existing_manifest.get("processed_dialog_indices", []))
+            batch_manifest_seed.update(existing_manifest)
+        except Exception:
+            processed_dialog_indices = set()
+
+    start_time = time.time()
+    qa_extract_client = init_openai_client(config.qa_extract_base_url, config.qa_extract_api_key)
+    selector_client = init_openai_client(config.selector_base_url, config.selector_api_key)
+    status_placeholder.info("✅ OpenAI 客户端初始化成功")
+
+    embedding_generator = None
+    if config.embedding_method == "bge":
+        try:
+            status_placeholder.info("🚀 初始化 BGE 嵌入模型...")
+            embedding_generator = RuntimeBGEEmbeddingGenerator(config, warning_reporter=st.warning)
+            status_placeholder.success("✅ BGE 嵌入模型加载成功")
+        except Exception as exc:
+            st.warning(f"⚠️ BGE 模型加载失败: {str(exc)}")
+
+    qa_extractor = RuntimeQAPairExtractor(
+        qa_extract_client,
+        config,
+        normalize_compare_text,
+        print_model_raw_output,
+        report_api_exception,
+        is_retryable_api_exception,
+    )
+    qa_cluster_selector = RuntimeQAClusterAndSelector(
+        selector_client,
+        config,
+        embedding_generator,
+        normalize_compare_text,
+        print_model_raw_output,
+        report_api_exception,
+        is_retryable_api_exception,
+        progress_bar=progress_bar,
+        status_placeholder=status_placeholder,
+        info_reporter=info_reporter or (lambda message: print(message)),
+    )
+
+    def persist_batch_manifest(stage, current_dialog_index=None, completed=False):
+        if not batch_manifest_path:
+            return
+        manifest = dict(batch_manifest_seed)
+        manifest.update({
+            "dialog_column": dialog_column,
+            "processed_dialog_indices": sorted(processed_dialog_indices),
+            "processed_dialog_count": len(processed_dialog_indices),
+            "current_dialog_index": current_dialog_index,
+            "current_stage": stage,
+            "completed": completed,
+            "updated_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        })
+        save_json_safe(manifest, batch_manifest_path, "批次进度")
+
+    status_placeholder.info(f"🔍 开始提取问答对 (共 {len(dialog_texts)} 条对话)...")
+    all_qa_pairs = []
+    extract_dropped_qa = []
+    valid_count = 0
+
+    for idx, (dialog_index, transcript) in enumerate(zip(dialog_indices, dialog_texts), 1):
+        progress = 0.5 + (idx / len(dialog_texts)) * 0.3 if dialog_texts else 0.8
+        progress_bar.progress(progress)
+        status_placeholder.info(f"处理对话 #{idx}/{len(dialog_texts)}")
+
+        dialog_file = os.path.join(dialog_extractions_dir, f"dialog_{dialog_index}.json")
+        if resume_existing and dialog_index in processed_dialog_indices and os.path.exists(dialog_file):
+            with open(dialog_file, "r", encoding="utf-8") as f:
+                dialog_result = json.load(f)
+            qa_list = normalize_runtime_qa_list(dialog_result.get("extracted_qa_pairs", []))
+            dialog_dropped = dialog_result.get("dropped_qa_pairs", [])
+        elif resume_existing and dialog_index in processed_dialog_indices:
+            qa_list = []
+            dialog_dropped = []
+        else:
+            before_drop_count = len(getattr(qa_extractor, "dropped_qa_pairs", []))
+            qa_list = normalize_runtime_qa_list(qa_extractor.extract_qa_from_transcript(transcript))
+            dialog_dropped = getattr(qa_extractor, "dropped_qa_pairs", [])[before_drop_count:]
+            dialog_dropped = attach_source_dialog_to_qa_list(dialog_dropped, dialog_index, transcript)
+            dialog_result = {
+                "dialog_index": dialog_index,
+                "full_dialog_text": transcript,
+                "dialog_preview": transcript[:200] + "..." if len(transcript) > 200 else transcript,
+                "extracted_qa_pairs": qa_list,
+                "dropped_qa_pairs": dialog_dropped,
+                "extraction_count": len(qa_list),
+                "success": True,
+            }
+            save_json_safe(dialog_result, dialog_file, f"对话 #{dialog_index}")
+            processed_dialog_indices.add(dialog_index)
+
+        if qa_list:
+            valid_count += 1
+        all_qa_pairs.extend(qa_list)
+        if isinstance(dialog_dropped, list):
+            extract_dropped_qa.extend(dialog_dropped)
+
+        save_json_safe(all_qa_pairs, raw_qa_file, "原始 QA 对")
+        persist_batch_manifest("extracting", current_dialog_index=dialog_index, completed=False)
+
+    status_placeholder.success(f"✅ 共提取 {len(all_qa_pairs)} 个 QA 对 (来自 {valid_count}/{len(dialog_texts)} 个对话)")
+
+    clusters = {}
+    final_representative_qa = []
+    dropped_representative_qa = list(extract_dropped_qa)
+    clear_directory_files(cluster_details_dir)
+
+    if all_qa_pairs:
+        status_placeholder.info("🧩 开始聚类分析...")
+        clusters = qa_cluster_selector.cluster_qa_pairs(all_qa_pairs)
+
+        cluster_results = {
+            "cluster_count": len(clusters),
+            "noise_cluster_count": len(clusters.get(-1, [])) if isinstance(clusters.get(-1, []), list) else 0,
+            "total_qa_pairs": len(all_qa_pairs),
+            "clusters": {str(label): {"size": len(qa_list), "qa_pairs": qa_list} for label, qa_list in clusters.items()},
+        }
+        save_json_safe(cluster_results, cluster_file, "聚类结果")
+        persist_batch_manifest("clustering", completed=False)
+
+        for label, cluster_qa in clusters.items():
+            if isinstance(cluster_qa, list) and cluster_qa:
+                save_json_safe(
+                    {
+                        "cluster_id": label,
+                        "size": len(cluster_qa),
+                        "qa_pairs": cluster_qa,
+                    },
+                    os.path.join(cluster_details_dir, f"cluster_{label}.json"),
+                    f"簇 #{label} 详细内容",
+                )
+
+        status_placeholder.info("🌟 筛选代表性问答对...")
+        sorted_clusters = sorted(clusters.items(), key=lambda x: len(x[1]), reverse=True)
+
+        for i, (label, cluster_qa) in enumerate(sorted_clusters):
+            if label == -1 or len(cluster_qa) == 0:
+                continue
+            progress = 0.8 + (i / len(sorted_clusters)) * 0.2 if sorted_clusters else 1.0
+            progress_bar.progress(progress)
+            status_placeholder.info(f"处理簇 #{label} ({i+1}/{len(sorted_clusters)})")
+
+            representative_qa = qa_cluster_selector.select_representative_qa(cluster_qa)
+            if representative_qa:
+                final_representative_qa.extend(representative_qa)
+            elif config.use_backup_strategy and cluster_qa:
+                backup_item = {
+                    "representative_question": cluster_qa[0]["question"],
+                    "representative_answer": cluster_qa[0]["answer"],
+                }
+                final_representative_qa.append(backup_item)
+        save_json_safe(final_representative_qa, rep_qa_before_review_file, "复审前代表性 QA 对")
+        status_placeholder.info("🧪 开始代表性 QA 入库复审...")
+        final_representative_qa, dropped_representative_qa = qa_cluster_selector.review_representative_qa_list(
+            final_representative_qa
+        )
+        dropped_representative_qa = list(extract_dropped_qa) + dropped_representative_qa
+        save_json_safe(final_representative_qa, rep_qa_file, "代表性 QA 对")
+        save_json_safe(dropped_representative_qa, rep_qa_dropped_file, "复审删除代表性 QA 对")
+        persist_batch_manifest("selecting_representative", completed=False)
+    else:
+        save_json_safe({
+            "cluster_count": 0,
+            "noise_cluster_count": 0,
+            "total_qa_pairs": 0,
+            "clusters": {},
+        }, cluster_file, "聚类结果")
+        save_json_safe([], rep_qa_file, "代表性 QA 对")
+        save_json_safe([], rep_qa_before_review_file, "复审前代表性 QA 对")
+        save_json_safe(dropped_representative_qa, rep_qa_dropped_file, "复审删除代表性 QA 对")
+        persist_batch_manifest("completed_without_qa", completed=False)
+
+    processing_time = time.time() - start_time
+    stats = {
+        "start_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "processing_time_seconds": round(processing_time, 2),
+        "total_dialogs_processed": len(dialog_texts),
+        "dialogs_with_valid_qa": valid_count,
+        "total_raw_qa_pairs": len(all_qa_pairs),
+        "total_clusters": len(clusters),
+        "noise_cluster_size": len(clusters.get(-1, [])) if isinstance(clusters.get(-1, []), list) else 0,
+        "final_representative_qa_count": len(final_representative_qa),
+        "review_dropped_representative_qa_count": len(dropped_representative_qa),
+        "success_rate": f"{valid_count/len(dialog_texts)*100:.1f}%" if dialog_texts else "",
+        "qa_extraction_rate": f"{len(all_qa_pairs)/len(dialog_texts):.2f} QA/对话" if dialog_texts else "",
+        "representative_qa_rate": f"{len(final_representative_qa)/len(all_qa_pairs)*100:.1f}%" if all_qa_pairs else "",
+    }
+    save_json_safe(stats, stats_file, "处理统计")
+    persist_batch_manifest("completed", completed=True)
+
+    progress_bar.progress(1.0)
+    status_placeholder.success(f"🎉 处理完成！总耗时: {processing_time:.2f} 秒")
+
+    return {
+        "stats": stats,
+        "representative_qa": final_representative_qa,
+        "clusters": clusters,
+        "all_qa_pairs": all_qa_pairs,
+        "result_dir": result_dir,
+        "dialog_column": dialog_column,
+    }
+
+
+def build_fixed_batch_ranges(total_dialogs, batch_size=30):
+    ranges = []
+    if total_dialogs <= 0:
+        return ranges
+    batch_no = 1
+    start_index = 1
+    while start_index <= total_dialogs:
+        end_index = min(start_index + batch_size - 1, total_dialogs)
+        ranges.append({
+            "batch_no": batch_no,
+            "start_index": start_index,
+            "end_index": end_index,
+        })
+        batch_no += 1
+        start_index = end_index + 1
+    return ranges
+
+
+def get_default_batch_job_dir(excel_path_value):
+    excel_name = os.path.splitext(os.path.basename(excel_path_value or "dialogs"))[0]
+    return os.path.join(BATCH_EXTRACT_TEST_ROOT, f"{excel_name}_batch_job")
+
+
+def get_batch_dir_name(batch_no, start_index, end_index):
+    return f"batch_{batch_no:04d}_{start_index:05d}_{end_index:05d}"
+
+
+def get_batch_result_dir(job_dir, batch_range):
+    return os.path.join(
+        job_dir,
+        "batches",
+        get_batch_dir_name(batch_range["batch_no"], batch_range["start_index"], batch_range["end_index"]),
+    )
+
+
+def is_complete_result_dir(result_dir):
+    return (
+        os.path.exists(os.path.join(result_dir, "cluster_results.json"))
+        and os.path.exists(os.path.join(result_dir, "representative_qa_pairs.json"))
+        and os.path.exists(os.path.join(result_dir, "processing_stats.json"))
+    )
+
+
+def load_json_if_exists(filepath, default_value):
+    if not os.path.exists(filepath):
+        return default_value
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return default_value
+
+
+def aggregate_batch_job_results(job_dir):
+    ensure_result_output_dirs(job_dir)
+    root_dialog_dir = os.path.join(job_dir, "dialog_extractions")
+    root_cluster_details_dir = os.path.join(job_dir, "cluster_details")
+    clear_directory_files(root_dialog_dir)
+    clear_directory_files(root_cluster_details_dir)
+
+    batches_root = os.path.join(job_dir, "batches")
+    raw_qa_pairs = []
+    representative_qa = []
+    representative_qa_before_review = []
+    dropped_representative_qa = []
+    aggregated_clusters = {}
+    total_dialogs_processed = 0
+    dialogs_with_valid_qa = 0
+    total_processing_seconds = 0.0
+    total_review_dropped_representative_qa = 0
+
+    if os.path.isdir(batches_root):
+        for batch_name in sorted(os.listdir(batches_root)):
+            batch_dir = os.path.join(batches_root, batch_name)
+            if not os.path.isdir(batch_dir) or not is_complete_result_dir(batch_dir):
+                continue
+
+            batch_raw_qa = load_json_if_exists(os.path.join(batch_dir, "raw_qa_pairs.json"), [])
+            batch_rep_qa = load_json_if_exists(os.path.join(batch_dir, "representative_qa_pairs.json"), [])
+            batch_rep_before_review = load_json_if_exists(os.path.join(batch_dir, "representative_qa_pairs_before_review.json"), [])
+            batch_rep_dropped = load_json_if_exists(os.path.join(batch_dir, "representative_qa_pairs_dropped.json"), [])
+            batch_stats = load_json_if_exists(os.path.join(batch_dir, "processing_stats.json"), {})
+            batch_cluster_results = load_json_if_exists(os.path.join(batch_dir, "cluster_results.json"), {})
+
+            raw_qa_pairs.extend(batch_raw_qa if isinstance(batch_raw_qa, list) else [])
+            representative_qa.extend(batch_rep_qa if isinstance(batch_rep_qa, list) else [])
+            representative_qa_before_review.extend(batch_rep_before_review if isinstance(batch_rep_before_review, list) else [])
+            dropped_representative_qa.extend(batch_rep_dropped if isinstance(batch_rep_dropped, list) else [])
+            total_dialogs_processed += int(batch_stats.get("total_dialogs_processed", 0) or 0)
+            dialogs_with_valid_qa += int(batch_stats.get("dialogs_with_valid_qa", 0) or 0)
+            total_processing_seconds += float(batch_stats.get("processing_time_seconds", 0) or 0)
+            total_review_dropped_representative_qa += int(batch_stats.get("review_dropped_representative_qa_count", 0) or 0)
+
+            raw_clusters = batch_cluster_results.get("clusters", {}) if isinstance(batch_cluster_results, dict) else {}
+            for label_str, cluster_data in raw_clusters.items():
+                qa_pairs = cluster_data.get("qa_pairs", []) if isinstance(cluster_data, dict) else cluster_data
+                if normalize_cluster_label_for_batch(label_str) == -1:
+                    aggregated_clusters.setdefault(-1, []).extend(qa_pairs)
+                else:
+                    aggregated_clusters[f"{batch_name}::{label_str}"] = qa_pairs
+
+            batch_dialog_dir = os.path.join(batch_dir, "dialog_extractions")
+            if os.path.isdir(batch_dialog_dir):
+                for dialog_file in sorted(os.listdir(batch_dialog_dir)):
+                    if not dialog_file.endswith(".json"):
+                        continue
+                    dialog_result = load_json_if_exists(os.path.join(batch_dialog_dir, dialog_file), None)
+                    if dialog_result is not None:
+                        save_json_safe(dialog_result, os.path.join(root_dialog_dir, dialog_file), dialog_file)
+
+    root_cluster_results = {
+        "cluster_count": len(aggregated_clusters),
+        "noise_cluster_count": 1 if isinstance(aggregated_clusters.get(-1), list) and aggregated_clusters.get(-1) else 0,
+        "total_qa_pairs": len(raw_qa_pairs),
+        "clusters": {
+            str(label): {"size": len(qa_list), "qa_pairs": qa_list}
+            for label, qa_list in aggregated_clusters.items()
+        },
+    }
+    for label, qa_list in aggregated_clusters.items():
+        if isinstance(qa_list, list) and qa_list:
+            save_json_safe(
+                {
+                    "cluster_id": label,
+                    "size": len(qa_list),
+                    "qa_pairs": qa_list,
+                },
+                os.path.join(root_cluster_details_dir, f"cluster_{str(label).replace('/', '_')}.json"),
+                f"聚合簇 {label}",
+            )
+
+    stats = {
+        "start_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "processing_time_seconds": round(total_processing_seconds, 2),
+        "total_dialogs_processed": total_dialogs_processed,
+        "dialogs_with_valid_qa": dialogs_with_valid_qa,
+        "total_raw_qa_pairs": len(raw_qa_pairs),
+        "total_clusters": len(aggregated_clusters),
+        "noise_cluster_size": len(aggregated_clusters.get(-1, [])) if isinstance(aggregated_clusters.get(-1, []), list) else 0,
+        "final_representative_qa_count": len(representative_qa),
+        "review_dropped_representative_qa_count": total_review_dropped_representative_qa or len(dropped_representative_qa),
+        "success_rate": f"{dialogs_with_valid_qa/total_dialogs_processed*100:.1f}%" if total_dialogs_processed else "",
+        "qa_extraction_rate": f"{len(raw_qa_pairs)/total_dialogs_processed:.2f} QA/对话" if total_dialogs_processed else "",
+        "representative_qa_rate": f"{len(representative_qa)/len(raw_qa_pairs)*100:.1f}%" if raw_qa_pairs else "",
+    }
+    save_json_safe(raw_qa_pairs, os.path.join(job_dir, "raw_qa_pairs.json"), "批处理汇总原始 QA")
+    save_json_safe(root_cluster_results, os.path.join(job_dir, "cluster_results.json"), "批处理汇总聚类结果")
+    save_json_safe(representative_qa, os.path.join(job_dir, "representative_qa_pairs.json"), "批处理汇总代表 QA")
+    save_json_safe(representative_qa_before_review, os.path.join(job_dir, "representative_qa_pairs_before_review.json"), "批处理汇总复审前代表 QA")
+    save_json_safe(dropped_representative_qa, os.path.join(job_dir, "representative_qa_pairs_dropped.json"), "批处理汇总复审删除代表 QA")
+    save_json_safe(stats, os.path.join(job_dir, "processing_stats.json"), "批处理汇总统计")
+
+    return {
+        "stats": stats,
+        "raw_qa_pairs": raw_qa_pairs,
+        "representative_qa": representative_qa,
+        "clusters": aggregated_clusters,
+    }
+
+
+def load_job_manifest(job_dir):
+    return load_json_if_exists(os.path.join(job_dir, "job_manifest.json"), {})
+
+
+def save_job_manifest(job_dir, manifest):
+    save_json_safe(manifest, os.path.join(job_dir, "job_manifest.json"), "批处理任务进度")
+
+
+def list_resume_batch_job_dirs(excel_path_value):
+    excel_name = os.path.splitext(os.path.basename(excel_path_value or "dialogs"))[0]
+    prefix = f"{excel_name}_batch_job"
+    candidates = []
+    if not os.path.isdir(BATCH_EXTRACT_TEST_ROOT):
+        return candidates
+
+    normalized_excel_path = os.path.abspath(excel_path_value or "")
+    for name in sorted(os.listdir(BATCH_EXTRACT_TEST_ROOT), reverse=True):
+        if not name.startswith(prefix):
+            continue
+        job_dir = os.path.join(BATCH_EXTRACT_TEST_ROOT, name)
+        if not os.path.isdir(job_dir):
+            continue
+
+        manifest = load_job_manifest(job_dir)
+        if not manifest:
+            continue
+
+        manifest_excel_path = os.path.abspath(str(manifest.get("excel_path") or ""))
+        if normalized_excel_path and manifest_excel_path and manifest_excel_path != normalized_excel_path:
+            continue
+
+        status = manifest.get("status", "unknown")
+        updated_at = manifest.get("updated_at", "")
+        current_batch_no = manifest.get("current_batch_no")
+        batch_desc = f"第{current_batch_no}批" if current_batch_no else "未开始"
+        label = f"{name} | {status} | {batch_desc} | {updated_at}"
+        candidates.append({
+            "label": label,
+            "job_dir": job_dir,
+            "manifest": manifest,
+        })
+    return candidates
+
+
+def is_process_alive(pid):
+    if not pid:
+        return False
+    try:
+        os.kill(int(pid), 0)
+        return True
+    except OSError:
+        return False
+    except Exception:
+        return False
+
+
+def normalize_cluster_label_for_batch(label):
+    if isinstance(label, (np.integer, int)):
+        return int(label)
+    if isinstance(label, str):
+        text = label.strip()
+        if text.lstrip("-").isdigit():
+            return int(text)
+    return label
+
+
+def resolve_cluster_zero_label_for_batch(clusters):
+    if 0 in clusters:
+        return 0
+    if "0" in clusters:
+        return "0"
+    for label in clusters.keys():
+        if normalize_cluster_label_for_batch(label) == 0:
+            return label
+    return None
+
+
+def extract_intent_type_for_batch(question):
+    text = normalize_compare_text(question)
+    if not text:
+        return "其他类"
+    if re.search(r"(如何处理|怎么办|怎么处理|如何解决|怎么解决)", text):
+        return "处理类"
+    if re.search(r"(是否正常|能否|可以吗|能不能|是否可以|是否可)", text):
+        return "判断类"
+    if re.search(r"(如何查询|怎么查询|如何核实|怎么核实|查询)", text):
+        return "查询类"
+    if "为什么" in text:
+        return "原因类"
+    return "其他类"
+
+
+def extract_primary_biz_keyword_for_batch(question):
+    text = normalize_compare_text(question)
+    if not text:
+        return "通用"
+    keywords = [
+        "停机保号", "未竣工", "短信费", "流量", "固网", "合约", "融合", "撤机",
+        "套餐", "返销", "解约", "无权限", "次月", "未生效", "已下架", "渠道不同",
+    ]
+    for kw in keywords:
+        if kw in text:
+            return kw
+    return "通用"
+
+
+def split_cluster_zero_for_batch(clusters, embedding_generator, config):
+    zero_label = resolve_cluster_zero_label_for_batch(clusters)
+    if zero_label is None:
+        return clusters, None
+
+    zero_items = clusters.get(zero_label, [])
+    if not isinstance(zero_items, list) or len(zero_items) < 6:
+        return clusters, None
+
+    bucket_map = {}
+    for qa in zero_items:
+        question = qa.get("question", "")
+        bucket_key = (
+            extract_intent_type_for_batch(question),
+            extract_primary_biz_keyword_for_batch(question),
+        )
+        bucket_map.setdefault(bucket_key, []).append(qa)
+
+    sub_clusters = []
+    for bucket_items in bucket_map.values():
+        if len(bucket_items) <= 3:
+            sub_clusters.append(bucket_items)
+            continue
+
+        questions = [item.get("question", "") for item in bucket_items]
+        embeddings = np.array([embedding_generator.get_embedding(q) for q in questions])
+        if len(embeddings) <= 1:
+            sub_clusters.append(bucket_items)
+            continue
+
+        distance_matrix = cosine_distances(embeddings)
+        upper_triangle = distance_matrix[np.triu_indices_from(distance_matrix, k=1)]
+        if upper_triangle.size == 0:
+            sub_clusters.append(bucket_items)
+            continue
+
+        bucket_median = float(np.median(upper_triangle))
+        second_coeff = max(0.45, min(0.85, float(config.dynamic_eps_coefficient) * 0.85))
+        second_min_eps = max(0.08, float(config.min_eps_value))
+        second_max_eps = min(0.65, max(float(config.max_eps_value), 0.5))
+        second_eps = max(second_min_eps, min(second_max_eps, bucket_median * second_coeff))
+        second_min_samples = max(2, int(config.dbscan_min_samples))
+
+        dbscan = DBSCAN(
+            eps=second_eps,
+            min_samples=second_min_samples,
+            metric=config.clustering_metric,
+        )
+        labels = dbscan.fit_predict(embeddings)
+
+        grouped = {}
+        noise_items = []
+        for idx, label in enumerate(labels):
+            normalized = normalize_cluster_label_for_batch(label)
+            if normalized == -1:
+                noise_items.append(bucket_items[idx])
+                continue
+            grouped.setdefault(normalized, []).append(bucket_items[idx])
+
+        for group in grouped.values():
+            sub_clusters.append(group)
+        if noise_items:
+            sub_clusters.append(noise_items)
+
+    if len(sub_clusters) <= 1:
+        return clusters, None
+
+    refined_clusters = {}
+    for label, qa_list in clusters.items():
+        if label == zero_label:
+            continue
+        refined_clusters[normalize_cluster_label_for_batch(label)] = qa_list
+
+    numeric_labels = [
+        int(label) for label in refined_clusters.keys()
+        if isinstance(label, (int, np.integer)) and int(label) >= 0
+    ]
+    next_label = (max(numeric_labels) + 1) if numeric_labels else 1
+    for sub_cluster in sub_clusters:
+        refined_clusters[next_label] = sub_cluster
+        next_label += 1
+
+    return refined_clusters, len(sub_clusters)
+
+
+def cluster_qa_pairs_for_batch(all_qa_pairs, embedding_generator, config, progress_bar=None, status_placeholder=None):
+    if len(all_qa_pairs) < 2:
+        return {0: all_qa_pairs}, {"dynamic_eps": 0.0, "distance_median": 0.0, "cluster_zero_split_count": None}
+
+    questions = [qa["question"] for qa in all_qa_pairs]
+    embeddings = []
+    for i, question in enumerate(questions):
+        if progress_bar is not None:
+            progress_bar.progress((i + 1) / max(1, len(questions)) * 0.65)
+        if status_placeholder is not None:
+            status_placeholder.info(f"生成聚类嵌入: {i + 1}/{len(questions)}")
+        embeddings.append(embedding_generator.get_embedding(question))
+
+    embeddings = np.array(embeddings)
+    if len(embeddings) > 1:
+        distance_matrix = cosine_distances(embeddings)
+        upper_triangle = distance_matrix[np.triu_indices_from(distance_matrix, k=1)]
+        distance_median = float(np.median(upper_triangle))
+        dynamic_eps = max(
+            config.min_eps_value,
+            min(config.max_eps_value, distance_median * config.dynamic_eps_coefficient),
+        )
+    else:
+        distance_median = 0.0
+        dynamic_eps = 0.2
+
+    dbscan = DBSCAN(
+        eps=dynamic_eps,
+        min_samples=config.dbscan_min_samples,
+        metric=config.clustering_metric,
+    )
+    labels = dbscan.fit_predict(embeddings)
+
+    clusters = {}
+    for idx, label in enumerate(labels):
+        normalized_label = normalize_cluster_label_for_batch(label)
+        clusters.setdefault(normalized_label, []).append(all_qa_pairs[idx])
+
+    split_count = None
+    if getattr(config, "enable_cluster_zero_split", False):
+        clusters, split_count = split_cluster_zero_for_batch(clusters, embedding_generator, config)
+
+    if progress_bar is not None:
+        progress_bar.progress(1.0)
+
+    return clusters, {
+        "dynamic_eps": dynamic_eps,
+        "distance_median": distance_median,
+        "cluster_zero_split_count": split_count,
+    }
+
+
+def normalize_local_representative_item_for_batch(item):
+    if not isinstance(item, dict):
+        return None
+
+    question_keys = ("representative_question", "question", "query", "q", "问题")
+    answer_keys = ("representative_answer", "answer", "reply", "a", "答案", "response")
+    question = next((item.get(key) for key in question_keys if isinstance(item.get(key), str)), None)
+    answer = next((item.get(key) for key in answer_keys if isinstance(item.get(key), str)), None)
+    if question is None or answer is None:
+        return None
+
+    question = question.strip()
+    answer = answer.strip()
+    if not question or not answer:
+        return None
+    return {
+        "representative_question": question,
+        "representative_answer": answer,
+    }
+
+
+def is_low_value_representative_for_batch(item):
+    question = normalize_compare_text(item["representative_question"])
+    answer = normalize_compare_text(item["representative_answer"])
+    if len(question) < 3 or len(answer) < 2:
+        return True
+
+    low_value_patterns = (
+        r"^(请稍等|稍等|请您稍等)[。！!？?]*$",
+        r"^.*已为您转接.*$",
+        r"^.*转接.*请稍等.*$",
+    )
+    if any(re.search(pattern, answer) for pattern in low_value_patterns):
+        return True
+    if re.search(r"^(请稍等|稍等)$", question):
+        return True
+    if is_case_specific_query_result_qa(question, answer):
+        return True
+    return False
+
+
+def parse_local_representative_output_for_batch(output_text):
+    text = (output_text or "").strip()
+    if not text:
+        return []
+
+    text = re.sub(r"^\s*```(?:json)?\s*", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"\s*```\s*$", "", text)
+
+    candidate_texts = [text]
+    array_start, array_end = text.find("["), text.rfind("]")
+    if array_start != -1 and array_end != -1 and array_end > array_start:
+        candidate_texts.append(text[array_start:array_end + 1])
+    obj_start, obj_end = text.find("{"), text.rfind("}")
+    if obj_start != -1 and obj_end != -1 and obj_end > obj_start:
+        obj_text = text[obj_start:obj_end + 1]
+        candidate_texts.append(obj_text)
+        candidate_texts.append(f"[{obj_text}]")
+
+    parsed_items = []
+    for candidate in candidate_texts:
+        try:
+            parsed = json.loads(candidate)
+        except Exception:
+            continue
+
+        rep_list = parsed
+        if isinstance(parsed, dict):
+            for key in ("representative_qa", "items", "data", "result"):
+                if isinstance(parsed.get(key), list):
+                    rep_list = parsed.get(key)
+                    break
+
+        if isinstance(rep_list, dict):
+            rep_list = [rep_list]
+        if not isinstance(rep_list, list):
+            continue
+
+        for item in rep_list:
+            normalized_item = normalize_local_representative_item_for_batch(item)
+            if normalized_item is not None and not is_low_value_representative_for_batch(normalized_item):
+                parsed_items.append(normalized_item)
+
+        if parsed_items or rep_list == []:
+            break
+
+    unique_items = []
+    seen = set()
+    for item in parsed_items:
+        key = (
+            normalize_compare_text(item["representative_question"]),
+            normalize_compare_text(item["representative_answer"]),
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        unique_items.append(item)
+    return unique_items
+
+
+def select_representative_qa_for_batch(cluster_qa_list, client, config):
+    if not cluster_qa_list:
+        return []
+
+    local_select_system_prompt = """你是客服知识库代表问答筛选助手。
+你的任务是从同一语义簇里的多个问答中，选出 1 到 2 个代表问答。
+
+硬性规则：
+1. 优先保留表述清楚、答案完整的问答。
+2. 可以保留通用问答，也可以保留具体业务场景问答。
+3. 删除碎片问句、无明确答案、纯等待话术、纯转接话术。
+4. 若该簇没有合格问答，返回 []。
+5. 只能输出严格 JSON 数组，禁止解释和 Markdown 代码块。"""
+
+    local_select_user_prompt = """请从下面同一簇问答中，挑选 1 到 2 个代表问答。
+
+筛选标准：
+- 问题必须是完整、可读的问句。
+- 如果问题是具体产品、具体号码场景、具体部门或具体月份，也可以保留。
+- 答案必须完整，且不能只是“请稍等”“已转接”“待核实”。
+- 如果多个问答表达同一意思，只保留更完整、更清楚的那个。
+- 如果该簇都不合格，返回 []。
+
+示例1
+输入簇：
+Q: 需要邀请集团
+A: 请稍等
+
+Q: 通过 APP 办理副卡报错怎么办？
+A: 如果通过 APP 办理副卡报错，建议咨询公客销进一步核实。
+
+正确输出：
+[{{"representative_question": "通过 APP 办理副卡报错怎么办？", "representative_answer": "如果通过 APP 办理副卡报错，建议咨询公客销进一步核实。"}}]
+
+示例2
+输入簇：
+Q: 欠费前有没有提醒
+A: 已转接后台核查
+
+Q: 需要邀请集团
+A: 请稍等
+
+正确输出：
+[]
+
+现在处理以下簇：
+{cluster_qa_text}
+
+只输出 JSON 数组："""
+
+    qa_to_use = cluster_qa_list if config.max_cluster_qa_count is None else cluster_qa_list[:config.max_cluster_qa_count]
+    cluster_qa_text = "\n".join([f"Q: {qa['question']}\nA: {qa['answer']}" for qa in qa_to_use])
+    formatted_input = cluster_qa_text[:config.max_input_length]
+    prompt = local_select_user_prompt.format(cluster_qa_text=formatted_input)
+
+    for attempt in range(1, config.local_max_attempts + 1):
+        try:
+            response = client.chat.completions.create(
+                model=config.selector_model_name,
+                messages=[
+                    {"role": "system", "content": local_select_system_prompt},
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=config.local_temperature,
+                max_tokens=config.local_selector_max_tokens,
+                top_p=config.local_top_p,
+                presence_penalty=config.local_presence_penalty,
+                frequency_penalty=config.local_frequency_penalty,
+                timeout=config.local_timeout,
+            )
+            output = (response.choices[0].message.content or "").strip()
+            print_model_raw_output("batch_local_qa_select", output)
+            output = re.sub(r'(\<think\>[\s\S]*?\<\/think\>)|(\<\|thinking\|\>[\s\S]*?\<\/\|thinking\|\>)', '', output)
+            return parse_local_representative_output_for_batch(output)
+        except Exception as exc:
+            if is_retryable_api_exception(exc) and attempt < config.local_max_attempts:
+                time.sleep(0.8 * attempt)
+                continue
+            report_api_exception(
+                "本地代表性 QA 筛选",
+                exc,
+                request_url=f"{config.selector_base_url.strip()}/chat/completions",
+            )
+            return []
 
 
 def print_model_raw_output(scene, output_text):
@@ -694,6 +1833,365 @@ def auto_init_knowledge_base():
         
         st.success(f"✅ 知识库初始化成功！当前知识库包含 {len(kb.knowledge_base)} 个问答对")
 
+
+def render_batch_processing_tab():
+    st.subheader("📦 分批处理")
+    st.caption("按当前“开始处理”主流程分批执行：每批固定 30 条，对该批单独抽 QA、单独聚类、单独筛代表 QA。")
+
+    batch_excel_path = st.text_input(
+        "批处理 Excel 路径",
+        value=excel_path,
+        help="默认复用左侧的 Excel 路径。",
+        key="batch_processing_excel_path",
+    )
+
+    if not os.path.exists(batch_excel_path):
+        st.warning("当前 Excel 路径不存在，请先确认文件路径。")
+        return
+
+    try:
+        all_dialogs, dialog_column = load_dialogs_from_excel(batch_excel_path, row_limit=None)
+    except Exception as exc:
+        st.error(f"读取 Excel 失败：{str(exc)}")
+        return
+
+    total_dialogs = len(all_dialogs)
+    resume_job_candidates = list_resume_batch_job_dirs(batch_excel_path)
+    with st.expander("加载已有断点任务", expanded=False):
+        if resume_job_candidates:
+            resume_options = {item["label"]: item for item in resume_job_candidates}
+            selected_resume_label = st.selectbox(
+                "选择任务目录",
+                options=list(resume_options.keys()),
+                key="batch_processing_resume_dir_selector",
+            )
+            if st.button("加载选定任务目录", key="batch_processing_load_resume_dir"):
+                selected_resume = resume_options[selected_resume_label]
+                selected_manifest = selected_resume["manifest"]
+                st.session_state["batch_processing_job_dir"] = selected_resume["job_dir"]
+                selection_mode = selected_manifest.get("batch_selection_mode")
+                if selection_mode in {"只处理指定批次", "处理批次范围", "处理全部未完成批次"}:
+                    st.session_state["batch_processing_selection_mode"] = selection_mode
+                if selected_manifest.get("selected_batch_no") is not None:
+                    st.session_state["batch_processing_selected_batch_no"] = int(selected_manifest["selected_batch_no"])
+                if selected_manifest.get("selected_batch_start_no") is not None:
+                    st.session_state["batch_processing_selected_batch_start_no"] = int(selected_manifest["selected_batch_start_no"])
+                if selected_manifest.get("selected_batch_end_no") is not None:
+                    st.session_state["batch_processing_selected_batch_end_no"] = int(selected_manifest["selected_batch_end_no"])
+                st.session_state["batch_processing_auto_new_result_dir"] = False
+                st.session_state["batch_processing_force_rerun_target_batches"] = False
+                st.success(f"已加载断点任务目录：{selected_resume['job_dir']}")
+                st.rerun()
+        else:
+            st.caption("当前 Excel 暂无可加载的断点任务目录。")
+
+    batch_ranges = build_fixed_batch_ranges(total_dialogs, batch_size=30)
+    batch_selection_mode = st.radio(
+        "批次选择",
+        ["只处理指定批次", "处理批次范围", "处理全部未完成批次"],
+        index=0,
+        horizontal=True,
+        help="每批固定 30 条；选择范围后只会处理目标范围内未完成的批次。",
+        key="batch_processing_selection_mode",
+    )
+
+    selected_batch_no = 1
+    selected_batch_start_no = 1
+    selected_batch_end_no = 1
+    if batch_ranges:
+        if batch_selection_mode == "只处理指定批次":
+            selected_batch_no = st.number_input(
+                "指定批次编号",
+                min_value=1,
+                max_value=len(batch_ranges),
+                value=1,
+                step=1,
+                key="batch_processing_selected_batch_no",
+            )
+            selected_batch_start_no = int(selected_batch_no)
+            selected_batch_end_no = int(selected_batch_no)
+        elif batch_selection_mode == "处理批次范围":
+            range_col1, range_col2 = st.columns(2)
+            selected_batch_start_no = range_col1.number_input(
+                "起始批次编号",
+                min_value=1,
+                max_value=len(batch_ranges),
+                value=1,
+                step=1,
+                key="batch_processing_selected_batch_start_no",
+            )
+            selected_batch_end_no = range_col2.number_input(
+                "结束批次编号",
+                min_value=1,
+                max_value=len(batch_ranges),
+                value=min(1, len(batch_ranges)),
+                step=1,
+                key="batch_processing_selected_batch_end_no",
+            )
+            if int(selected_batch_end_no) < int(selected_batch_start_no):
+                st.error("结束批次编号不能小于起始批次编号。")
+                return
+        else:
+            selected_batch_start_no = 1
+            selected_batch_end_no = len(batch_ranges)
+
+    only_selected_batch = batch_selection_mode == "只处理指定批次"
+    selected_batch_range_enabled = batch_selection_mode == "处理批次范围"
+    active_batch_ranges = [
+        batch_range for batch_range in batch_ranges
+        if (
+            batch_selection_mode == "处理全部未完成批次"
+            or (
+                batch_selection_mode == "只处理指定批次"
+                and batch_range["batch_no"] == int(selected_batch_no)
+            )
+            or (
+                batch_selection_mode == "处理批次范围"
+                and int(selected_batch_start_no) <= batch_range["batch_no"] <= int(selected_batch_end_no)
+            )
+        )
+    ]
+    if active_batch_ranges:
+        selected_range = active_batch_ranges[0]
+        selected_end_range = active_batch_ranges[-1]
+        st.caption(
+            f"本次目标：第 {selected_range['batch_no']}-{selected_end_range['batch_no']} 批，"
+            f"覆盖第 {selected_range['start_index']}-{selected_end_range['end_index']} 条对话。"
+        )
+
+    default_job_dir = get_default_batch_job_dir(batch_excel_path)
+    batch_job_dir = st.text_input(
+        "批处理结果目录",
+        value=default_job_dir,
+        help="该目录下会保存每批结果和汇总结果。",
+        key="batch_processing_job_dir",
+    )
+    auto_new_result_dir = st.checkbox(
+        "每次启动使用新的结果目录",
+        value=True,
+        help="开启后点击“开始/继续分批处理”会自动在目录后追加时间戳，避免旧结果污染。",
+        key="batch_processing_auto_new_result_dir",
+    )
+    force_rerun_target_batches = st.checkbox(
+        "强制重跑当前目标批次（会清除该批旧结果）",
+        value=False,
+        help="仅用于测试。开启后会删除当前目标批次目录，并重新抽取、聚类、筛选代表 QA；其他批次结果不受影响。",
+        key="batch_processing_force_rerun_target_batches",
+    )
+
+    completed_batch_count = 0
+    next_batch_range = None
+    for batch_range in active_batch_ranges:
+        batch_dir = get_batch_result_dir(batch_job_dir, batch_range)
+        if is_complete_result_dir(batch_dir):
+            completed_batch_count += 1
+        elif next_batch_range is None:
+            next_batch_range = batch_range
+
+    job_manifest = load_job_manifest(batch_job_dir) if os.path.isdir(batch_job_dir) else {}
+    job_pid = job_manifest.get("pid")
+    job_alive = bool(job_pid and is_process_alive(job_pid))
+    job_status = job_manifest.get("status", "idle")
+    if job_manifest and job_status in {"running", "paused"} and not job_alive:
+        if is_complete_result_dir(batch_job_dir):
+            job_status = "completed"
+        else:
+            job_status = "stopped"
+        save_job_manifest(batch_job_dir, {
+            **job_manifest,
+            "status": job_status,
+            "updated_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        })
+        job_manifest = load_job_manifest(batch_job_dir)
+
+    st.info(f"当前 Excel 共 {total_dialogs} 条对话，对话列：{dialog_column}。")
+    metric_col1, metric_col2, metric_col3, metric_col4 = st.columns(4)
+    metric_col1.metric("固定批大小", 30)
+    metric_col2.metric("本次目标批次", len(active_batch_ranges))
+    metric_col3.metric("已完成批次", completed_batch_count)
+    metric_col4.metric(
+        "任务状态",
+        "运行中" if job_alive and job_status == "running" else ("已暂停" if job_alive and job_status == "paused" else job_status),
+    )
+
+    overall_ratio = float(job_manifest.get("overall_progress", completed_batch_count / len(active_batch_ranges) if active_batch_ranges else 1.0))
+    st.progress(max(0.0, min(1.0, overall_ratio)))
+    if next_batch_range is not None:
+        st.caption(
+            f"下一个待处理批次：第 {next_batch_range['batch_no']}/{len(batch_ranges)} 批，"
+            f"范围 {next_batch_range['start_index']}-{next_batch_range['end_index']}"
+        )
+    elif active_batch_ranges:
+        st.caption("当前目标批次已完成。")
+        if not force_rerun_target_batches:
+            st.warning("当前目标批次已经完成，点击“开始/继续分批处理”会被跳过。请选择其他批次，或勾选“强制重跑当前目标批次”。")
+
+    if job_manifest:
+        st.caption(
+            f"任务状态：{job_manifest.get('status', 'unknown')} | "
+            f"上次更新时间：{job_manifest.get('updated_at', '')}"
+        )
+        if job_manifest.get("current_batch_no"):
+            st.caption(
+                f"当前批次：第 {job_manifest.get('current_batch_no')}/{len(batch_ranges)} 批，"
+                f"范围 {job_manifest.get('current_batch_start_index')}-{job_manifest.get('current_batch_end_index')} | "
+                f"阶段：{job_manifest.get('current_stage', '')}"
+            )
+        if job_manifest.get("current_batch_total_dialogs"):
+            st.progress(max(0.0, min(1.0, float(job_manifest.get("current_batch_progress", 0.0)))))
+            st.caption(
+                f"当前批进度：{job_manifest.get('current_batch_processed_dialogs', 0)}/"
+                f"{job_manifest.get('current_batch_total_dialogs', 0)}"
+            )
+
+    btn_col1, btn_col2, btn_col3 = st.columns(3)
+    run_batch_processing_button = btn_col1.button(
+        "开始/继续分批处理",
+        type="primary",
+        use_container_width=True,
+        key="run_batch_processing_button",
+    )
+    pause_batch_processing_button = btn_col2.button(
+        "暂停处理",
+        use_container_width=True,
+        key="pause_batch_processing_button",
+        disabled=not job_alive or job_status != "running",
+    )
+    refresh_batch_processing_button = btn_col3.button(
+        "刷新任务状态",
+        use_container_width=True,
+        key="refresh_batch_processing_button",
+    )
+
+    if refresh_batch_processing_button:
+        st.rerun()
+
+    if pause_batch_processing_button:
+        try:
+            os.kill(int(job_pid), signal.SIGSTOP)
+            save_job_manifest(batch_job_dir, {
+                **job_manifest,
+                "status": "paused",
+                "updated_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            })
+            st.success("✅ 已暂停分批处理")
+        except Exception as exc:
+            st.error(f"❌ 暂停失败: {str(exc)}")
+        return
+
+    if not run_batch_processing_button:
+        return
+
+    if qa_extract_model_source == "线上模型" and not api_key:
+        st.error("❌ 请提供 API Key")
+        return
+    if qa_extract_model_source == "本地模型":
+        if not (local_qa_base_url or "").strip():
+            st.error("❌ 请选择本地模型时提供本地 QA API 地址")
+            return
+        if not local_qa_api_key:
+            st.error("❌ 请选择本地模型时提供本地 QA API Key")
+            return
+        if not (local_qa_model_name or "").strip():
+            st.error("❌ 请选择本地模型时提供本地 QA 模型名")
+            return
+
+    os.makedirs(batch_job_dir, exist_ok=True)
+    os.makedirs(os.path.join(batch_job_dir, "batches"), exist_ok=True)
+    ensure_result_output_dirs(batch_job_dir)
+
+    effective_batch_job_dir = batch_job_dir
+    if auto_new_result_dir:
+        ts = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        effective_batch_job_dir = f"{batch_job_dir}_{ts}"
+        st.info(f"本次将写入新目录：{effective_batch_job_dir}")
+        if job_alive and job_status in {"running", "paused"}:
+            st.info("已勾选“每次启动使用新的结果目录”，本次不会继续旧任务，而是新建时间戳目录运行。")
+    else:
+        if job_alive and job_status == "paused":
+            try:
+                os.kill(int(job_pid), signal.SIGCONT)
+                save_job_manifest(batch_job_dir, {
+                    **job_manifest,
+                    "status": "running",
+                    "updated_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                })
+                st.success("✅ 已继续分批处理")
+            except Exception as exc:
+                st.error(f"❌ 继续失败: {str(exc)}")
+            return
+
+        if job_alive and job_status == "running":
+            st.info("当前分批任务已在后台运行。")
+            return
+
+        target_batches_complete = bool(active_batch_ranges) and completed_batch_count == len(active_batch_ranges)
+        if target_batches_complete and not force_rerun_target_batches:
+            st.warning("目标批次已完成，未启动 worker。请选择其他批次，或勾选“强制重跑当前目标批次”。")
+            return
+
+        if force_rerun_target_batches:
+            removed_batch_count = 0
+            for batch_range in active_batch_ranges:
+                batch_dir = get_batch_result_dir(batch_job_dir, batch_range)
+                if os.path.isdir(batch_dir):
+                    shutil.rmtree(batch_dir)
+                    removed_batch_count += 1
+            if removed_batch_count:
+                aggregate_batch_job_results(batch_job_dir)
+                completed_batch_count = 0
+                st.info(f"已清除 {removed_batch_count} 个目标批次旧结果，将重新处理。")
+
+    try:
+        os.makedirs(effective_batch_job_dir, exist_ok=True)
+        os.makedirs(os.path.join(effective_batch_job_dir, "batches"), exist_ok=True)
+        ensure_result_output_dirs(effective_batch_job_dir)
+
+        runtime_config = build_runtime_config(effective_batch_job_dir, batch_excel_path, None)
+        job_config_path = os.path.join(effective_batch_job_dir, "job_config.json")
+        save_json_safe({
+            "excel_path": batch_excel_path,
+            "batch_size": 30,
+            "batch_selection_mode": batch_selection_mode,
+            "only_selected_batch": bool(only_selected_batch),
+            "selected_batch_no": int(selected_batch_no) if only_selected_batch else None,
+            "selected_batch_start_no": int(selected_batch_start_no) if selected_batch_range_enabled else None,
+            "selected_batch_end_no": int(selected_batch_end_no) if selected_batch_range_enabled else None,
+            "runtime_config": runtime_config.__dict__,
+        }, job_config_path, "批处理任务配置")
+
+        worker_script = os.path.join(os.path.dirname(__file__), "batch_pipeline_worker.py")
+        worker_env = os.environ.copy()
+        worker_env.setdefault("QA_DEBUG_TRACE", "1")
+        worker_env.setdefault("QA_DEBUG_TRACE_PROMPT", "0")
+        worker_env.setdefault("QA_DEBUG_TRACE_FILE_AUTO", "1")
+        process = subprocess.Popen(
+            [sys.executable, worker_script, "--job-dir", effective_batch_job_dir],
+            cwd=os.path.dirname(os.path.abspath(__file__)),
+            env=worker_env,
+            start_new_session=True,
+        )
+        save_job_manifest(effective_batch_job_dir, {
+            "excel_path": batch_excel_path,
+            "dialog_column": dialog_column,
+            "total_dialogs": total_dialogs,
+            "batch_size": 30,
+            "total_batches": len(active_batch_ranges),
+            "all_batches_in_excel": len(batch_ranges),
+            "batch_selection_mode": batch_selection_mode,
+            "only_selected_batch": bool(only_selected_batch),
+            "selected_batch_no": int(selected_batch_no) if only_selected_batch else None,
+            "selected_batch_start_no": int(selected_batch_start_no) if selected_batch_range_enabled else None,
+            "selected_batch_end_no": int(selected_batch_end_no) if selected_batch_range_enabled else None,
+            "completed_batches": completed_batch_count,
+            "pid": process.pid,
+            "status": "running",
+            "updated_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        })
+        st.success(f"✅ 已启动后台分批处理，PID={process.pid}，目录：{effective_batch_job_dir}")
+    except Exception as exc:
+        st.error(f"❌ 启动分批处理失败: {str(exc)}")
+
 # ==================== 4. Tab1: 结果展示 ====================
 with tab1:
     # 初始化 session state
@@ -706,7 +2204,7 @@ with tab1:
         st.session_state.result_dir = None
 
     # 检测结果目录
-    result_dirs = [d for d in os.listdir('.') if d.startswith('data_test_result_') and os.path.isdir(d)]
+    result_dirs = list_displayable_result_dirs()
     if result_dirs:
         with st.expander("📁 历史结果", expanded=True):
             selected_dir = st.selectbox("选择历史结果", sorted(result_dirs, reverse=True), index=0)
@@ -754,6 +2252,42 @@ with tab1:
         status_placeholder = st.empty()
         progress_bar = st.progress(0)
         status_placeholder.info("🚀 开始处理...")
+
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        result_dir = f"./data_test_result_{timestamp}"
+        config = build_runtime_config(result_dir, excel_path, excel_row_limit)
+
+        try:
+            status_placeholder.info(f"📂 读取 Excel 文件: {excel_path}")
+            dialog_texts, dialog_column = load_dialogs_from_excel(config.excel_path, config.excel_row_limit)
+            status_placeholder.success(
+                f"✅ 成功加载 {len(dialog_texts)} 条对话记录（对话列：{dialog_column}）"
+            )
+        except Exception as exc:
+            st.error(f"❌ 读取 Excel 失败: {str(exc)}")
+            st.stop()
+
+        results = run_exact_processing_pipeline(
+            config=config,
+            dialog_texts=dialog_texts,
+            dialog_indices=list(range(1, len(dialog_texts) + 1)),
+            result_dir=config.result_dir,
+            status_placeholder=status_placeholder,
+            progress_bar=progress_bar,
+            dialog_column=dialog_column,
+            resume_existing=False,
+            info_reporter=st.info,
+        )
+
+        st.session_state.processing_results = results
+        st.session_state.stats = results["stats"]
+        st.session_state.representative_qa = results["representative_qa"]
+        st.session_state.clusters = results["clusters"]
+        st.session_state.processing_time = results["stats"]["processing_time_seconds"]
+        st.session_state.result_dir = results["result_dir"]
+        st.rerun()
+        # 当前“开始处理”实际走上面的共享 runtime；下面保留的是历史实现，已不再进入。
+        st.stop()
         
         # 创建配置对象
         class StreamlitConfig:
@@ -784,6 +2318,7 @@ with tab1:
                 self.dynamic_eps_coefficient = dynamic_eps_coefficient
                 self.min_eps_value = min_eps_value
                 self.max_eps_value = max_eps_value
+                self.enable_cluster_zero_split = enable_cluster_zero_split
                 
                 # 嵌入模型参数 - 简化配置
                 self.embedding_dim = 768
@@ -796,12 +2331,12 @@ with tab1:
                 self.top_p = top_p
                 self.local_temperature = 0.0
                 self.local_top_p = 1.0
-                self.local_max_tokens = 384
+                self.local_max_tokens = 1536
                 self.local_presence_penalty = 0.0
                 self.local_frequency_penalty = 0.0
                 self.local_timeout = 45
                 self.local_max_attempts = 2
-                self.local_selector_max_tokens = 512
+                self.local_selector_max_tokens = 1024
                 
                 # 数据处理参数
                 self.min_dialog_length = min_dialog_length
@@ -869,20 +2404,18 @@ with tab1:
 提取的问答对："""
 
                 shared_extract_rules = (
-                    "1. 只保留脱离当前会话也能成立、且最终可以写入知识库的知识型 QA：业务规则、办理条件、失败原因、查询结论、费用口径、功能点处理依据、是否可办理/续约/顺延。\n"
-                    "2. 答案必须包含明确业务知识，例如原因、规则、条件、结论、依据；不能只有处理动作。\n"
-                    "3. 如果答案只是当前会话中的客服反馈、临时状态、查询过程或处理动作，一律删除。例如：我这边查不到、没有短信、请稍等、已转接、需后台处理、需派单核查。\n"
-                    "4. 答案可综合整段对话中的有效回复，不要求紧跟在问题后；但只能基于原对话，不得臆造。\n"
-                    "5. 删除补资料、提单、关注工单、已处理请查看、等待转接、内部协同、纯确认、纯重复客户原话等低价值内容。\n"
-                    "6. 删除手机号、姓名、工号、具体客户、具体当前订单等个案标识；产品名、业务名、规则条件、报错文案、功能点可以保留。\n"
-                    "7. 如果答案没有新增知识，或者这条问答不能帮助其他用户解决同类问题，则不保留；没有合格结果返回 []。\n"
-                    "8. 只能输出最终 JSON 数组，禁止输出思考过程、解释、分析、<think> 标签或 Markdown。"
+                    "1. 只保留脱离当前会话也能成立的知识型 QA：业务规则、办理条件、失败原因、处理路径、查询结论、费用/优先级口径，请注意！一定要确保QA能复用。\n"
+                    "2. 答案可综合整段对话中的有效回复，不要求紧跟在问题后；但只能基于原对话，不得臆造。\n"
+                    "3. 删除补资料、提单、关注工单、已处理请查看、等待转接、内部协同、纯确认等低价值话术。\n"
+                    "4. 不保留仅在当前会话语境下成立的客服反馈，如“我这边查不到”“没有短信”“需后台处理”。\n"
+                    "5. 删除手机号、姓名、工号、具体客户等个案标识；产品名、业务名、规则条件可以保留。\n"
+                    "6. 如果答案没有新增知识，或问答只是重复/推进会话，不保留；没有合格结果返回 []。\n"
                 )
 
                 self.local_direct_system_prompt = (
                     "你是客服知识库 QA 高精度抽取助手。\n"
                     "你的任务是从单条客服对话中直接提取最终可以写入知识库的知识型问答。\n"
-                    "你必须优先保证精度，宁可少抽，也不要保留不具备知识库价值的问答。\n"
+                    "你必须优先保证精度，宁可少抽，也不要保留不具备知识库价值的问答，高价值的问答是指，该问答具有广泛的适用性和复用价值，如果问答提及了用户的个人信息或者提及了用户套餐的信息，这样的问答不具备知识库价值。\n"
                     "直接输出最终结果，不要输出思考过程。\n\n"
                     "规则：\n"
                     + shared_extract_rules
@@ -1336,7 +2869,7 @@ with tab1:
                 for qa in qa_pairs:
                     qa_text = json.dumps([qa], ensure_ascii=False, indent=2)
                     prompt = self.local_generic_user_prompt.format(qa_text=qa_text)
-                    output = self._call_local_model(self.local_generic_system_prompt, prompt, max_tokens=196)
+                    output = self._call_local_model(self.local_generic_system_prompt, prompt, max_tokens=768)
                     if output is None:
                         genericized_pairs.append(qa)
                         continue
@@ -1491,6 +3024,8 @@ A: 请稍等
                     return True
                 if re.search(r"^(请稍等|稍等)$", question):
                     return True
+                if is_case_specific_query_result_qa(question, answer):
+                    return True
                 return False
 
             def _parse_local_representative_output(self, output_text):
@@ -1580,6 +3115,151 @@ A: 请稍等
                             request_url=f"{self.config.selector_base_url.strip()}/chat/completions"
                         )
                         return None
+
+            def _normalize_cluster_label(self, label):
+                """尽量将簇标签标准化为 int，无法转换时保留原值。"""
+                if isinstance(label, (np.integer, int)):
+                    return int(label)
+                if isinstance(label, str):
+                    text = label.strip()
+                    if text.lstrip("-").isdigit():
+                        return int(text)
+                return label
+
+            def _resolve_cluster_zero_label(self, clusters):
+                """兼容 int/str 混用场景，定位代表簇0的原始 key。"""
+                if 0 in clusters:
+                    return 0
+                if "0" in clusters:
+                    return "0"
+                for label in clusters.keys():
+                    normalized = self._normalize_cluster_label(label)
+                    if normalized == 0:
+                        return label
+                return None
+
+            def _extract_intent_type(self, question):
+                text = normalize_compare_text(question)
+                if not text:
+                    return "其他类"
+                if re.search(r"(如何处理|怎么办|怎么处理|如何解决|怎么解决)", text):
+                    return "处理类"
+                if re.search(r"(是否正常|能否|可以吗|能不能|是否可以|是否可)", text):
+                    return "判断类"
+                if re.search(r"(如何查询|怎么查询|如何核实|怎么核实|查询)", text):
+                    return "查询类"
+                if "为什么" in text:
+                    return "原因类"
+                return "其他类"
+
+            def _extract_primary_biz_keyword(self, question):
+                text = normalize_compare_text(question)
+                if not text:
+                    return "通用"
+                # 可扩展关键词表，按顺序匹配首个关键词，避免分桶过细
+                keywords = [
+                    "停机保号", "未竣工", "短信费", "流量", "固网", "合约", "融合", "撤机",
+                    "套餐", "返销", "解约", "无权限", "次月", "未生效", "已下架", "渠道不同",
+                ]
+                for kw in keywords:
+                    if kw in text:
+                        return kw
+                return "通用"
+
+            def _bucket_key_for_cluster_zero(self, question):
+                # 仅使用 intent + 业务关键词，避免因限制词维度过严导致过分拆分
+                return (self._extract_intent_type(question), self._extract_primary_biz_keyword(question))
+
+            def _split_cluster_zero(self, clusters):
+                """
+                第一次全量聚类后，仅对簇0做二次切分。
+                二次切分偏温和：先分桶，再在桶内使用较宽松参数做 DBSCAN。
+                """
+                zero_label = self._resolve_cluster_zero_label(clusters)
+                if zero_label is None:
+                    return clusters
+
+                zero_items = clusters.get(zero_label, [])
+                if not isinstance(zero_items, list) or len(zero_items) < 6:
+                    return clusters
+
+                bucket_map = {}
+                for qa in zero_items:
+                    question = qa.get("question", "")
+                    bucket_key = self._bucket_key_for_cluster_zero(question)
+                    bucket_map.setdefault(bucket_key, []).append(qa)
+
+                sub_clusters = []
+                for bucket_items in bucket_map.values():
+                    # 小桶直接保留，避免过度切分
+                    if len(bucket_items) <= 3:
+                        sub_clusters.append(bucket_items)
+                        continue
+
+                    questions = [item.get("question", "") for item in bucket_items]
+                    embeddings = [self.embedding_generator.get_embedding(q) for q in questions]
+                    embeddings = np.array(embeddings)
+                    if len(embeddings) <= 1:
+                        sub_clusters.append(bucket_items)
+                        continue
+
+                    distance_matrix = cosine_distances(embeddings)
+                    upper_triangle = distance_matrix[np.triu_indices_from(distance_matrix, k=1)]
+                    if upper_triangle.size == 0:
+                        sub_clusters.append(bucket_items)
+                        continue
+
+                    bucket_median = float(np.median(upper_triangle))
+                    # 温和再分簇：比全量稍严格，但不激进，避免碎裂
+                    second_coeff = max(0.45, min(0.85, float(self.config.dynamic_eps_coefficient) * 0.85))
+                    second_min_eps = max(0.08, float(self.config.min_eps_value))
+                    second_max_eps = min(0.65, max(float(self.config.max_eps_value), 0.5))
+                    second_eps = max(second_min_eps, min(second_max_eps, bucket_median * second_coeff))
+                    second_min_samples = max(2, int(self.config.dbscan_min_samples))
+
+                    dbscan = DBSCAN(
+                        eps=second_eps,
+                        min_samples=second_min_samples,
+                        metric=self.config.clustering_metric
+                    )
+                    labels = dbscan.fit_predict(embeddings)
+
+                    grouped = {}
+                    noise_items = []
+                    for idx, label in enumerate(labels):
+                        normalized = self._normalize_cluster_label(label)
+                        if normalized == -1:
+                            noise_items.append(bucket_items[idx])
+                            continue
+                        grouped.setdefault(normalized, []).append(bucket_items[idx])
+
+                    for group in grouped.values():
+                        sub_clusters.append(group)
+                    if noise_items:
+                        # 同桶噪声合并为一个子簇，避免分裂过细
+                        sub_clusters.append(noise_items)
+
+                # 如果没有产生有效拆分，保持原簇0
+                if len(sub_clusters) <= 1:
+                    return clusters
+
+                refined_clusters = {}
+                for label, qa_list in clusters.items():
+                    if label == zero_label:
+                        continue
+                    refined_clusters[self._normalize_cluster_label(label)] = qa_list
+
+                numeric_labels = [
+                    int(label) for label in refined_clusters.keys()
+                    if isinstance(label, (int, np.integer)) and int(label) >= 0
+                ]
+                next_label = (max(numeric_labels) + 1) if numeric_labels else 1
+                for sub_cluster in sub_clusters:
+                    refined_clusters[next_label] = sub_cluster
+                    next_label += 1
+
+                st.info(f"🧩 簇0二次切分完成：由 1 个簇拆分为 {len(sub_clusters)} 个子簇（温和模式）")
+                return refined_clusters
             
             def cluster_qa_pairs(self, all_qa_pairs):
                 if len(all_qa_pairs) < 2:
@@ -1620,9 +3300,14 @@ A: 请稍等
                 # 3. 整理聚类结果
                 clusters = {}
                 for idx, label in enumerate(labels):
-                    if label not in clusters:
-                        clusters[label] = []
-                    clusters[label].append(all_qa_pairs[idx])
+                    normalized_label = self._normalize_cluster_label(label)
+                    if normalized_label not in clusters:
+                        clusters[normalized_label] = []
+                    clusters[normalized_label].append(all_qa_pairs[idx])
+
+                # 4. 可选：仅对簇0进行二次切分（不影响其他簇）
+                if self.config.enable_cluster_zero_split:
+                    clusters = self._split_cluster_zero(clusters)
                 
                 status_placeholder.success(f"✅ 聚类完成，共生成 {len(clusters)} 个簇（标签 -1 为噪声簇）")
                 return clusters
@@ -1717,15 +3402,10 @@ A: 请稍等
             status_placeholder.info(f"📂 读取 Excel 文件: {excel_path}")
             
             try:
-                df = pd.read_excel(config.excel_path, usecols=[3])  # 读取 D 列
-                df.columns = ['dialog']
-                
-                if config.excel_row_limit is None:
-                    dialog_texts = df['dialog'].dropna().astype(str).tolist()
-                else:
-                    dialog_texts = df['dialog'].dropna().astype(str).head(config.excel_row_limit).tolist()
-                
-                status_placeholder.success(f"✅ 成功加载 {len(dialog_texts)} 条对话记录")
+                dialog_texts, dialog_column = load_dialogs_from_excel(config.excel_path, config.excel_row_limit)
+                status_placeholder.success(
+                    f"✅ 成功加载 {len(dialog_texts)} 条对话记录（对话列：{dialog_column}）"
+                )
             except Exception as e:
                 st.error(f"❌ 读取 Excel 失败: {str(e)}")
                 st.stop()
@@ -1800,7 +3480,7 @@ A: 请稍等
                 
                 if representative_qa:
                     final_representative_qa.extend(representative_qa)
-                elif config.use_backup_strategy and cluster_qa:
+                elif config.use_backup_strategy and cluster_qa and not should_skip_backup_first_qa(cluster_qa[0]):
                     final_representative_qa.append({
                         "representative_question": cluster_qa[0]["question"],
                         "representative_answer": cluster_qa[0]["answer"]
@@ -2102,7 +3782,7 @@ with tab2:
     # 1. 加载历史结果和知识库操作区
     col1, col2 = st.columns([2, 1])
     with col1:
-        result_dirs = [d for d in os.listdir('.') if d.startswith('data_test_result_') and os.path.isdir(d)]
+        result_dirs = list_kb_importable_result_dirs()
         if result_dirs:
             selected_dir = st.selectbox("选择要导入的历史结果", sorted(result_dirs, reverse=True), index=0)
             if st.button("加载结果", key="kb_load"):
@@ -2774,6 +4454,10 @@ with tab2:
             st.warning("⚠️ 知识库正在初始化中，请稍候...")
         if not st.session_state.kb_analysis_results:
             st.info("ℹ️ 请先选择并加载历史分析结果")
+
+with tab3:
+    render_batch_processing_tab()
+
 # ==================== 6. 页脚 ====================
 st.markdown("---")
 st.markdown("""

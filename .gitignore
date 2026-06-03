@@ -1,0 +1,30 @@
+# 备份文件
+*.tar.gz
+*.bak
+*.bak.*
+*.backup
+
+# 运行结果
+batch_extract_test_runs/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# 数据文件
+data_test/
+data_test_result_*/
+
+# 环境
+.env
+*.log
+
+# 大文件
+*.zip
+*.tar
+
+# IDE
+.idea/
+.vscode/
+*.swp
