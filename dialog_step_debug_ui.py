@@ -18,11 +18,15 @@ LOCAL_QA_DEFAULT_MODEL_NAME = "qa-extractor-qwen3"
 ONLINE_DEFAULT_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 ONLINE_DEFAULT_API_KEY = "sk-64987e1a5a82403b8f878a6c3939ad8a"
 ONLINE_MODEL_OPTIONS = ["qwen3-max", "qwen3-plus", "qwen3-turbo"]
-DEFAULT_EXCEL_PATH = "/home/majie/work/LtV1/data_test/2506_在线咨询-替换后.xlsx"
+DEFAULT_EXCEL_PATH = "/home/majie/work/LtV1/data_test/2507-在线客服.xlsx"
 
 
 def normalize_compare_text(value: Any) -> str:
     return re.sub(r"\s+", " ", str(value or "")).strip()
+
+
+def normalize_excel_column_name(value: Any) -> str:
+    return re.sub(r"\s+", "", str(value or "")).strip().lower()
 
 
 def classify_api_exception(exc: Exception) -> dict[str, Any]:
@@ -190,9 +194,37 @@ class DebugQAPairExtractor(SharedQAPairExtractor):
 
 
 def load_dialogs_from_excel(excel_path: str, row_limit: int | None) -> list[str]:
-    df = pd.read_excel(excel_path, usecols=[3])
-    df.columns = ["dialog"]
-    dialogs = df["dialog"].dropna().astype(str)
+    df = pd.read_excel(excel_path)
+    normalized_columns = {
+        normalize_excel_column_name(column): column
+        for column in df.columns
+    }
+    dialog_column_candidates = (
+        "专家对话内容",
+        "对话内容",
+        "清洗后对话",
+        "会话内容",
+        "聊天内容",
+        "聊天记录",
+        "对话",
+        "dialog",
+    )
+
+    dialog_column = None
+    for candidate in dialog_column_candidates:
+        normalized_candidate = normalize_excel_column_name(candidate)
+        if normalized_candidate in normalized_columns:
+            dialog_column = normalized_columns[normalized_candidate]
+            break
+
+    if dialog_column is None:
+        raise ValueError(
+            "未找到对话内容列。请确认 Excel 中包含以下列名之一："
+            + "、".join(dialog_column_candidates)
+        )
+
+    dialogs = df[dialog_column].dropna().astype(str)
+    dialogs = dialogs[dialogs.str.strip() != ""]
     if row_limit is not None:
         dialogs = dialogs.head(row_limit)
     return dialogs.tolist()
@@ -422,7 +454,7 @@ def render_dialog_step_debug_page(
         max_tokens=None,
         local_temperature=0.0,
         local_top_p=1.0,
-        local_max_tokens=384,
+        local_max_tokens=1536,
         local_presence_penalty=0.0,
         local_frequency_penalty=0.0,
         local_timeout=int(local_timeout),
